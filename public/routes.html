@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMS Application Map & Routes Reference</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(31, 41, 55, 0.3) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, rgba(17, 24, 39, 0.5) 0, transparent 50%);
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="text-slate-100 font-sans antialiased min-h-screen py-8 px-4 md:px-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
+            <div>
+                <span class="text-xs font-semibold tracking-wider text-indigo-400 uppercase">System Overview</span>
+                <h1 class="text-3xl md:text-4xl font-extrabold font-heading text-white tracking-tight mt-1">
+                    Application Map &amp; Routes
+                </h1>
+                <p class="text-slate-400 text-sm mt-2">
+                    Interactive guide for the PHP (Laravel 11) &amp; MySQL Serialized Inventory Management System.
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="http://127.0.0.1:8000" target="_blank" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-indigo-900/30 transition-all">
+                    Launch Application
+                </a>
+            </div>
+        </header>
+
+        <!-- Stats Overview Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="text-indigo-400 text-xs font-bold uppercase tracking-wider">Total Registered Routes</div>
+                <div class="text-4xl font-extrabold font-heading text-white mt-1">23</div>
+                <div class="text-slate-400 text-xs mt-1">Includes Web, API &amp; Scaffolding Auth</div>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="text-indigo-400 text-xs font-bold uppercase tracking-wider">Database Tables</div>
+                <div class="text-4xl font-extrabold font-heading text-white mt-1">6 Master Tables</div>
+                <div class="text-slate-400 text-xs mt-1">Fully configured in local MySQL</div>
+            </div>
+            <div class="glass-card p-6 rounded-2xl">
+                <div class="text-indigo-400 text-xs font-bold uppercase tracking-wider">Local Server Port</div>
+                <div class="text-4xl font-extrabold font-heading text-white mt-1">8000</div>
+                <div class="text-slate-400 text-xs mt-1">URL: http://127.0.0.1:8000</div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-6 relative">
+            <input type="text" id="routeSearch" onkeyup="filterRoutes()" placeholder="Search routes, methods, names, or components..." 
+                   class="w-full bg-slate-900/80 border border-slate-700 focus:border-indigo-500 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none transition-all">
+            <span class="absolute right-4 top-3.5 text-slate-500 text-sm">🔍 Filter</span>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex gap-2 mb-6 border-b border-slate-800 pb-px">
+            <button onclick="switchTab('routes-tab')" id="btn-routes-tab" class="tab-btn px-4 py-2 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all">
+                System Routes
+            </button>
+            <button onclick="switchTab('db-tab')" id="btn-db-tab" class="tab-btn px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition-all">
+                Database Schema
+            </button>
+            <button onclick="switchTab('commands-tab')" id="btn-commands-tab" class="tab-btn px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition-all">
+                Developer Cheat Sheet
+            </button>
+        </div>
+
+        <!-- TAB CONTENT: ROUTES -->
+        <div id="routes-tab" class="tab-content block">
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="routesTable">
+                        <thead>
+                            <tr class="bg-slate-950/60 border-b border-slate-800 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                <th class="py-4 px-6">Method</th>
+                                <th class="py-4 px-6">Route URI</th>
+                                <th class="py-4 px-6">Route Name</th>
+                                <th class="py-4 px-6">Description / Controller</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-sm">
+                            <!-- GENERAL -->
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/</td>
+                                <td class="py-4 px-6 text-slate-400">-</td>
+                                <td class="py-4 px-6 text-slate-300">Public landing welcome page</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/dashboard</td>
+                                <td class="py-4 px-6 text-indigo-400">dashboard</td>
+                                <td class="py-4 px-6 text-slate-300">
+                                    <span class="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded mr-2">Auth Required</span>
+                                    Returns the main dashboard view
+                                </td>
+                            </tr>
+
+                            <!-- PROFILE -->
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/profile</td>
+                                <td class="py-4 px-6 text-indigo-400">profile.edit</td>
+                                <td class="py-4 px-6 text-slate-300">
+                                    <span class="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded mr-2">Auth Required</span>
+                                    ProfileController@edit (Edit user info page)
+                                </td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30">PATCH</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/profile</td>
+                                <td class="py-4 px-6 text-indigo-400">profile.update</td>
+                                <td class="py-4 px-6 text-slate-300">
+                                    <span class="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded mr-2">Auth Required</span>
+                                    ProfileController@update (Saves details edits)
+                                </td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-rose-500/20 text-rose-400 border border-rose-500/30">DELETE</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/profile</td>
+                                <td class="py-4 px-6 text-indigo-400">profile.destroy</td>
+                                <td class="py-4 px-6 text-slate-300">
+                                    <span class="px-2 py-0.5 text-xs bg-red-500/20 text-red-400 border border-red-500/30 rounded mr-2">Auth Required</span>
+                                    ProfileController@destroy (Terminates user account)
+                                </td>
+                            </tr>
+
+                            <!-- REGISTRATION -->
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/register</td>
+                                <td class="py-4 px-6 text-indigo-400">register</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\RegisteredUserController@create (Account signup form)</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">POST</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/register</td>
+                                <td class="py-4 px-6 text-slate-400">-</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\RegisteredUserController@store (Processes new user registration)</td>
+                            </tr>
+
+                            <!-- LOGIN -->
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/login</td>
+                                <td class="py-4 px-6 text-indigo-400">login</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\AuthenticatedSessionController@create (Sign-in form)</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">POST</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/login</td>
+                                <td class="py-4 px-6 text-slate-400">-</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\AuthenticatedSessionController@store (Authenticates session)</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">POST</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/logout</td>
+                                <td class="py-4 px-6 text-indigo-400">logout</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\AuthenticatedSessionController@destroy (Terminates user session)</td>
+                            </tr>
+
+                            <!-- FORGOT PASSWORD -->
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/forgot-password</td>
+                                <td class="py-4 px-6 text-indigo-400">password.request</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\PasswordResetLinkController@create</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">POST</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/forgot-password</td>
+                                <td class="py-4 px-6 text-indigo-400">password.email</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\PasswordResetLinkController@store</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/reset-password/{token}</td>
+                                <td class="py-4 px-6 text-indigo-400">password.reset</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\NewPasswordController@create</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">POST</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/reset-password</td>
+                                <td class="py-4 px-6 text-indigo-400">password.store</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\NewPasswordController@store</td>
+                            </tr>
+
+                            <!-- EMAIL VERIFICATION -->
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/verify-email</td>
+                                <td class="py-4 px-6 text-indigo-400">verification.notice</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\EmailVerificationPromptController</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/verify-email/{id}/{hash}</td>
+                                <td class="py-4 px-6 text-indigo-400">verification.verify</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\VerifyEmailController</td>
+                            </tr>
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">POST</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/email/verification-notification</td>
+                                <td class="py-4 px-6 text-indigo-400">verification.send</td>
+                                <td class="py-4 px-6 text-slate-300">Auth\EmailVerificationNotificationController@store</td>
+                            </tr>
+
+                            <!-- SYSTEM CHECK -->
+                            <tr class="route-row hover:bg-slate-900/40 transition-all">
+                                <td class="py-4 px-6"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">GET</span></td>
+                                <td class="py-4 px-6 font-mono text-white text-base">/up</td>
+                                <td class="py-4 px-6 text-slate-400">-</td>
+                                <td class="py-4 px-6 text-slate-300">Laravel framework system status health check</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: DATABASE SCHEMA -->
+        <div id="db-tab" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Product Master -->
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold font-heading text-white border-b border-slate-800 pb-3 mb-4">1. Product Master (products)</h3>
+                    <ul class="space-y-2.5 font-mono text-sm">
+                        <li class="flex justify-between"><span class="text-slate-400">id</span> <span class="text-indigo-400">bigint (PK, Auto-increment)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">product_id</span> <span class="text-amber-400">varchar (Unique Code, e.g. A, B)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">product_name</span> <span class="text-slate-300">varchar</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">sku</span> <span class="text-amber-400">varchar (Unique index)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">fsn</span> <span class="text-slate-500">varchar (Nullable, Flipkart ID)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">asin</span> <span class="text-slate-500">varchar (Nullable, Amazon ID)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">updated_by</span> <span class="text-slate-500">varchar (Nullable, Editor User)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">created_at / updated_at</span> <span class="text-slate-500">datetime</span></li>
+                    </ul>
+                </div>
+
+                <!-- Purchase Master -->
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold font-heading text-white border-b border-slate-800 pb-3 mb-4">2. Purchase Master (purchases)</h3>
+                    <ul class="space-y-2.5 font-mono text-sm">
+                        <li class="flex justify-between"><span class="text-slate-400">id</span> <span class="text-indigo-400">bigint (PK)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">product_id</span> <span class="text-pink-400">bigint (FK -> products.id)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">date</span> <span class="text-slate-300">date (Purchase date)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">vendor_id</span> <span class="text-slate-300">varchar (Vendor Code)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">quantity</span> <span class="text-slate-300">int (Purchased quantity)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">price</span> <span class="text-slate-300">decimal (10,2)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">amount</span> <span class="text-slate-300">decimal (10,2) (Price * Qty)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">updated_by</span> <span class="text-slate-500">varchar</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">created_at / updated_at</span> <span class="text-slate-500">datetime</span></li>
+                    </ul>
+                </div>
+
+                <!-- Inward ItemCode Master -->
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold font-heading text-white border-b border-slate-800 pb-3 mb-4">3. Inward ItemCode Master (inward_item_codes)</h3>
+                    <ul class="space-y-2.5 font-mono text-sm">
+                        <li class="flex justify-between"><span class="text-slate-400">id</span> <span class="text-indigo-400">bigint (PK)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">product_id</span> <span class="text-pink-400">bigint (FK -> products.id)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">uid</span> <span class="text-amber-400">varchar (Unique serial e.g. Zig0001)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">quantity</span> <span class="text-slate-300">int (Default 1)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">status</span> <span class="text-slate-300">varchar (Good Inventory / Damaged)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">updated_by</span> <span class="text-slate-500">varchar</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">created_at / updated_at</span> <span class="text-slate-500">datetime</span></li>
+                    </ul>
+                </div>
+
+                <!-- SaleMaster -->
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold font-heading text-white border-b border-slate-800 pb-3 mb-4">4. SaleMaster (sales)</h3>
+                    <ul class="space-y-2.5 font-mono text-sm">
+                        <li class="flex justify-between"><span class="text-slate-400">id</span> <span class="text-indigo-400">bigint (PK)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">portal_id</span> <span class="text-slate-300">varchar (Amazon / Flipkart)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">product_id</span> <span class="text-pink-400">bigint (FK -> products.id)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">order_date</span> <span class="text-slate-300">date</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">quantity</span> <span class="text-slate-300">int (Sold count)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">updated_by</span> <span class="text-slate-500">varchar</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">created_at / updated_at</span> <span class="text-slate-500">datetime</span></li>
+                    </ul>
+                </div>
+
+                <!-- DispatchItemCode Master -->
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold font-heading text-white border-b border-slate-800 pb-3 mb-4">5. DispatchItemCode Master (dispatch_item_codes)</h3>
+                    <ul class="space-y-2.5 font-mono text-sm">
+                        <li class="flex justify-between"><span class="text-slate-400">id</span> <span class="text-indigo-400">bigint (PK)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">product_id</span> <span class="text-pink-400">bigint (FK -> products.id)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">uid</span> <span class="text-amber-400">varchar (Index -> inward_item_codes.uid)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">quantity</span> <span class="text-slate-300">int (Default -1)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">status</span> <span class="text-slate-300">varchar (Sold / Returned)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">updated_by</span> <span class="text-slate-500">varchar</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">created_at / updated_at</span> <span class="text-slate-500">datetime</span></li>
+                    </ul>
+                </div>
+
+                <!-- User Master -->
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-xl font-bold font-heading text-white border-b border-slate-800 pb-3 mb-4">6. User Master (users)</h3>
+                    <ul class="space-y-2.5 font-mono text-sm">
+                        <li class="flex justify-between"><span class="text-slate-400">id</span> <span class="text-indigo-400">bigint (PK)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">name</span> <span class="text-slate-300">varchar (Full Name)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">email</span> <span class="text-amber-400">varchar (UserID, Unique)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">password</span> <span class="text-slate-300">varchar (Hashed)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">status</span> <span class="text-slate-300">varchar (Active / Inactive)</span></li>
+                        <li class="flex justify-between"><span class="text-slate-400">created_at / updated_at</span> <span class="text-slate-500">datetime</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB CONTENT: COMMANDS -->
+        <div id="commands-tab" class="tab-content hidden">
+            <div class="glass-card p-8 rounded-2xl">
+                <h3 class="text-2xl font-bold font-heading text-white mb-6">Terminal Commands Cheatsheet</h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-semibold text-indigo-400 mb-2">1. Running the System Locally</h4>
+                        <p class="text-slate-400 text-sm mb-3">Run these commands in separate terminal tabs in your project folder:</p>
+                        <div class="bg-slate-950 p-4 rounded-xl font-mono text-sm border border-slate-800 space-y-2">
+                            <div><span class="text-emerald-400"># Start PHP backend server</span></div>
+                            <div class="text-white">php artisan serve</div>
+                            <div class="mt-4"><span class="text-emerald-400"># Compile styles in real-time</span></div>
+                            <div class="text-white">npm run dev</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-indigo-400 mb-2">2. Database Migration Commands</h4>
+                        <div class="bg-slate-950 p-4 rounded-xl font-mono text-sm border border-slate-800 space-y-2">
+                            <div><span class="text-emerald-400"># Run pending migrations</span></div>
+                            <div class="text-white">php artisan migrate</div>
+                            <div class="mt-4"><span class="text-emerald-400"># WIPE database and rebuild tables fresh</span></div>
+                            <div class="text-white">php artisan migrate:fresh</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-indigo-400 mb-2">3. Creating Seeders (Dummy Data)</h4>
+                        <div class="bg-slate-950 p-4 rounded-xl font-mono text-sm border border-slate-800 space-y-2">
+                            <div><span class="text-emerald-400"># Run all seeders (populates default values)</span></div>
+                            <div class="text-white">php artisan db:seed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Switch between tabs
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.add('hidden'));
+            
+            // Show target content
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Deactivate all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('border-b-2', 'border-indigo-500', 'text-indigo-400');
+                btn.classList.add('text-slate-400');
+            });
+
+            // Activate current button
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.remove('text-slate-400');
+            activeBtn.classList.add('border-b-2', 'border-indigo-500', 'text-indigo-400');
+        }
+
+        // Live Route Filter Search
+        function filterRoutes() {
+            const input = document.getElementById('routeSearch');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('routesTable');
+            const trs = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < trs.length; i++) {
+                const tr = trs[i];
+                const tds = tr.getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < tds.length; j++) {
+                    const td = tds[j];
+                    if (td && td.textContent.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    tr.style.display = "";
+                } else {
+                    tr.style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
