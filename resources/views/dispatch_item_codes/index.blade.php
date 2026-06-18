@@ -58,7 +58,7 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 text-slate-700 dark:text-slate-300 transition-colors">
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->id }}</td>
                                 <td class="py-4.5 px-6">
-                                    <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal('{{ $item->uid }}', '{{ $item->product->product_name ?? 'Product' }}')" title="Click to view/print barcode label">
+                                    <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
                                         <div class="flex flex-col gap-1.5 shrink-0">
                                             <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit group-hover:border-indigo-500/50 dark:group-hover:border-indigo-500/50 transition-colors">
                                                 {{ $item->uid }}
@@ -267,7 +267,7 @@
         window.addEventListener("DOMContentLoaded", () => {
             @foreach ($dispatchItemCodes as $item)
                 try {
-                    JsBarcode("#inline-barcode-{{ $item->id }}", "{{ $item->uid }}", {
+                    JsBarcode("#inline-barcode-{{ $item->id }}", {!! json_encode($item->uid) !!}, {
                         format: "CODE128",
                         width: 1.1,
                         height: 25,
@@ -275,7 +275,7 @@
                         margin: 0
                     });
                 } catch(e) {
-                    console.error("Failed to render inline barcode for {{ $item->uid }}", e);
+                    console.error("Failed to render inline barcode for " + {!! json_encode($item->uid) !!}, e);
                 }
             @endforeach
         });

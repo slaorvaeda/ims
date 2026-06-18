@@ -141,7 +141,7 @@
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 text-slate-700 dark:text-slate-300 transition-colors">
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->id }}</td>
                                 <td class="py-4.5 px-6">
-                                    <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal('{{ $item->uid }}', '{{ $item->product->product_name ?? 'Product' }}')" title="Click to view/print barcode label">
+                                    <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
                                         <div class="flex flex-col gap-1.5 shrink-0">
                                             <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit group-hover:border-indigo-500/50 dark:group-hover:border-indigo-500/50 transition-colors">
                                                 {{ $item->uid }}
@@ -251,7 +251,7 @@
                         </div>
 
                         <!-- Card Center -->
-                        <div class="flex flex-col items-center justify-center py-4 cursor-pointer" @click="openBarcodeModal('{{ $item->uid }}', '{{ $item->product->product_name ?? 'Product' }}')" title="Click to view/print barcode label">
+                        <div class="flex flex-col items-center justify-center py-4 cursor-pointer" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
                             <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit mb-2 group-hover:border-indigo-500/50 transition-colors">
                                 {{ $item->uid }}
                             </span>
@@ -285,7 +285,7 @@
                                     </form>
                                 @endif
                             <button 
-                                @click="openBarcodeModal('{{ $item->uid }}', '{{ $item->product->product_name ?? 'Product' }}')"
+                                @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->product_name ?? 'Product') }})"
                                 class="p-2 bg-white text-slate-900 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
                             >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -482,7 +482,7 @@
                 try {
                     const tableEl = document.getElementById("inline-barcode-{{ $item->id }}");
                     if (tableEl) {
-                        JsBarcode("#inline-barcode-{{ $item->id }}", "{{ $item->uid }}", {
+                        JsBarcode("#inline-barcode-{{ $item->id }}", {!! json_encode($item->uid) !!}, {
                             format: "CODE128",
                             width: 1.1,
                             height: 25,
@@ -491,13 +491,13 @@
                         });
                     }
                 } catch(e) {
-                    console.error("Failed to render inline barcode (table) for {{ $item->uid }}", e);
+                    console.error("Failed to render inline barcode (table) for " + {!! json_encode($item->uid) !!}, e);
                 }
 
                 try {
                     const cardEl = document.getElementById("inline-barcode-card-{{ $item->id }}");
                     if (cardEl) {
-                        JsBarcode("#inline-barcode-card-{{ $item->id }}", "{{ $item->uid }}", {
+                        JsBarcode("#inline-barcode-card-{{ $item->id }}", {!! json_encode($item->uid) !!}, {
                             format: "CODE128",
                             width: 1.3,
                             height: 40,
@@ -506,7 +506,7 @@
                         });
                     }
                 } catch(e) {
-                    console.error("Failed to render inline barcode (card) for {{ $item->uid }}", e);
+                    console.error("Failed to render inline barcode (card) for " + {!! json_encode($item->uid) !!}, e);
                 }
             @endforeach
         };
