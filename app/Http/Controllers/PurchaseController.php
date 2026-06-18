@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Purchase;
 use App\Models\Product;
+use App\Models\InwardItemCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
@@ -36,7 +38,42 @@ class PurchaseController extends Controller
     public function create()
     {
         $products = Product::all();
-        return view('purchases.create', compact('products'));
+        
+        $nextUids = [];
+        $lastGlobalItem = InwardItemCode::orderBy('id', 'desc')->first();
+        $globalNextUid = 'Zig0001';
+        if ($lastGlobalItem) {
+            $lastUid = $lastGlobalItem->uid;
+            if (preg_match('/^(.*?)(\d+)$/', $lastUid, $matches)) {
+                $prefix = $matches[1];
+                $numberStr = $matches[2];
+                $nextNum = (int)$numberStr + 1;
+                $padLength = strlen($numberStr);
+                $globalNextUid = $prefix . str_pad((string)$nextNum, $padLength, '0', STR_PAD_LEFT);
+            } else {
+                $globalNextUid = $lastUid . '0001';
+            }
+        }
+
+        foreach ($products as $product) {
+            $lastItem = InwardItemCode::where('product_id', $product->id)->orderBy('id', 'desc')->first();
+            if ($lastItem) {
+                $lastUid = $lastItem->uid;
+                if (preg_match('/^(.*?)(\d+)$/', $lastUid, $matches)) {
+                    $prefix = $matches[1];
+                    $numberStr = $matches[2];
+                    $nextNum = (int)$numberStr + 1;
+                    $padLength = strlen($numberStr);
+                    $nextUids[$product->id] = $prefix . str_pad((string)$nextNum, $padLength, '0', STR_PAD_LEFT);
+                } else {
+                    $nextUids[$product->id] = $lastUid . '0001';
+                }
+            } else {
+                $nextUids[$product->id] = $globalNextUid;
+            }
+        }
+
+        return view('purchases.create', compact('products', 'nextUids', 'globalNextUid'));
     }
 
     /**
@@ -50,15 +87,63 @@ class PurchaseController extends Controller
             'vendor_id' => 'required|string|max:255',
             'quantity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
+            'start_uid' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
         ]);
 
         $validated['amount'] = $validated['quantity'] * $validated['price'];
         $validated['updated_by'] = Auth::user()->name ?? 'System';
 
-        Purchase::create($validated);
+        $startUid = $request->input('start_uid');
+        $quantity = (int)$validated['quantity'];
+        $status = $request->input('status', 'Good Inventory');
+
+        // Extract prefix and numerical suffix
+        if (preg_match('/^(.*?)(\d+)$/', $startUid, $matches)) {
+            $prefix = $matches[1];
+            $numberStr = $matches[2];
+            $startNum = (int)$numberStr;
+            $padLength = strlen($numberStr);
+        } else {
+            $prefix = $startUid;
+            $startNum = 1;
+            $padLength = 1;
+        }
+
+        // Generate the sequence of UIDs
+        $uids = [];
+        for ($i = 0; $i < $quantity; $i++) {
+            $currentNum = $startNum + $i;
+            $currentNumStr = str_pad((string)$currentNum, $padLength, '0', STR_PAD_LEFT);
+            $uids[] = $prefix . $currentNumStr;
+        }
+
+        // Validate all generated UIDs are unique in the inward_item_codes table
+        $duplicates = InwardItemCode::whereIn('uid', $uids)->pluck('uid')->toArray();
+        if (!empty($duplicates)) {
+            return back()->withErrors([
+                'start_uid' => 'The following generated serial codes already exist in the database: ' . implode(', ', $duplicates)
+            ])->withInput();
+        }
+
+        // Create purchase and corresponding inward records inside a transaction
+        DB::transaction(function () use ($validated, $uids, $status) {
+            Purchase::create($validated);
+
+            $updatedBy = Auth::user()->name ?? 'System';
+            foreach ($uids as $uid) {
+                InwardItemCode::create([
+                    'product_id' => $validated['product_id'],
+                    'uid' => $uid,
+                    'quantity' => 1,
+                    'status' => $status,
+                    'updated_by' => $updatedBy,
+                ]);
+            }
+        });
 
         return redirect()->route('purchases.index')
-            ->with('success', 'Purchase record created successfully.');
+            ->with('success', 'Purchase record logged and corresponding ' . $quantity . ' inward serial codes successfully created.');
     }
 
     /**

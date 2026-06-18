@@ -29,7 +29,7 @@ class InwardItemCodeController extends Controller
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->latest()
+            ->orderBy('id', 'asc')
             ->paginate(15);
 
         return view('inward_item_codes.index', compact('inwardItemCodes', 'search', 'status'));

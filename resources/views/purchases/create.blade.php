@@ -104,6 +104,66 @@
                     </div>
                 </div>
 
+                <!-- Starting UID & Autocomplete control -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                        <label for="start_uid" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Starting UID / Serial Code</label>
+                        <input 
+                            type="text" 
+                            id="start_uid" 
+                            name="start_uid" 
+                            value="{{ old('start_uid') }}" 
+                            placeholder="Select a product to auto-fill" 
+                            required 
+                            readonly
+                            oninput="generateSequencePreview()"
+                            class="w-full px-5 py-4 bg-slate-100 dark:bg-slate-950/20 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-500 dark:text-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all font-mono"
+                        >
+                        @error('start_uid')
+                            <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
+                        @enderror
+
+                        <!-- Checkbox to unfreeze / enable manual edit -->
+                        <div class="flex items-center gap-2.5 mt-3 select-none">
+                            <input 
+                                type="checkbox" 
+                                id="manual_uid_check" 
+                                onchange="toggleManualUid()"
+                                class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2"
+                            >
+                            <label for="manual_uid_check" class="text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer">
+                                Edit starting UID manually
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Inward Inventory Status -->
+                    <div>
+                        <label for="status" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Inward Inventory Status</label>
+                        <select 
+                            id="status" 
+                            name="status" 
+                            required 
+                            class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        >
+                            <option value="Good Inventory" {{ old('status', 'Good Inventory') == 'Good Inventory' ? 'selected' : '' }}>Good Inventory</option>
+                            <option value="Damaged" {{ old('status') == 'Damaged' ? 'selected' : '' }}>Damaged</option>
+                            <option value="Returned" {{ old('status') == 'Returned' ? 'selected' : '' }}>Returned</option>
+                        </select>
+                        @error('status')
+                            <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Live Preview of Generated UIDs -->
+                <div class="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/60 rounded-3xl space-y-3">
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Live Serial Codes Preview</p>
+                    <div id="uids-preview-container" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                        <span class="text-xs text-slate-400 italic">Select a product and enter quantity to preview list...</span>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/50">
                     <a href="{{ route('purchases.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
                         Cancel
@@ -115,4 +175,106 @@
             </form>
         </div>
     </div>
+
+    <!-- Script to dynamically generate UID preview sequence and autofill -->
+    <script>
+        const nextUids = @json($nextUids);
+        const globalNextUid = @json($globalNextUid);
+
+        function toggleManualUid() {
+            const checkBox = document.getElementById('manual_uid_check');
+            const uidInput = document.getElementById('start_uid');
+
+            if (checkBox.checked) {
+                // Enable manual edit
+                uidInput.removeAttribute('readonly');
+                uidInput.classList.remove('bg-slate-100', 'dark:bg-slate-950/20', 'text-slate-500', 'dark:text-slate-400');
+                uidInput.classList.add('bg-slate-50', 'dark:bg-slate-950/60', 'text-slate-800', 'dark:text-slate-200');
+            } else {
+                // Freeze again and restore auto-filled value
+                uidInput.setAttribute('readonly', 'readonly');
+                uidInput.classList.add('bg-slate-100', 'dark:bg-slate-950/20', 'text-slate-500', 'dark:text-slate-400');
+                uidInput.classList.remove('bg-slate-50', 'dark:bg-slate-950/60', 'text-slate-800', 'dark:text-slate-200');
+                
+                autofillUid();
+            }
+        }
+
+        function autofillUid() {
+            const productSelect = document.getElementById('product_id');
+            const uidInput = document.getElementById('start_uid');
+            const checkBox = document.getElementById('manual_uid_check');
+
+            // Only autofill if manual override checkbox is unchecked
+            if (!checkBox.checked) {
+                const productId = productSelect.value;
+                if (productId && nextUids[productId]) {
+                    uidInput.value = nextUids[productId];
+                } else if (productId) {
+                    uidInput.value = globalNextUid;
+                } else {
+                    uidInput.value = '';
+                }
+                generateSequencePreview();
+            }
+        }
+
+        function generateSequencePreview() {
+            const startUidInput = document.getElementById('start_uid');
+            const qtyInput = document.getElementById('quantity');
+            const previewContainer = document.getElementById('uids-preview-container');
+
+            const startUid = startUidInput.value.trim();
+            const qty = parseInt(qtyInput.value) || 0;
+
+            if (!startUid || qty <= 0) {
+                previewContainer.innerHTML = '<span class="text-xs text-slate-400 italic">Select a product and enter quantity to preview list...</span>';
+                return;
+            }
+
+            // Extract trailing numbers
+            const match = startUid.match(/^(.*?)(\d+)$/);
+            let prefix = startUid;
+            let startNum = 1;
+            let padLength = 1;
+
+            if (match) {
+                prefix = match[1];
+                const numberStr = match[2];
+                startNum = parseInt(numberStr);
+                padLength = numberStr.length;
+            }
+
+            let html = '';
+            // Limit preview to first 100 to avoid locking page on large counts
+            const maxPreview = Math.min(qty, 100);
+
+            for (let i = 0; i < maxPreview; i++) {
+                const currentNum = startNum + i;
+                const currentNumStr = String(currentNum).padStart(padLength, '0');
+                const finalUid = prefix + currentNumStr;
+
+                html += `<span class="px-2.5 py-1.5 bg-slate-100 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-xl font-mono text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-sm">${finalUid}</span>`;
+            }
+
+            if (qty > 100) {
+                html += `<span class="text-xs text-slate-400 dark:text-slate-500 italic self-center pl-2">+ ${qty - 100} more items...</span>`;
+            }
+
+            previewContainer.innerHTML = html;
+        }
+
+        // Attach listeners and setup page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const productSelect = document.getElementById('product_id');
+            const qtyInput = document.getElementById('quantity');
+            
+            productSelect.addEventListener('change', autofillUid);
+            qtyInput.addEventListener('input', generateSequencePreview);
+            
+            // Run initially if fields are already filled (e.g. from validation error/old input)
+            autofillUid();
+            generateSequencePreview();
+        });
+    </script>
 </x-app-layout>
