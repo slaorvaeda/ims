@@ -76,6 +76,301 @@
         </div>
     </div>
 
+    <!-- Analytics Section -->
+    <div class="mt-12 space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h3 class="text-2xl font-extrabold font-heading text-slate-900 dark:text-white">Warehouse Insights & Analytics</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Real-time charts tracking transaction volumes, product levels, and logistics activity.</p>
+            </div>
+            <div class="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 px-4 py-2 rounded-2xl self-start sm:self-center">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wide">Live Feed Active</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Chart 1: Sales & Purchases Growth Trend (Area Chart) -->
+            <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h4 class="text-md font-bold text-slate-800 dark:text-white">Sales & Purchases Growth Trend</h4>
+                        <p class="text-xs text-slate-400 dark:text-slate-500">Monthly transactional quantities comparison</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                        <span class="inline-block w-2.5 h-2.5 rounded bg-indigo-600"></span> Purchases
+                        <span class="inline-block w-2.5 h-2.5 rounded bg-emerald-500 ml-2"></span> Sales
+                    </div>
+                </div>
+                <div id="chart-monthly-trends" class="min-h-[300px]"></div>
+            </div>
+
+            <!-- Chart 2: Sales Channel Distribution (Donut Chart) -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                <div>
+                    <h4 class="text-md font-bold text-slate-800 dark:text-white">Sales Channels Allocation</h4>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-6">Distribution of order sources</p>
+                </div>
+                <div class="flex items-center justify-center min-h-[300px]">
+                    <div id="chart-portal-distribution" class="w-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Chart 3: Physical Product Inventory (Horizontal Bar Chart) -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                <div class="mb-6">
+                    <h4 class="text-md font-bold text-slate-800 dark:text-white">Current Physical Stock Levels</h4>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Inward inventory minus dispatched units</p>
+                </div>
+                <div id="chart-product-stock" class="min-h-[300px]"></div>
+            </div>
+
+            <!-- Chart 4: Logistics Activity Timeline (Column Chart) -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h4 class="text-md font-bold text-slate-800 dark:text-white">Logistics Daily Intake & Dispatch</h4>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 font-sans">7-Day inward receipts vs outward dispatches</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                        <span class="inline-block w-2.5 h-2.5 rounded bg-indigo-500"></span> Inward
+                        <span class="inline-block w-2.5 h-2.5 rounded bg-amber-500 ml-2"></span> Dispatched
+                    </div>
+                </div>
+                <div id="chart-daily-log" class="min-h-[300px]"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if dark mode is active
+            const isDarkMode = document.documentElement.classList.contains('dark') || 
+                               (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            
+            // 1. Sales vs Purchases area chart
+            const monthlyTrendsOptions = {
+                series: [{
+                    name: 'Purchases (Qty)',
+                    data: @json($chartMonthlyPurchases)
+                }, {
+                    name: 'Sales (Qty)',
+                    data: @json($chartMonthlySales)
+                }],
+                chart: {
+                    height: 320,
+                    type: 'area',
+                    toolbar: { show: false },
+                    zoom: { enabled: false },
+                    fontFamily: 'Plus Jakarta Sans, sans-serif'
+                },
+                colors: ['#4f46e5', '#10b981'], // indigo-600, emerald-500
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 3 },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.45,
+                        opacityTo: 0.05,
+                        stops: [0, 100]
+                    }
+                },
+                grid: {
+                    borderColor: isDarkMode ? '#1e293b' : '#f1f5f9',
+                    strokeDashArray: 4
+                },
+                xaxis: {
+                    categories: @json($chartMonthlyMonths),
+                    labels: {
+                        style: { colors: isDarkMode ? '#94a3b8' : '#64748b' }
+                    },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: isDarkMode ? '#94a3b8' : '#64748b' }
+                    }
+                },
+                tooltip: {
+                    theme: isDarkMode ? 'dark' : 'light',
+                    y: {
+                        formatter: function (val) {
+                            return val + " units";
+                        }
+                    }
+                },
+                legend: { show: false }
+            };
+            const monthlyTrendsChart = new ApexCharts(document.querySelector("#chart-monthly-trends"), monthlyTrendsOptions);
+            monthlyTrendsChart.render();
+
+            // 2. Sales Portals donut chart
+            const portalDistributionOptions = {
+                series: @json($chartPortalSales),
+                chart: {
+                    type: 'donut',
+                    height: 320,
+                    fontFamily: 'Plus Jakarta Sans, sans-serif'
+                },
+                labels: @json($chartPortalNames),
+                colors: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'],
+                stroke: { show: false },
+                dataLabels: { enabled: false },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '75%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total Sold',
+                                    color: isDarkMode ? '#94a3b8' : '#64748b',
+                                    formatter: function (w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + ' units'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                grid: {
+                    padding: { bottom: 0 }
+                },
+                legend: {
+                    position: 'bottom',
+                    horizontalAlign: 'center',
+                    labels: { colors: isDarkMode ? '#cbd5e1' : '#334155' }
+                },
+                tooltip: {
+                    theme: isDarkMode ? 'dark' : 'light'
+                }
+            };
+            const portalDistributionChart = new ApexCharts(document.querySelector("#chart-portal-distribution"), portalDistributionOptions);
+            portalDistributionChart.render();
+
+            // 3. Product Stocks horizontal bar chart
+            const productStockOptions = {
+                series: [{
+                    name: 'Physical Stock',
+                    data: @json($chartProductStocks)
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 320,
+                    toolbar: { show: false },
+                    fontFamily: 'Plus Jakarta Sans, sans-serif'
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 8,
+                        horizontal: true,
+                        barHeight: '45%',
+                        distributed: true
+                    }
+                },
+                colors: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'],
+                dataLabels: { enabled: false },
+                grid: {
+                    borderColor: isDarkMode ? '#1e293b' : '#f1f5f9',
+                    strokeDashArray: 4,
+                    xaxis: { lines: { show: true } },
+                    yaxis: { lines: { show: false } }
+                },
+                xaxis: {
+                    categories: @json($chartProductNames),
+                    labels: {
+                        style: { colors: isDarkMode ? '#94a3b8' : '#64748b' }
+                    },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: isDarkMode ? '#94a3b8' : '#64748b' }
+                    }
+                },
+                tooltip: {
+                    theme: isDarkMode ? 'dark' : 'light',
+                    y: {
+                        formatter: function (val) {
+                            return val + " units in stock";
+                        }
+                    }
+                },
+                legend: { show: false }
+            };
+            const productStockChart = new ApexCharts(document.querySelector("#chart-product-stock"), productStockOptions);
+            productStockChart.render();
+
+            // 4. Daily Activity Log (Inward vs Dispatch)
+            const dailyActivityOptions = {
+                series: [{
+                    name: 'Inward Receipts',
+                    data: @json($chartActivityInward)
+                }, {
+                    name: 'Outward Dispatches',
+                    data: @json($chartActivityDispatch)
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 320,
+                    toolbar: { show: false },
+                    fontFamily: 'Plus Jakarta Sans, sans-serif'
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        borderRadius: 6,
+                    },
+                },
+                colors: ['#6366f1', '#f59e0b'], // Indigo-500, Amber-500
+                dataLabels: { enabled: false },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                grid: {
+                    borderColor: isDarkMode ? '#1e293b' : '#f1f5f9',
+                    strokeDashArray: 4
+                },
+                xaxis: {
+                    categories: @json($chartActivityDays),
+                    labels: {
+                        style: { colors: isDarkMode ? '#94a3b8' : '#64748b' }
+                    },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: isDarkMode ? '#94a3b8' : '#64748b' }
+                    }
+                },
+                fill: { opacity: 1 },
+                tooltip: {
+                    theme: isDarkMode ? 'dark' : 'light',
+                    y: {
+                        formatter: function (val) {
+                            return val + " items";
+                        }
+                    }
+                },
+                legend: { show: false }
+            };
+            const dailyActivityChart = new ApexCharts(document.querySelector("#chart-daily-log"), dailyActivityOptions);
+            dailyActivityChart.render();
+        });
+    </script>
+
     <!-- Quick Navigation Panels Info -->
     <div class="mt-12 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 sm:p-8">
         <h3 class="text-xl font-bold font-heading text-slate-900 dark:text-white mb-6">Database Master Directory</h3>
