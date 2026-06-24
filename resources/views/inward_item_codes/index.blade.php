@@ -339,8 +339,37 @@
 
             <!-- Printable Label Container -->
             <div id="modal-barcode-print-content" class="flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-950/40 rounded-3xl border border-slate-100 dark:border-slate-800/80">
-                <span class="text-xs font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider mb-2" x-text="uid"></span>
+                <span class="barcode-uid-title text-xs font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider mb-2" x-text="uid"></span>
                 <svg id="modal-barcode-svg" class="bg-white p-1 rounded max-w-full"></svg>
+            </div>
+
+            <!-- Print Dimensions (mm) -->
+            <div class="border-t border-slate-100 dark:border-slate-800/50 pt-4 space-y-3">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Print Dimensions (mm)</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 dark:text-slate-500 mb-1">Width (mm)</label>
+                        <input 
+                            type="number" 
+                            min="10" 
+                            max="300" 
+                            x-model.number="printWidth"
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                            placeholder="50"
+                        >
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 dark:text-slate-500 mb-1">Height (mm)</label>
+                        <input 
+                            type="number" 
+                            min="10" 
+                            max="300" 
+                            x-model.number="printHeight"
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                            placeholder="25"
+                        >
+                    </div>
+                </div>
             </div>
 
             <!-- Actions -->
@@ -367,6 +396,8 @@
                 isOpen: false,
                 uid: '',
                 productName: '',
+                printWidth: 50,
+                printHeight: 25,
                 viewMode: localStorage.getItem('inward_view_mode') || 'list',
                 inputFocused: true,
 
@@ -460,9 +491,36 @@
                                 left: 50%;
                                 top: 50%;
                                 transform: translate(-50%, -50%);
-                                padding: 20px;
+                                padding: 0 !important;
                                 background: white !important;
                                 text-align: center;
+                            }
+                            #temp-print-area #modal-barcode-print-content {
+                                width: ${this.printWidth || 50}mm !important;
+                                height: ${this.printHeight || 25}mm !important;
+                                max-width: ${this.printWidth || 50}mm !important;
+                                max-height: ${this.printHeight || 25}mm !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                display: flex !important;
+                                align-items: center !important;
+                                justify-content: center !important;
+                                background: white !important;
+                                box-sizing: border-box !important;
+                            }
+                            #temp-print-area #modal-barcode-print-content svg {
+                                max-width: 100% !important;
+                                max-height: 100% !important;
+                                width: auto !important;
+                                height: auto !important;
+                                object-fit: contain !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                            }
+                            #temp-print-area .barcode-uid-title {
+                                display: none !important;
                             }
                         }
                     `;
