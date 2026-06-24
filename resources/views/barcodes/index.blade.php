@@ -169,6 +169,18 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Product SKU for Print -->
+                <div class="border-t border-slate-100 dark:border-slate-800/50 pt-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Product SKU (for Print)</label>
+                    <input 
+                        type="text" 
+                        x-model="printSku"
+                        placeholder="e.g. Zigma-Charm-WallFan-12inch-Blk"
+                        class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                    >
+                    <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">If blank, the barcode number is printed at the top.</p>
+                </div>
             </div>
         </div>
 
@@ -198,6 +210,9 @@
                         <div class="barcode-card p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center shadow-sm relative group shrink-0">
                             <!-- Label top info -->
                             <div class="label-title text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2" x-text="'Label #' + (index + 1)"></div>
+                            
+                            <!-- SKU/UID top text -->
+                            <div class="print-sku-title text-[9px] text-slate-400 dark:text-slate-500 font-mono mb-1 text-center hidden" x-text="printSku ? printSku.toLowerCase() : item.toLowerCase()"></div>
                             
                             <!-- SVG Barcode Container -->
                             <svg :id="'barcode-' + index" class="barcode-svg max-w-full bg-white p-1 rounded"></svg>
@@ -241,7 +256,7 @@
         function barcodeApp() {
             return {
                 mode: 'manual',
-                manualText: 'IMS-PROD-A\nZig0001\nZig0002',
+                manualText: 'Zig0001\nZig0002',
                 startUid: 'Zig0010',
                 quantity: 5,
                 format: 'CODE128',
@@ -250,6 +265,7 @@
                 displayValue: true,
                 printWidth: 50,
                 printHeight: 25,
+                printSku: '',
                 items: [],
 
                 init() {
@@ -303,7 +319,7 @@
                                 width: this.barWidth,
                                 height: this.barHeight,
                                 displayValue: this.displayValue,
-                                margin: 10,
+                                margin: 2,
                                 background: "#ffffff",
                                 lineColor: "#000000"
                             });
@@ -409,6 +425,14 @@
                             #temp-print-area .label-title {
                                 display: none !important;
                             }
+                            #temp-print-area .print-sku-title {
+                                display: block !important;
+                                font-size: 8px !important;
+                                text-transform: lowercase !important;
+                                margin-bottom: 2px !important;
+                                font-family: monospace !important;
+                                color: black !important;
+                            }
                             .group {
                                 border: none !important;
                                 box-shadow: none !important;
@@ -451,7 +475,7 @@
                 margin: 0 !important;
                 display: flex !important;
                 flex-wrap: wrap !important;
-                gap: 15px !important;
+                gap: 4px !important;
                 border: none !important;
                 overflow: visible !important;
                 max-h-none !important;
@@ -484,6 +508,14 @@
             }
             .barcode-card .label-title {
                 display: none !important;
+            }
+            .barcode-card .print-sku-title {
+                display: block !important;
+                font-size: 8px !important;
+                text-transform: lowercase !important;
+                margin-bottom: 2px !important;
+                font-family: monospace !important;
+                color: #000000 !important;
             }
             /* Hide the individual download hover overlays in print */
             .barcode-card .group-hover\:opacity-100 {

@@ -121,12 +121,53 @@
             </div>
         </div>
 
+        <!-- Bulk Action Bar -->
+        <div 
+            x-show="selectedUids.length > 0" 
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-2"
+            class="p-4 bg-indigo-50 dark:bg-slate-900/60 border border-indigo-100/30 dark:border-slate-800 rounded-3xl flex items-center justify-between shadow-sm"
+            style="display: none;"
+        >
+            <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold" x-text="selectedUids.length"></span>
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">barcodes selected for download</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button 
+                    @click="selectedUids = []" 
+                    class="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 px-3 py-2 transition-all"
+                >
+                    Clear Selection
+                </button>
+                <button 
+                    @click="downloadSelectedBarcodes()" 
+                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span>Download Selected</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Table Panel (List View) -->
         <div x-show="viewMode === 'list'" class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                            <th class="py-4 px-6 w-12 select-none">
+                                <input 
+                                    type="checkbox" 
+                                    @change="toggleSelectAll($event)"
+                                    :checked="isAllSelected()"
+                                    class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                >
+                            </th>
                             <th class="py-4 px-6">ID</th>
                             <th class="py-4 px-6">UID (Serial Code)</th>
                             <th class="py-4 px-6">Product Name</th>
@@ -139,9 +180,17 @@
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 text-sm">
                         @forelse ($inwardItemCodes as $item)
                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 text-slate-700 dark:text-slate-300 transition-colors">
+                                <td class="py-4.5 px-6 w-12">
+                                    <input 
+                                        type="checkbox" 
+                                        :value="{{ json_encode($item->uid) }}" 
+                                        x-model="selectedUids"
+                                        class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    >
+                                </td>
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->id }}</td>
                                 <td class="py-4.5 px-6">
-                                    <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
+                                    <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
                                         <div class="flex flex-col gap-1.5 shrink-0">
                                             <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit group-hover:border-indigo-500/50 dark:group-hover:border-indigo-500/50 transition-colors">
                                                 {{ $item->uid }}
@@ -234,7 +283,15 @@
                     <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-all relative group flex flex-col justify-between min-h-[260px]">
                         <!-- Card Top -->
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase font-mono">ID: {{ $item->id }}</span>
+                            <div class="flex items-center gap-2">
+                                <input 
+                                    type="checkbox" 
+                                    :value="{{ json_encode($item->uid) }}" 
+                                    x-model="selectedUids"
+                                    class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                >
+                                <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase font-mono">ID: {{ $item->id }}</span>
+                            </div>
                             @if ($item->status == 'Good Inventory')
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
                                     Good Inventory
@@ -251,7 +308,7 @@
                         </div>
 
                         <!-- Card Center -->
-                        <div class="flex flex-col items-center justify-center py-4 cursor-pointer" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
+                        <div class="flex flex-col items-center justify-center py-4 cursor-pointer" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
                             <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit mb-2 group-hover:border-indigo-500/50 transition-colors">
                                 {{ $item->uid }}
                             </span>
@@ -285,9 +342,9 @@
                                     </form>
                                 @endif
                             <button 
-                                @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->product_name ?? 'Product') }})"
-                                class="p-2 bg-white text-slate-900 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
-                            >
+                             @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})"
+                                 class="p-2 bg-white text-slate-900 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
+                             >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <span>Zoom</span>
                             </button>
@@ -340,6 +397,8 @@
             <!-- Printable Label Container -->
             <div id="modal-barcode-print-content" class="flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-950/40 rounded-3xl border border-slate-100 dark:border-slate-800/80">
                 <span class="barcode-uid-title text-xs font-bold text-slate-400 dark:text-slate-500 font-mono tracking-wider mb-2" x-text="uid"></span>
+                <!-- SKU Name at top of barcode -->
+                 <div class="print-sku-title text-[9px] text-slate-400 dark:text-slate-500 font-mono mb-1 text-center hidden" x-text="productName.toLowerCase()"></div>
                 <svg id="modal-barcode-svg" class="bg-white p-1 rounded max-w-full"></svg>
             </div>
 
@@ -398,6 +457,87 @@
                 productName: '',
                 printWidth: 50,
                 printHeight: 25,
+                selectedUids: [],
+                pageUids: {!! json_encode($inwardItemCodes->pluck('uid')->toArray()) !!},
+                
+                isAllSelected() {
+                    return this.pageUids.length > 0 && this.pageUids.every(uid => this.selectedUids.includes(uid));
+                },
+                
+                toggleSelectAll(event) {
+                    if (event.target.checked) {
+                        this.pageUids.forEach(uid => {
+                            if (!this.selectedUids.includes(uid)) {
+                                this.selectedUids.push(uid);
+                            }
+                        });
+                    } else {
+                        this.selectedUids = this.selectedUids.filter(uid => !this.pageUids.includes(uid));
+                    }
+                },
+
+                downloadBarcodeByText(uid) {
+                    const tempSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    tempSvg.style.display = "none";
+                    document.body.appendChild(tempSvg);
+                    
+                    try {
+                        JsBarcode(tempSvg, uid, {
+                            format: "CODE128",
+                            width: 2,
+                            height: 70,
+                            displayValue: true,
+                            margin: 10,
+                            background: "#ffffff",
+                            lineColor: "#000000"
+                        });
+                        
+                        const svgString = new XMLSerializer().serializeToString(tempSvg);
+                        const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+                        
+                        const URL = window.URL || window.webkitURL || window;
+                        const blobURL = URL.createObjectURL(svgBlob);
+                        
+                        const image = new Image();
+                        image.onload = () => {
+                            const canvas = document.createElement("canvas");
+                            const bbox = tempSvg.getBBox();
+                            canvas.width = bbox.width + 20;
+                            canvas.height = bbox.height + 20;
+                            const context = canvas.getContext("2d");
+                            
+                            context.fillStyle = "#ffffff";
+                            context.fillRect(0, 0, canvas.width, canvas.height);
+                            context.drawImage(image, 10, 10);
+                            
+                            const png = canvas.toDataURL("image/png");
+                            const downloadLink = document.createElement("a");
+                            downloadLink.href = png;
+                            downloadLink.download = "barcode-" + uid.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".png";
+                            document.body.appendChild(downloadLink);
+                            downloadLink.click();
+                            document.body.removeChild(downloadLink);
+                            
+                            document.body.removeChild(tempSvg);
+                            URL.revokeObjectURL(blobURL);
+                        };
+                        image.src = blobURL;
+                    } catch (err) {
+                        console.error("Failed to generate/download barcode for " + uid, err);
+                        if (tempSvg.parentNode) {
+                            document.body.removeChild(tempSvg);
+                        }
+                    }
+                },
+
+                downloadSelectedBarcodes() {
+                    if (this.selectedUids.length === 0) return;
+                    this.selectedUids.forEach((uid, index) => {
+                        setTimeout(() => {
+                            this.downloadBarcodeByText(uid);
+                        }, index * 250);
+                    });
+                },
                 viewMode: localStorage.getItem('inward_view_mode') || 'list',
                 inputFocused: true,
 
@@ -422,7 +562,7 @@
                                 width: 2,
                                 height: 70,
                                 displayValue: true,
-                                margin: 10,
+                                margin: 2,
                                 background: "#ffffff",
                                 lineColor: "#000000"
                             });
@@ -521,6 +661,14 @@
                             }
                             #temp-print-area .barcode-uid-title {
                                 display: none !important;
+                            }
+                            #temp-print-area .print-sku-title {
+                                display: block !important;
+                                font-size: 8px !important;
+                                text-transform: lowercase !important;
+                                margin-bottom: 2px !important;
+                                font-family: monospace !important;
+                                color: black !important;
                             }
                         }
                     `;
