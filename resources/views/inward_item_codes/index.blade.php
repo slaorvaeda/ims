@@ -455,8 +455,8 @@
                 isOpen: false,
                 uid: '',
                 productName: '',
-                printWidth: 50,
-                printHeight: 25,
+                printWidth: parseInt(localStorage.getItem('modal_printWidth')) || 50,
+                printHeight: parseInt(localStorage.getItem('modal_printHeight')) || 25,
                 selectedUids: [],
                 pageUids: {!! json_encode($inwardItemCodes->pluck('uid')->toArray()) !!},
                 
@@ -562,7 +562,8 @@
                                 width: 2,
                                 height: 70,
                                 displayValue: true,
-                                margin: 2,
+                                margin: 10,
+                                marginTop: 2,
                                 background: "#ffffff",
                                 lineColor: "#000000"
                             });
@@ -610,6 +611,8 @@
                 },
                 
                 printBarcode() {
+                    localStorage.setItem('modal_printWidth', this.printWidth);
+                    localStorage.setItem('modal_printHeight', this.printHeight);
                     const card = document.getElementById("modal-barcode-print-content").cloneNode(true);
                     const printDiv = document.createElement("div");
                     printDiv.id = "temp-print-area";
@@ -645,6 +648,7 @@
                                 padding: 0 !important;
                                 margin: 0 !important;
                                 display: flex !important;
+                                flex-direction: column !important;
                                 align-items: center !important;
                                 justify-content: center !important;
                                 background: white !important;
@@ -666,7 +670,8 @@
                                 display: block !important;
                                 font-size: 8px !important;
                                 text-transform: lowercase !important;
-                                margin-bottom: 2px !important;
+                                margin-bottom: 0 !important;
+                                line-height: 1 !important;
                                 font-family: monospace !important;
                                 color: black !important;
                             }
