@@ -506,10 +506,6 @@
             const reverbKey = "{{ env('REVERB_APP_KEY') }}";
 
             if (reverbKey) {
-                // Enable debugging console logs for Pusher
-                Pusher.logToConsole = true;
-                console.log('Echo Config:', { host: echoHost, port: reverbPort, key: reverbKey, protocol: window.location.protocol });
-
                 window.Echo = new Echo({
                     broadcaster: 'reverb',
                     key: reverbKey,
