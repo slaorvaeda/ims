@@ -207,7 +207,7 @@
                                     </div>
                                 </td>
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->quantity }}</td>
-                                <td class="py-4.5 px-6">
+                                <td class="py-4.5 px-6" id="inward-status-{{ $item->uid }}">
                                     @if ($item->status == 'Good Inventory')
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
                                             Good Inventory
@@ -222,14 +222,14 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="py-4.5 px-6">
+                                <td class="py-4.5 px-6" id="inward-updater-{{ $item->uid }}">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-xs">{{ $item->updated_by ?? 'System' }}</span>
                                         <span class="text-[10px] text-slate-400">{{ $item->updated_at->diffForHumans() }}</span>
                                     </div>
                                 </td>
-                                <td class="py-4.5 px-6 text-right">
-                                    <div class="flex items-center justify-end gap-2">
+                                <td class="py-4.5 px-6 text-right" id="inward-actions-{{ $item->uid }}">
+                                    <div class="flex items-center justify-end gap-2" id="inward-action-wrapper-{{ $item->uid }}">
                                         @if ($item->status !== 'Sold')
                                             <form method="POST" action="{{ route('inward-item-codes.scan-dispatch') }}" class="inline">
                                                 @csrf
@@ -292,19 +292,21 @@
                                 >
                                 <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase font-mono">ID: {{ $item->id }}</span>
                             </div>
-                            @if ($item->status == 'Good Inventory')
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
-                                    Good Inventory
-                                </span>
-                            @elseif ($item->status == 'Sold')
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
-                                    Sold
-                                </span>
-                            @else
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
-                                    {{ $item->status }}
-                                </span>
-                            @endif
+                            <div id="card-status-{{ $item->uid }}">
+                                @if ($item->status == 'Good Inventory')
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
+                                        Good Inventory
+                                    </span>
+                                @elseif ($item->status == 'Sold')
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+                                        Sold
+                                    </span>
+                                @else
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
+                                        {{ $item->status }}
+                                    </span>
+                                @endif
+                            </div>
                         </div>
 
                         <!-- Card Center -->
@@ -323,12 +325,12 @@
                             </div>
                             <div class="flex justify-between items-center text-[10px] text-slate-400">
                                 <span>Qty: {{ $item->quantity }}</span>
-                                <span>By: {{ $item->updated_by ?? 'System' }}</span>
+                                <span id="card-updater-{{ $item->uid }}">By: {{ $item->updated_by ?? 'System' }}</span>
                             </div>
                         </div>
 
                         <!-- Actions Overlay -->
-                        <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 rounded-[2.5rem] flex items-center justify-center gap-2 transition-all duration-200 backdrop-blur-[1px] z-10 p-4 flex-wrap">
+                        <div id="card-actions-{{ $item->uid }}" class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 rounded-[2.5rem] flex items-center justify-center gap-2 transition-all duration-200 backdrop-blur-[1px] z-10 p-4 flex-wrap">
                                 @if ($item->status !== 'Sold')
                                     <form method="POST" action="{{ route('inward-item-codes.scan-dispatch') }}" class="inline-block">
                                         @csrf
@@ -753,6 +755,111 @@
                         scanInput.focus();
                     }
                 });
+            }
+        });
+    </script>
+
+    <!-- WebSockets Live Feeds -->
+    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Audio chimes
+            function playChime() {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } catch (e) {
+                    console.log("Audio feedback block active");
+                }
+            }
+
+            // Initialize Echo
+            const echoHost = window.location.hostname;
+            const reverbPort = {{ env('REVERB_PORT', 8080) }};
+            const reverbKey = "{{ env('REVERB_APP_KEY') }}";
+
+            if (reverbKey) {
+                window.Echo = new Echo({
+                    broadcaster: 'reverb',
+                    key: reverbKey,
+                    wsHost: echoHost,
+                    wsPort: reverbPort,
+                    wssPort: reverbPort,
+                    forceTLS: window.location.protocol === 'https:',
+                    enabledTransports: ['ws', 'wss'],
+                });
+
+                // Listen for dispatches
+                window.Echo.channel('dispatches')
+                    .listen('.barcode.dispatched', (e) => {
+                        console.log('Dispatch event received on serial codes index page:', e);
+                        
+                        // 1. Play chime audio
+                        playChime();
+
+                        // 2. Update Table Status Badge
+                        const tableStatus = document.getElementById(`inward-status-${e.uid}`);
+                        if (tableStatus) {
+                            tableStatus.classList.add('scale-105', 'transition-all', 'duration-300');
+                            tableStatus.innerHTML = `
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+                                    Sold
+                                </span>
+                            `;
+                            setTimeout(() => {
+                                tableStatus.classList.remove('scale-105');
+                            }, 300);
+                        }
+
+                        // 3. Update Table Updater Details
+                        const tableUpdater = document.getElementById(`inward-updater-${e.uid}`);
+                        if (tableUpdater) {
+                            tableUpdater.innerHTML = `
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-xs">${e.updatedBy}</span>
+                                    <span class="text-[10px] text-slate-400 font-sans">Just now</span>
+                                </div>
+                            `;
+                        }
+
+                        // 4. Remove Table Dispatch Action Form
+                        const dispatchForm = document.querySelector(`#inward-action-wrapper-${e.uid} form[action*="scan-dispatch"]`);
+                        if (dispatchForm) {
+                            dispatchForm.remove();
+                        }
+
+                        // 5. Update Card Status Badge
+                        const cardStatus = document.getElementById(`card-status-${e.uid}`);
+                        if (cardStatus) {
+                            cardStatus.innerHTML = `
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
+                                    Sold
+                                </span>
+                            `;
+                        }
+
+                        // 6. Update Card Updater Name
+                        const cardUpdater = document.getElementById(`card-updater-${e.uid}`);
+                        if (cardUpdater) {
+                            cardUpdater.innerText = `By: ${e.updatedBy}`;
+                        }
+
+                        // 7. Remove Card Dispatch Form
+                        const cardForm = document.querySelector(`#card-actions-${e.uid} form[action*="scan-dispatch"]`);
+                        if (cardForm) {
+                            cardForm.remove();
+                        }
+                    });
             }
         });
     </script>

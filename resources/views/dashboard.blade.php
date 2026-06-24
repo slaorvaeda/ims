@@ -23,7 +23,7 @@
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200 group">
             <div class="space-y-2">
                 <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Active Inventory Stock</p>
-                <h3 class="text-3xl font-extrabold font-heading text-slate-900 dark:text-white">{{ $stats['active_stock'] }}</h3>
+                <h3 id="stat-active-stock" class="text-3xl font-extrabold font-heading text-slate-900 dark:text-white transition-all duration-350">{{ $stats['active_stock'] }}</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Total physical units</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-200">
@@ -66,7 +66,7 @@
             <div class="space-y-2">
                 <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Portal Orders</p>
                 <h3 class="text-3xl font-extrabold font-heading text-slate-900 dark:text-white">{{ $stats['total_sales'] }}</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">{{ $stats['total_dispatch'] }} units dispatched</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400"><span id="stat-total-dispatch" class="transition-all duration-350">{{ $stats['total_dispatch'] }}</span> units dispatched</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -442,4 +442,156 @@
             </a>
         </div>
     </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-4 pointer-events-none w-full max-w-md"></div>
+
+    <style>
+        .toast-card {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(120%);
+            opacity: 0;
+        }
+        .toast-card.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    </style>
+
+    <!-- WebSockets Live Feeds -->
+    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Audio chimes
+            function playChime() {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    const osc1 = audioCtx.createOscillator();
+                    const gain1 = audioCtx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    gain1.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain1.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+                    osc1.connect(gain1);
+                    gain1.connect(audioCtx.destination);
+                    osc1.start();
+                    osc1.stop(audioCtx.currentTime + 0.4);
+
+                    setTimeout(() => {
+                        const osc2 = audioCtx.createOscillator();
+                        const gain2 = audioCtx.createGain();
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
+                        gain2.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.start();
+                        osc2.stop(audioCtx.currentTime + 0.5);
+                    }, 100);
+                } catch (e) {
+                    console.log("Audio contextual block active", e);
+                }
+            }
+
+            // Initialize Echo
+            const echoHost = window.location.hostname;
+            const reverbPort = {{ env('REVERB_PORT', 8080) }};
+            const reverbKey = "{{ env('REVERB_APP_KEY') }}";
+
+            if (reverbKey) {
+                // Enable debugging console logs for Pusher
+                Pusher.logToConsole = true;
+                console.log('Echo Config:', { host: echoHost, port: reverbPort, key: reverbKey, protocol: window.location.protocol });
+
+                window.Echo = new Echo({
+                    broadcaster: 'reverb',
+                    key: reverbKey,
+                    wsHost: echoHost,
+                    wsPort: reverbPort,
+                    wssPort: reverbPort,
+                    forceTLS: window.location.protocol === 'https:',
+                    enabledTransports: ['ws', 'wss'],
+                });
+
+                // Listen for dispatches
+                window.Echo.channel('dispatches')
+                    .listen('.barcode.dispatched', (e) => {
+                        console.log('Dispatch event received:', e);
+                        
+                        // 1. Play premium audio feedback
+                        playChime();
+
+                        // 2. Update stats indicators with text animation
+                        const activeStockEl = document.getElementById('stat-active-stock');
+                        const totalDispatchEl = document.getElementById('stat-total-dispatch');
+
+                        if (activeStockEl && e.stats) {
+                            activeStockEl.classList.add('scale-110', 'text-rose-500', 'font-black');
+                            setTimeout(() => {
+                                activeStockEl.innerText = e.stats.active_stock;
+                                setTimeout(() => {
+                                    activeStockEl.classList.remove('scale-110', 'text-rose-500', 'font-black');
+                                }, 300);
+                            }, 150);
+                        }
+
+                        if (totalDispatchEl && e.stats) {
+                            totalDispatchEl.classList.add('scale-110', 'text-amber-500', 'font-black');
+                            setTimeout(() => {
+                                totalDispatchEl.innerText = e.stats.total_dispatch;
+                                setTimeout(() => {
+                                    totalDispatchEl.classList.remove('scale-110', 'text-amber-500', 'font-black');
+                                }, 300);
+                            }, 150);
+                        }
+
+                        // 3. Render slide-in glassmorphism notification toast
+                        const toastContainer = document.getElementById('toast-container');
+                        if (toastContainer) {
+                            const toast = document.createElement('div');
+                            toast.className = 'toast-card pointer-events-auto p-5 rounded-2xl flex items-start gap-4 border border-slate-700/60 text-white w-full shadow-2xl';
+                            toast.innerHTML = `
+                                <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 flex-shrink-0 animate-pulse">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Live Dispatch</p>
+                                        <p class="text-[10px] text-slate-500">Just now</p>
+                                    </div>
+                                    <h4 class="font-bold text-sm text-slate-100 mt-1">Item Sold & Dispatched</h4>
+                                    <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                                        Serial Code <span class="font-mono text-slate-200 font-bold bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700">${e.uid}</span> (<span class="font-medium text-slate-300">${e.productName}</span>) was shipped by operator <span class="font-semibold text-indigo-300">${e.updatedBy}</span>.
+                                    </p>
+                                </div>
+                            `;
+
+                            toastContainer.appendChild(toast);
+                            
+                            // Trigger slide-in entry animation
+                            setTimeout(() => {
+                                toast.classList.add('show');
+                            }, 50);
+
+                            // Trigger exit animation and remove from DOM
+                            setTimeout(() => {
+                                toast.classList.remove('show');
+                                setTimeout(() => {
+                                    toast.remove();
+                                }, 500);
+                            }, 5500);
+                        }
+                    });
+            }
+        });
+    </script>
 </x-app-layout>

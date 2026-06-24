@@ -116,8 +116,8 @@ class InwardItemCodeController extends Controller
 
         $uid = trim($request->input('scan_uid'));
 
-        // Find available InwardItemCode
-        $inwardItem = InwardItemCode::where('uid', $uid)->first();
+        // Find available InwardItemCode with its product loaded
+        $inwardItem = InwardItemCode::with('product')->where('uid', $uid)->first();
 
         if (!$inwardItem) {
             return back()->with('error', "Serial Code '{$uid}' does not exist in Inward Stock.");
@@ -143,6 +143,15 @@ class InwardItemCodeController extends Controller
                 'updated_by' => Auth::user()->name ?? 'System',
             ]);
         });
+
+        // Fire WebSocket event for live update (wrapped in try-catch to prevent broadcast failures from failing the web request)
+        $operator = Auth::user()->name ?? 'System';
+        try {
+            event(new \App\Events\BarcodeDispatched($inwardItem, $uid, $operator));
+        } catch (\Exception $broadcastException) {
+            // Log the failure, but do not interrupt the successful response
+            \Illuminate\Support\Facades\Log::warning('BarcodeDispatched web broadcast failed: ' . $broadcastException->getMessage());
+        }
 
         return back()->with('success', "Successfully dispatched Serial Code '{$uid}' as Sold.");
     }
