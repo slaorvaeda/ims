@@ -86,7 +86,7 @@
 
                     <!-- Price -->
                     <div>
-                        <label for="price" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Unit Price ($)</label>
+                        <label for="price" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Unit Price (₹)</label>
                         <input 
                             type="number" 
                             step="0.01"

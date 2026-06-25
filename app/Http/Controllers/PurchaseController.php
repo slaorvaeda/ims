@@ -142,8 +142,13 @@ class PurchaseController extends Controller
             }
         });
 
+        $product = Product::find($validated['product_id']);
+        $productName = $product ? $product->product_name : 'Product';
+
         return redirect()->route('purchases.index')
-            ->with('success', 'Purchase record logged and corresponding ' . $quantity . ' inward serial codes successfully created.');
+            ->with('success', 'Purchase record logged and corresponding ' . $quantity . ' inward serial codes successfully created.')
+            ->with('new_purchase_uids', $uids)
+            ->with('new_purchase_product_name', $productName);
     }
 
     /**

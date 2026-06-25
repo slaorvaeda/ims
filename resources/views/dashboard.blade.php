@@ -51,7 +51,7 @@
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200 group">
             <div class="space-y-2">
                 <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Purchases Cost</p>
-                <h3 class="text-2xl font-extrabold font-heading text-slate-900 dark:text-white">${{ number_format($stats['total_purchase_cost'], 2) }}</h3>
+                <h3 class="text-2xl font-extrabold font-heading text-slate-900 dark:text-white">₹{{ number_format($stats['total_purchase_cost'], 2) }}</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400">For {{ $stats['total_purchase_qty'] }} total units</p>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform duration-200">

@@ -11,24 +11,37 @@
             <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Generator Mode</h3>
-                    <span class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wider rounded-md">Live Preview</span>
+                    <template x-if="!isEditing">
+                        <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-slate-200/80 dark:border-slate-700/30 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                            <span>Locked</span>
+                        </span>
+                    </template>
+                    <template x-if="isEditing">
+                        <span class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-amber-100 dark:border-amber-900/40 flex items-center gap-1 animate-pulse">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span>Editing</span>
+                        </span>
+                    </template>
                 </div>
                 
                 <!-- Mode Toggle -->
-                <div class="flex p-1 bg-slate-100 dark:bg-slate-950/60 rounded-2xl mb-6">
+                <div class="flex p-1 bg-slate-100 dark:bg-slate-950/60 rounded-2xl mb-6" :class="{'opacity-75 cursor-not-allowed': !isEditing}">
                     <button 
                         type="button"
-                        @click="mode = 'manual'; updateAndRender();"
+                        @click="if (isEditing) { mode = 'manual'; updateAndRender(); }"
+                        :disabled="!isEditing"
                         :class="mode === 'manual' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'"
-                        class="flex-1 py-2 text-xs font-bold rounded-xl transition-all"
+                        class="flex-1 py-2 text-xs font-bold rounded-xl transition-all disabled:pointer-events-none"
                     >
                         Manual Input
                     </button>
                     <button 
                         type="button"
-                        @click="mode = 'sequence'; updateAndRender();"
+                        @click="if (isEditing) { mode = 'sequence'; updateAndRender(); }"
+                        :disabled="!isEditing"
                         :class="mode === 'sequence' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700'"
-                        class="flex-1 py-2 text-xs font-bold rounded-xl transition-all"
+                        class="flex-1 py-2 text-xs font-bold rounded-xl transition-all disabled:pointer-events-none"
                     >
                         Bulk Sequence
                     </button>
@@ -42,10 +55,11 @@
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Barcode Text / UIDs</label>
                             <textarea 
                                 x-model="manualText"
+                                :disabled="!isEditing"
                                 @input.debounce.250ms="updateAndRender()"
                                 placeholder="Enter one text per line..."
                                 rows="5"
-                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                             ></textarea>
                             <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Type multiple items separated by new lines.</p>
                         </div>
@@ -59,9 +73,10 @@
                                 <input 
                                     type="text" 
                                     x-model="startUid"
+                                    :disabled="!isEditing"
                                     @input.debounce.250ms="updateAndRender()"
                                     placeholder="e.g., Zig0001"
-                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                             </div>
                             <div>
@@ -69,10 +84,11 @@
                                 <input 
                                     type="number" 
                                     x-model.number="quantity"
+                                    :disabled="!isEditing"
                                     @input="updateAndRender()"
                                     min="1"
                                     max="100"
-                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all"
+                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                 <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Generates up to 100 codes at a time.</p>
                             </div>
@@ -90,8 +106,9 @@
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Barcode Format</label>
                     <select 
                         x-model="format"
+                        :disabled="!isEditing"
                         @change="updateAndRender()"
-                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-sm focus:outline-none focus:border-indigo-500 transition-all"
+                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-sm focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <option value="CODE128">Code 128 (Recommended)</option>
                         <option value="CODE39">Code 39</option>
@@ -99,7 +116,7 @@
                         <option value="EAN8">EAN 8</option>
                     </select>
                 </div>
-
+ 
                 <!-- Width Slider -->
                 <div>
                     <div class="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
@@ -112,11 +129,12 @@
                         max="4" 
                         step="1"
                         x-model.number="barWidth"
+                        :disabled="!isEditing"
                         @input="updateAndRender()"
-                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                 </div>
-
+ 
                 <!-- Height Slider -->
                 <div>
                     <div class="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
@@ -129,19 +147,21 @@
                         max="150" 
                         step="5"
                         x-model.number="barHeight"
+                        :disabled="!isEditing"
                         @input="updateAndRender()"
-                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                 </div>
-
+ 
                 <!-- Display Value checkbox -->
                 <div class="flex items-center gap-3">
                     <input 
                         type="checkbox" 
                         id="displayValue" 
                         x-model="displayValue"
+                        :disabled="!isEditing"
                         @change="updateAndRender()"
-                        class="w-5 h-5 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-lg focus:ring-indigo-500 focus:ring-2"
+                        class="w-5 h-5 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-lg focus:ring-indigo-500 focus:ring-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                     <label for="displayValue" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 cursor-pointer select-none">Display Text below Barcode</label>
                 </div>
@@ -159,8 +179,9 @@
                                 min="10" 
                                 max="300" 
                                 x-model.number="printWidth"
+                                :disabled="!isEditing"
                                 @input="updateAndRender()"
-                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                                 placeholder="50"
                             >
                         </div>
@@ -171,12 +192,46 @@
                                 min="10" 
                                 max="300" 
                                 x-model.number="printHeight"
+                                :disabled="!isEditing"
                                 @input="updateAndRender()"
-                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                                 placeholder="25"
                             >
                         </div>
                     </div>
+                </div>
+
+                <!-- Lock / Unlock Settings Controls -->
+                <div class="border-t border-slate-100 dark:border-slate-800/50 pt-5 mt-2">
+                    <template x-if="!isEditing">
+                        <button 
+                            type="button" 
+                            @click="isEditing = true"
+                            class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-indigo-900/10 flex items-center justify-center gap-2"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            <span>Edit Configuration</span>
+                        </button>
+                    </template>
+                    <template x-if="isEditing">
+                        <div class="flex gap-3">
+                            <button 
+                                type="button" 
+                                @click="saveConfiguration()"
+                                class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-emerald-900/10 flex items-center justify-center gap-2"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                <span>Save Changes</span>
+                            </button>
+                            <button 
+                                type="button" 
+                                @click="cancelConfiguration()"
+                                class="px-4 py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-2xl transition-all"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -266,6 +321,7 @@
 
         function barcodeApp() {
             return {
+                isEditing: false,
                 mode: getStorage('barcode_mode', 'manual') === 'sequence' ? 'sequence' : 'manual',
                 manualText: getStorage('barcode_manualText', 'Zig0001\nZig0002'),
                 startUid: getStorage('barcode_startUid', 'Zig0010'),
@@ -285,6 +341,14 @@
                 },
 
                 updateAndRender() {
+                    this.generateItems();
+
+                    setTimeout(() => {
+                        this.renderActiveBarcodes();
+                    }, 0);
+                },
+
+                saveConfiguration() {
                     setStorage('barcode_mode', this.mode);
                     setStorage('barcode_manualText', this.manualText);
                     setStorage('barcode_startUid', this.startUid);
@@ -296,11 +360,23 @@
                     setStorage('barcode_printWidth', this.printWidth);
                     setStorage('barcode_printHeight', this.printHeight);
 
-                    this.generateItems();
+                    this.isEditing = false;
+                },
 
-                    setTimeout(() => {
-                        this.renderActiveBarcodes();
-                    }, 0);
+                cancelConfiguration() {
+                    this.mode = getStorage('barcode_mode', 'manual') === 'sequence' ? 'sequence' : 'manual';
+                    this.manualText = getStorage('barcode_manualText', 'Zig0001\nZig0002');
+                    this.startUid = getStorage('barcode_startUid', 'Zig0010');
+                    this.quantity = parseInt(getStorage('barcode_quantity', '5')) || 5;
+                    this.format = getStorage('barcode_format', 'CODE128');
+                    this.barWidth = parseInt(getStorage('barcode_barWidth', '2')) || 2;
+                    this.barHeight = parseInt(getStorage('barcode_barHeight', '60')) || 60;
+                    this.displayValue = getStorage('barcode_displayValue', 'true') === 'true';
+                    this.printWidth = parseInt(getStorage('barcode_printWidth', '50')) || 50;
+                    this.printHeight = parseInt(getStorage('barcode_printHeight', '25')) || 25;
+
+                    this.updateAndRender();
+                    this.isEditing = false;
                 },
 
                 generateItems() {
