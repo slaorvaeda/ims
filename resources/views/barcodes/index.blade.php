@@ -11,19 +11,24 @@
             <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Generator Mode</h3>
-                    <template x-if="!isEditing">
-                        <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-slate-200/80 dark:border-slate-700/30 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                            <span>Locked</span>
-                        </span>
-                    </template>
-                    <template x-if="isEditing">
-                        <span class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-amber-100 dark:border-amber-900/40 flex items-center gap-1 animate-pulse">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                            <span>Editing</span>
-                        </span>
-                    </template>
+                    <span 
+                        x-show="!isEditing" 
+                        x-cloak
+                        class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-slate-200/80 dark:border-slate-700/30 flex items-center gap-1"
+                    >
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        <span>Locked</span>
+                    </span>
+                    <span 
+                        x-show="isEditing" 
+                        x-cloak
+                        class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-amber-100 dark:border-amber-900/40 flex items-center gap-1 animate-pulse"
+                    >
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        <span>Editing</span>
+                    </span>
                 </div>
+
                 
                 <!-- Mode Toggle -->
                 <div class="flex p-1 bg-slate-100 dark:bg-slate-950/60 rounded-2xl mb-6" :class="{'opacity-75 cursor-not-allowed': !isEditing}">
@@ -46,54 +51,50 @@
                         Bulk Sequence
                     </button>
                 </div>
-
+                
                 <!-- Input Fields -->
                 <div class="space-y-4">
                     <!-- Manual Mode Fields -->
-                    <template x-if="mode === 'manual'">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Barcode Text / UIDs</label>
-                            <textarea 
-                                x-model="manualText"
-                                :disabled="!isEditing"
-                                @input.debounce.250ms="updateAndRender()"
-                                placeholder="Enter one text per line..."
-                                rows="5"
-                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
-                            ></textarea>
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Type multiple items separated by new lines.</p>
-                        </div>
-                    </template>
+                    <div x-show="mode === 'manual'" x-cloak>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Barcode Text / UIDs</label>
+                        <textarea 
+                            x-model="manualText"
+                            :disabled="!isEditing"
+                            @input.debounce.250ms="updateAndRender()"
+                            placeholder="Enter one text per line..."
+                            rows="5"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                        ></textarea>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Type multiple items separated by new lines.</p>
+                    </div>
 
                     <!-- Sequence Mode Fields -->
-                    <template x-if="mode === 'sequence'">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Starting UID</label>
-                                <input 
-                                    type="text" 
-                                    x-model="startUid"
-                                    :disabled="!isEditing"
-                                    @input.debounce.250ms="updateAndRender()"
-                                    placeholder="e.g., Zig0001"
-                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Quantity</label>
-                                <input 
-                                    type="number" 
-                                    x-model.number="quantity"
-                                    :disabled="!isEditing"
-                                    @input="updateAndRender()"
-                                    min="1"
-                                    max="100"
-                                    class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                                >
-                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Generates up to 100 codes at a time.</p>
-                            </div>
+                    <div x-show="mode === 'sequence'" x-cloak class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Starting UID</label>
+                            <input 
+                                type="text" 
+                                x-model="startUid"
+                                :disabled="!isEditing"
+                                @input.debounce.250ms="updateAndRender()"
+                                placeholder="e.g., Zig0001"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
                         </div>
-                    </template>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Quantity</label>
+                            <input 
+                                type="number" 
+                                x-model.number="quantity"
+                                :disabled="!isEditing"
+                                @input="updateAndRender()"
+                                min="1"
+                                max="100"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Generates up to 100 codes at a time.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -203,35 +204,33 @@
 
                 <!-- Lock / Unlock Settings Controls -->
                 <div class="border-t border-slate-100 dark:border-slate-800/50 pt-5 mt-2">
-                    <template x-if="!isEditing">
+                    <button 
+                        type="button" 
+                        @click="isEditing = true"
+                        x-show="!isEditing"
+                        x-cloak
+                        class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-indigo-900/10 flex items-center justify-center gap-2"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        <span>Update Configuration</span>
+                    </button>
+                    <div x-show="isEditing" x-cloak class="flex gap-3">
                         <button 
                             type="button" 
-                            @click="isEditing = true"
-                            class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-indigo-900/10 flex items-center justify-center gap-2"
+                            @click="saveConfiguration()"
+                            class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-emerald-900/10 flex items-center justify-center gap-2"
                         >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                            <span>Edit Configuration</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            <span>Save Changes</span>
                         </button>
-                    </template>
-                    <template x-if="isEditing">
-                        <div class="flex gap-3">
-                            <button 
-                                type="button" 
-                                @click="saveConfiguration()"
-                                class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-emerald-900/10 flex items-center justify-center gap-2"
-                            >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                <span>Save Changes</span>
-                            </button>
-                            <button 
-                                type="button" 
-                                @click="cancelConfiguration()"
-                                class="px-4 py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-2xl transition-all"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </template>
+                        <button 
+                            type="button" 
+                            @click="cancelConfiguration()"
+                            class="px-4 py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-2xl transition-all"
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

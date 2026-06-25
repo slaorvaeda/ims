@@ -33,6 +33,9 @@
         
         <!-- Custom Styles -->
         <style>
+            [x-cloak] {
+                display: none !important;
+            }
             body {
                 font-family: 'Plus Jakarta Sans', sans-serif;
             }
