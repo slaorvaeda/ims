@@ -61,8 +61,8 @@
         <div class="flex flex-col xl:flex-row justify-between items-stretch xl:items-center gap-4">
             <!-- Search and Filters Panel -->
             <div class="flex-1 p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-                <form method="GET" action="{{ route('inward-item-codes.index') }}" class="w-full flex flex-col sm:flex-row gap-4">
-                    <div class="relative flex-1">
+                <form method="GET" action="{{ route('inward-item-codes.index') }}" class="w-full flex flex-col sm:flex-row gap-4 items-center">
+                    <div class="relative flex-1 w-full">
                         <input 
                             type="text" 
                             name="search" 
@@ -89,14 +89,20 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10">
-                        Apply Search
-                    </button>
-                    @if ($search || $status)
-                        <a href="{{ route('inward-item-codes.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm text-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
-                            Clear
-                        </a>
-                    @endif
+                    <div class="flex w-full sm:w-auto items-center gap-2">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10 whitespace-nowrap">
+                            Apply Search
+                        </button>
+                        @if ($search || $status)
+                            <a href="{{ route('inward-item-codes.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm text-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                                Clear
+                            </a>
+                        @endif
+                        <button type="button" @click="showExcelTools = !showExcelTools" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border border-slate-200/40 dark:border-slate-700/40 shrink-0">
+                            <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                            <span>Excel Import/Export</span>
+                        </button>
+                    </div>
                 </form>
             </div>
             
@@ -118,6 +124,49 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
                     <span>Card View</span>
                 </button>
+            </div>
+        </div>
+
+        <!-- Excel Tools Panel (Toggleable) -->
+        <div x-show="showExcelTools" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-4"
+             class="p-6 bg-gradient-to-br from-indigo-50/50 to-slate-50 dark:from-indigo-950/20 dark:to-slate-900 border border-indigo-100/60 dark:border-slate-800/80 rounded-[2rem] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6" 
+             x-cloak>
+            <!-- Export Section -->
+            <div class="space-y-3">
+                <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Export Data
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Download all inward serial codes matching the current search & status criteria as an Excel-compatible CSV file.
+                </p>
+                <a href="{{ route('inward-item-codes.export', ['search' => request('search'), 'status' => request('status')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-950/10">
+                    Export Filtered Serial Codes
+                </a>
+            </div>
+
+            <!-- Import Section -->
+            <div class="space-y-3">
+                <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Import Serial Codes
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Upload an Excel/CSV file with columns: <strong>UID, Product ID, SKU, Quantity, Status</strong>. UID must be unique. Product ID or SKU is used to match products. Status defaults to "In Stock".
+                </p>
+                <form action="{{ route('inward-item-codes.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center gap-3">
+                    @csrf
+                    <input type="file" name="file" required class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-100 dark:file:bg-slate-800 file:text-slate-700 dark:file:text-slate-300 hover:file:bg-slate-200 dark:hover:file:bg-slate-700 transition-all border border-slate-200 dark:border-slate-800 rounded-xl p-1 bg-white dark:bg-slate-950">
+                    <button type="submit" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-emerald-950/10 whitespace-nowrap">
+                        Upload & Import
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -150,6 +199,13 @@
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Download Selected</span>
+                </button>
+                <button 
+                    @click="printSelectedBarcodes()" 
+                    class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"/></svg>
+                    <span>Print Selected</span>
                 </button>
             </div>
         </div>
@@ -415,6 +471,7 @@
                             min="10" 
                             max="300" 
                             x-model.number="printWidth"
+                            @input="setStorage('barcode_printWidth', printWidth)"
                             class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
                             placeholder="50"
                         >
@@ -426,6 +483,7 @@
                             min="10" 
                             max="300" 
                             x-model.number="printHeight"
+                            @input="setStorage('barcode_printHeight', printHeight)"
                             class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
                             placeholder="25"
                         >
@@ -447,18 +505,36 @@
         </div>
     </div>
 
-
-
     <!-- Barcode Rendering and Modal Logic -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script>
+        function getStorage(key, fallback) {
+            try {
+                const val = localStorage.getItem(key);
+                return val !== null ? val : fallback;
+            } catch (e) {
+                return fallback;
+            }
+        }
+        function setStorage(key, val) {
+            try {
+                localStorage.setItem(key, val);
+            } catch (e) {}
+        }
+
         function barcodeModalApp() {
             return {
                 isOpen: false,
+                showExcelTools: false,
                 uid: '',
                 productName: '',
-                printWidth: parseInt(localStorage.getItem('modal_printWidth')) || 50,
-                printHeight: parseInt(localStorage.getItem('modal_printHeight')) || 25,
+                printWidth: parseInt(getStorage('barcode_printWidth', '50')) || 50,
+                printHeight: parseInt(getStorage('barcode_printHeight', '25')) || 25,
+                printGap: parseInt(getStorage('barcode_printGap', '3')) || 3,
+                format: getStorage('barcode_format', 'CODE128'),
+                barWidth: parseInt(getStorage('barcode_barWidth', '2')) || 2,
+                barHeight: parseInt(getStorage('barcode_barHeight', '60')) || 60,
+                displayValue: getStorage('barcode_displayValue', 'true') === 'true',
                 selectedUids: [],
                 pageUids: {!! json_encode($inwardItemCodes->pluck('uid')->toArray()) !!},
                 
@@ -485,10 +561,10 @@
                     
                     try {
                         JsBarcode(tempSvg, uid, {
-                            format: "CODE128",
-                            width: 2,
-                            height: 70,
-                            displayValue: true,
+                            format: this.format,
+                            width: this.barWidth,
+                            height: this.barHeight,
+                            displayValue: this.displayValue,
                             margin: 10,
                             background: "#ffffff",
                             lineColor: "#000000"
@@ -540,6 +616,138 @@
                         }, index * 250);
                     });
                 },
+
+                printSelectedBarcodes() {
+                    if (this.selectedUids.length === 0) return;
+                    
+                    const printDiv = document.createElement("div");
+                    printDiv.id = "temp-print-area";
+                    printDiv.style.setProperty('--print-w', `${this.printWidth || 50}mm`);
+                    printDiv.style.setProperty('--print-h', `${this.printHeight || 25}mm`);
+                    
+                    const printArea = document.createElement("div");
+                    printArea.id = "print-area";
+                    printDiv.appendChild(printArea);
+                    document.body.appendChild(printDiv);
+                    
+                    this.selectedUids.forEach((uid, index) => {
+                        const card = document.createElement("div");
+                        card.className = "barcode-card";
+                        
+                        const skuText = document.createElement("div");
+                        skuText.className = "print-sku-title";
+                        
+                        let product = "";
+                        try {
+                            const rows = document.querySelectorAll("tbody tr");
+                            for (let row of rows) {
+                                const checkbox = row.querySelector("input[type='checkbox']");
+                                if (checkbox && checkbox.value === JSON.stringify(uid)) {
+                                    const productNameSpan = row.querySelector("td:nth-child(4) span.font-bold") || row.querySelector("td:nth-child(4)");
+                                    if (productNameSpan) {
+                                        product = productNameSpan.textContent.trim().toLowerCase();
+                                    }
+                                    break;
+                                }
+                            }
+                        } catch (e) {}
+                        
+                        skuText.textContent = product || "product";
+                        card.appendChild(skuText);
+                        
+                        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                        svg.id = "print-svg-" + index;
+                        card.appendChild(svg);
+                        printArea.appendChild(card);
+                        
+                        try {
+                            JsBarcode(svg, uid, {
+                                format: this.format,
+                                width: this.barWidth,
+                                height: this.barHeight,
+                                displayValue: this.displayValue,
+                                margin: 10,
+                                marginTop: 2,
+                                background: "#ffffff",
+                                lineColor: "#000000"
+                            });
+                        } catch (err) {
+                            console.error("Failed to render barcode in print selection", err);
+                        }
+                    });
+                    
+                    const style = document.createElement("style");
+                    style.id = "temp-print-style-bulk";
+                    style.innerHTML = `
+                        @media print {
+                            @page {
+                                margin: 0;
+                            }
+                            body > :not(#temp-print-area) {
+                                display: none !important;
+                            }
+                            #temp-print-area {
+                                position: static !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                background: white !important;
+                                text-align: left !important;
+                            }
+                            #temp-print-area #print-area {
+                                width: 100% !important;
+                                display: flex !important;
+                                flex-wrap: wrap !important;
+                                justify-content: flex-start !important;
+                                gap: ${this.printGap || 3}mm !important;
+                                border: none !important;
+                                background: white !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                overflow: visible !important;
+                                max-height: none !important;
+                            }
+                            .barcode-card {
+                                width: var(--print-w, 50mm) !important;
+                                height: var(--print-h, 25mm) !important;
+                                max-width: var(--print-w, 50mm) !important;
+                                max-height: var(--print-h, 25mm) !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                display: flex !important;
+                                flex-direction: column !important;
+                                align-items: flex-start !important;
+                                justify-content: center !important;
+                                box-sizing: border-box !important;
+                                background: white !important;
+                                page-break-inside: avoid;
+                            }
+                            .barcode-card svg {
+                                max-width: 100% !important;
+                                max-height: 100% !important;
+                                width: auto !important;
+                                height: auto !important;
+                                object-fit: contain !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                            }
+                            .barcode-card .print-sku-title {
+                                display: block !important;
+                                font-size: 8px !important;
+                                text-transform: lowercase !important;
+                                margin-bottom: 0 !important;
+                                line-height: 1 !important;
+                                font-family: monospace !important;
+                                color: black !important;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    window.print();
+                    document.body.removeChild(printDiv);
+                    document.head.removeChild(style);
+                },
                 viewMode: localStorage.getItem('inward_view_mode') || 'list',
                 inputFocused: true,
 
@@ -557,13 +765,21 @@
                     this.productName = productName;
                     this.isOpen = true;
                     
+                    // Sync settings in case they were modified elsewhere
+                    this.printWidth = parseInt(getStorage('barcode_printWidth', '50')) || 50;
+                    this.printHeight = parseInt(getStorage('barcode_printHeight', '25')) || 25;
+                    this.format = getStorage('barcode_format', 'CODE128');
+                    this.barWidth = parseInt(getStorage('barcode_barWidth', '2')) || 2;
+                    this.barHeight = parseInt(getStorage('barcode_barHeight', '60')) || 60;
+                    this.displayValue = getStorage('barcode_displayValue', 'true') === 'true';
+
                     this.$nextTick(() => {
                         try {
                             JsBarcode("#modal-barcode-svg", uid, {
-                                format: "CODE128",
-                                width: 2,
-                                height: 70,
-                                displayValue: true,
+                                format: this.format,
+                                width: this.barWidth,
+                                height: this.barHeight,
+                                displayValue: this.displayValue,
                                 margin: 10,
                                 marginTop: 2,
                                 background: "#ffffff",
@@ -613,8 +829,8 @@
                 },
                 
                 printBarcode() {
-                    localStorage.setItem('modal_printWidth', this.printWidth);
-                    localStorage.setItem('modal_printHeight', this.printHeight);
+                    setStorage('barcode_printWidth', this.printWidth);
+                    setStorage('barcode_printHeight', this.printHeight);
                     const card = document.getElementById("modal-barcode-print-content").cloneNode(true);
                     const printDiv = document.createElement("div");
                     printDiv.id = "temp-print-area";
@@ -625,20 +841,18 @@
                     style.id = "temp-print-style";
                     style.innerHTML = `
                         @media print {
-                            body * {
-                                visibility: hidden;
+                            @page {
+                                margin: 0;
                             }
-                            #temp-print-area, #temp-print-area * {
-                                visibility: visible;
+                            body > :not(#temp-print-area) {
+                                display: none !important;
                             }
                             #temp-print-area {
-                                position: absolute;
-                                left: 50%;
-                                top: 50%;
-                                transform: translate(-50%, -50%);
+                                position: static !important;
                                 padding: 0 !important;
+                                margin: 0 !important;
                                 background: white !important;
-                                text-align: center;
+                                text-align: left !important;
                             }
                             #temp-print-area #modal-barcode-print-content {
                                 width: ${this.printWidth || 50}mm !important;
@@ -651,7 +865,7 @@
                                 margin: 0 !important;
                                 display: flex !important;
                                 flex-direction: column !important;
-                                align-items: center !important;
+                                align-items: flex-start !important;
                                 justify-content: center !important;
                                 background: white !important;
                                 box-sizing: border-box !important;

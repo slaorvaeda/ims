@@ -47,6 +47,7 @@
                             <th class="py-4 px-6">ID</th>
                             <th class="py-4 px-6">Name</th>
                             <th class="py-4 px-6">Email Address</th>
+                            <th class="py-4 px-6">Role</th>
                             <th class="py-4 px-6">Status</th>
                             <th class="py-4 px-6">Registered On</th>
                             <th class="py-4 px-6 text-right">Actions</th>
@@ -58,6 +59,17 @@
                                 <td class="py-4.5 px-6 font-semibold">{{ $user->id }}</td>
                                 <td class="py-4.5 px-6 font-bold text-slate-900 dark:text-white">{{ $user->name }}</td>
                                 <td class="py-4.5 px-6">{{ $user->email }}</td>
+                                <td class="py-4.5 px-6">
+                                    @if ($user->role === 'admin')
+                                        <span class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded-lg border border-amber-100 dark:border-amber-900/40 uppercase tracking-wider">
+                                            Admin
+                                        </span>
+                                    @else
+                                        <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded-lg border border-slate-200/80 dark:border-slate-700/30 uppercase tracking-wider">
+                                            Operator
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="py-4.5 px-6">
                                     @if ($user->status === 'Active')
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
@@ -93,7 +105,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                                     No users found.
                                 </td>
                             </tr>

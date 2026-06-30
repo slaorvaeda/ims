@@ -5,11 +5,145 @@ namespace App\Http\Controllers;
 use App\Models\DispatchItemCode;
 use App\Models\InwardItemCode;
 use App\Models\Product;
+use App\Services\CsvExcelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DispatchItemCodeController extends Controller
 {
+    /**
+     * Export dispatch item codes to Excel/CSV.
+     */
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+
+        $dispatchItemCodes = DispatchItemCode::with('product')
+            ->where(function ($q) {
+                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+            })
+            ->when($search, function ($query, $search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('uid', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($q) use ($search) {
+                            $q->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('product_id', 'like', "%{$search}%")
+                                ->orWhere('sku', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest()
+            ->get();
+
+        $headers = ['UID', 'Product ID', 'SKU', 'Product Name', 'Quantity', 'Status', 'Updated By', 'Created At'];
+        $data = [];
+
+        foreach ($dispatchItemCodes as $item) {
+            $data[] = [
+                $item->uid,
+                $item->product->product_id ?? '',
+                $item->product->sku ?? '',
+                $item->product->product_name ?? '',
+                $item->quantity,
+                $item->status,
+                $item->updated_by ?? 'System',
+                $item->created_at ? $item->created_at->toDateTimeString() : '',
+            ];
+        }
+
+        return CsvExcelService::export($headers, $data, 'dispatch_item_codes_export_' . now()->format('Ymd_His') . '.csv');
+    }
+
+    /**
+     * Import dispatch item codes from Excel/CSV.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:4096',
+        ]);
+
+        try {
+            $records = CsvExcelService::import(
+                $request->file('file')->getRealPath(),
+                ['UID']
+            );
+
+            $imported = 0;
+            $errors = [];
+            $user = Auth::user()->name ?? 'System';
+
+            DB::beginTransaction();
+
+            foreach ($records as $index => $record) {
+                $rowNumber = $index + 2;
+
+                $uid = $record['UID'] ?? '';
+                $productIdCode = $record['Product ID'] ?? '';
+                $sku = $record['SKU'] ?? '';
+                $quantity = intval($record['Quantity'] ?? -1);
+                $status = $record['Status'] ?? 'Sold';
+
+                if (empty($uid)) {
+                    $errors[] = "Row {$rowNumber}: UID is required.";
+                    continue;
+                }
+
+                // Check for duplicate dispatch in DB (excluding cancelled records)
+                if (DispatchItemCode::where('uid', $uid)->where(function($q) {
+                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+                })->exists()) {
+                    $errors[] = "Row {$rowNumber}: UID '{$uid}' is already dispatched.";
+                    continue;
+                }
+
+                if (empty($productIdCode) && empty($sku)) {
+                    $errors[] = "Row {$rowNumber}: Missing both Product ID and SKU.";
+                    continue;
+                }
+
+                $product = null;
+                if (!empty($sku)) {
+                    $product = Product::where('sku', $sku)->first();
+                }
+                if (!$product && !empty($productIdCode)) {
+                    $product = Product::where('product_id', $productIdCode)->first();
+                }
+
+                if (!$product) {
+                    $errors[] = "Row {$rowNumber}: Product not found with Product ID '{$productIdCode}' or SKU '{$sku}'.";
+                    continue;
+                }
+
+                DispatchItemCode::create([
+                    'product_id' => $product->id,
+                    'uid' => $uid,
+                    'quantity' => $quantity,
+                    'status' => $status,
+                    'updated_by' => $user,
+                ]);
+
+                $imported++;
+            }
+
+            if (!empty($errors)) {
+                DB::rollBack();
+                return redirect()->route('dispatch-item-codes.index')
+                    ->with('error', 'Import failed due to validation errors. First few: ' . implode(' | ', array_slice($errors, 0, 5)));
+            }
+
+            DB::commit();
+
+            return redirect()->route('dispatch-item-codes.index')
+                ->with('success', "Dispatch item codes import completed successfully. Imported {$imported} records.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('dispatch-item-codes.index')
+                ->with('error', 'Import failed: ' . $e->getMessage());
+        }
+    }
     /**
      * Display a listing of the resource.
      */
@@ -18,12 +152,17 @@ class DispatchItemCodeController extends Controller
         $search = $request->input('search');
 
         $dispatchItemCodes = DispatchItemCode::with('product')
+            ->where(function ($q) {
+                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+            })
             ->when($search, function ($query, $search) {
-                $query->where('uid', 'like', "%{$search}%")
-                    ->orWhereHas('product', function ($q) use ($search) {
-                        $q->where('product_name', 'like', "%{$search}%")
-                            ->orWhere('product_id', 'like', "%{$search}%");
-                    });
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('uid', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($q) use ($search) {
+                            $q->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('product_id', 'like', "%{$search}%");
+                        });
+                });
             })
             ->latest()
             ->paginate(15);
@@ -38,8 +177,10 @@ class DispatchItemCodeController extends Controller
     {
         $products = Product::all();
         
-        // Fetch inward UIDs that have not been dispatched yet
-        $dispatchedUids = DispatchItemCode::pluck('uid')->toArray();
+        // Fetch inward UIDs that have not been actively dispatched yet (ignoring cancelled)
+        $dispatchedUids = DispatchItemCode::where(function ($q) {
+            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+        })->pluck('uid')->toArray();
         $availableInwardItems = InwardItemCode::whereNotIn('uid', $dispatchedUids)->get();
 
         return view('dispatch_item_codes.create', compact('products', 'availableInwardItems'));
@@ -59,7 +200,17 @@ class DispatchItemCodeController extends Controller
         $validated['quantity'] = -1;
         $validated['updated_by'] = Auth::user()->name ?? 'System';
 
-        DispatchItemCode::create($validated);
+        DB::transaction(function () use ($validated) {
+            DispatchItemCode::create($validated);
+
+            // Update Inward status to match dispatch status
+            $inwardItem = InwardItemCode::where('uid', $validated['uid'])->first();
+            if ($inwardItem) {
+                $inwardItem->update([
+                    'status' => $validated['status'],
+                ]);
+            }
+        });
 
         return redirect()->route('dispatch-item-codes.index')
             ->with('success', 'Item dispatched successfully.');
@@ -80,8 +231,11 @@ class DispatchItemCodeController extends Controller
     {
         $products = Product::all();
         
-        // Fetch inward UIDs that have not been dispatched yet (including the current one being edited)
-        $dispatchedUids = DispatchItemCode::where('id', '!=', $dispatchItemCode->id)->pluck('uid')->toArray();
+        // Fetch inward UIDs that have not been active (excluding this one and ignoring cancelled)
+        $dispatchedUids = DispatchItemCode::where('id', '!=', $dispatchItemCode->id)
+            ->where(function ($q) {
+                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+            })->pluck('uid')->toArray();
         $availableInwardItems = InwardItemCode::whereNotIn('uid', $dispatchedUids)->get();
 
         return view('dispatch_item_codes.edit', compact('dispatchItemCode', 'products', 'availableInwardItems'));
@@ -101,10 +255,74 @@ class DispatchItemCodeController extends Controller
         $validated['quantity'] = -1;
         $validated['updated_by'] = Auth::user()->name ?? 'System';
 
-        $dispatchItemCode->update($validated);
+        DB::transaction(function () use ($dispatchItemCode, $validated) {
+            $oldUid = $dispatchItemCode->uid;
+            $newUid = $validated['uid'];
+
+            $dispatchItemCode->update($validated);
+
+            // If UID changed, reset old UID status to 'Good Inventory'
+            if ($oldUid !== $newUid) {
+                $oldInward = InwardItemCode::where('uid', $oldUid)->first();
+                if ($oldInward) {
+                    $oldInward->update([
+                        'status' => 'Good Inventory',
+                    ]);
+                }
+            }
+
+            // Update new UID status to match dispatch status
+            $newInward = InwardItemCode::where('uid', $newUid)->first();
+            if ($newInward) {
+                $newInward->update([
+                    'status' => $validated['status'],
+                ]);
+            }
+        });
 
         return redirect()->route('dispatch-item-codes.index')
             ->with('success', 'Dispatch record updated successfully.');
+    }
+
+    /**
+     * Scan and cancel dispatch of a serial code.
+     */
+    public function scanCancel(Request $request)
+    {
+        $request->validate([
+            'scan_uid' => 'required|string|max:255',
+        ]);
+
+        $uid = trim($request->input('scan_uid'));
+
+        // Find the active Dispatch record
+        $dispatchItem = DispatchItemCode::where('uid', $uid)
+            ->where(function ($q) {
+                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+            })
+            ->first();
+
+        if (!$dispatchItem) {
+            return back()->with('error', "Serial Code '{$uid}' is not currently dispatched.");
+        }
+
+        // Run in transaction to update dispatch record mark to 'cancelled' and update Inward status to 'Good Inventory'
+        DB::transaction(function () use ($dispatchItem, $uid) {
+            // Update dispatch record mark to 'cancelled'
+            $dispatchItem->update([
+                'mark' => 'cancelled',
+            ]);
+
+            // Find matching InwardItemCode and set back to 'Good Inventory'
+            $inwardItem = InwardItemCode::where('uid', $uid)->first();
+            if ($inwardItem) {
+                $inwardItem->update([
+                    'status' => 'Good Inventory',
+                ]);
+            }
+        });
+
+        return back()->with('success', "Successfully cancelled dispatch for Serial Code '{$uid}'. It has been returned to Good Inventory.");
     }
 
     /**
@@ -112,9 +330,24 @@ class DispatchItemCodeController extends Controller
      */
     public function destroy(DispatchItemCode $dispatchItemCode)
     {
-        $dispatchItemCode->delete();
+        $uid = $dispatchItemCode->uid;
+
+        DB::transaction(function () use ($dispatchItemCode, $uid) {
+            // Update dispatch record mark to 'cancelled' instead of deleting it
+            $dispatchItemCode->update([
+                'mark' => 'cancelled',
+            ]);
+
+            // Find matching InwardItemCode and set back to 'Good Inventory'
+            $inwardItem = InwardItemCode::where('uid', $uid)->first();
+            if ($inwardItem) {
+                $inwardItem->update([
+                    'status' => 'Good Inventory',
+                ]);
+            }
+        });
 
         return redirect()->route('dispatch-item-codes.index')
-            ->with('success', 'Dispatch record deleted successfully.');
+            ->with('success', 'Dispatch record cancelled and item returned to Good Inventory successfully.');
     }
 }

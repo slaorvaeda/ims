@@ -11,31 +11,83 @@
         </div>
     </x-slot>
 
-    <div class="space-y-6">
+    <div x-data="{ showExcelTools: false }" class="space-y-6">
         <!-- Search Panel -->
         <div class="p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm">
-            <form method="GET" action="{{ route('sales.index') }}" class="flex flex-col sm:flex-row gap-4">
-                <div class="relative flex-1">
-                    <input 
-                        type="text" 
-                        name="search" 
-                        value="{{ $search }}" 
-                        placeholder="Search sales by Portal ID or Product..." 
-                        class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
-                    >
-                    <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <form method="GET" action="{{ route('sales.index') }}" class="flex-1 flex flex-col sm:flex-row gap-4">
+                    <div class="relative flex-1">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            value="{{ $search }}" 
+                            placeholder="Search sales by Portal ID or Product..." 
+                            class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        >
+                        <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10">
+                        Apply Search
+                    </button>
+                    @if ($search)
+                        <a href="{{ route('sales.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm text-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                            Clear
+                        </a>
+                    @endif
+                </form>
+
+                <div class="flex items-center gap-2">
+                    <button @click="showExcelTools = !showExcelTools" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border border-slate-200/40 dark:border-slate-700/40">
+                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                        <span>Excel Import/Export</span>
+                    </button>
                 </div>
-                <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10">
-                    Apply Search
-                </button>
-                @if ($search)
-                    <a href="{{ route('sales.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm text-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
-                        Clear
-                    </a>
-                @endif
-            </form>
+            </div>
+        </div>
+
+        <!-- Excel Tools Panel (Toggleable) -->
+        <div x-show="showExcelTools" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-4"
+             class="p-6 bg-gradient-to-br from-indigo-50/50 to-slate-50 dark:from-indigo-950/20 dark:to-slate-900 border border-indigo-100/60 dark:border-slate-800/80 rounded-[2rem] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6" 
+             x-cloak>
+            <!-- Export Section -->
+            <div class="space-y-3">
+                <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Export Data
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Download all sales orders matching the current search criteria as an Excel-compatible CSV file.
+                </p>
+                <a href="{{ route('sales.export', ['search' => request('search')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-950/10">
+                    Export Filtered Sales
+                </a>
+            </div>
+
+            <!-- Import Section -->
+            <div class="space-y-3">
+                <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Import Sales
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Upload an Excel/CSV file with columns: <strong>Order Date, Portal ID, Quantity, Product ID, SKU</strong>. Product ID or SKU is used to match products. Date format: YYYY-MM-DD.
+                </p>
+                <form action="{{ route('sales.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center gap-3">
+                    @csrf
+                    <input type="file" name="file" required class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-100 dark:file:bg-slate-800 file:text-slate-700 dark:file:text-slate-300 hover:file:bg-slate-200 dark:hover:file:bg-slate-700 transition-all border border-slate-200 dark:border-slate-800 rounded-xl p-1 bg-white dark:bg-slate-950">
+                    <button type="submit" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-emerald-950/10 whitespace-nowrap">
+                        Upload & Import
+                    </button>
+                </form>
+            </div>
         </div>
 
         <!-- Table Panel -->

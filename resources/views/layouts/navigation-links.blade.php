@@ -9,6 +9,18 @@
     <span x-show="!sidebarMinimized">Dashboard</span>
 </a>
 
+<!-- Analytics Link -->
+<a href="{{ route('analytics.index') }}" 
+   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('analytics.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
+   :class="sidebarMinimized ? 'justify-center px-2' : ''"
+   x-bind:title="sidebarMinimized ? 'Analytics' : ''">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+    </svg>
+    <span x-show="!sidebarMinimized">Analytics</span>
+</a>
+
+@if(auth()->user()->hasPermission('products'))
 <!-- Product Master Link -->
 <a href="{{ route('products.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('products.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -19,7 +31,9 @@
     </svg>
     <span x-show="!sidebarMinimized">Product Master</span>
 </a>
+@endif
 
+@if(auth()->user()->hasPermission('purchases'))
 <!-- Purchase Master Link -->
 <a href="{{ route('purchases.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('purchases.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -30,7 +44,9 @@
     </svg>
     <span x-show="!sidebarMinimized">Purchase Master</span>
 </a>
+@endif
 
+@if(auth()->user()->hasPermission('inward_item_codes'))
 <!-- Inward ItemCode Master Link -->
 <a href="{{ route('inward-item-codes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('inward-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -41,7 +57,9 @@
     </svg>
     <span x-show="!sidebarMinimized">Inward Serial Codes</span>
 </a>
+@endif
 
+@if(auth()->user()->hasPermission('sales'))
 <!-- Sale Master Link -->
 <a href="{{ route('sales.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('sales.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -52,7 +70,9 @@
     </svg>
     <span x-show="!sidebarMinimized">Sale Master</span>
 </a>
+@endif
 
+@if(auth()->user()->hasPermission('dispatch_item_codes'))
 <!-- Dispatch ItemCode Master Link -->
 <a href="{{ route('dispatch-item-codes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('dispatch-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -63,7 +83,9 @@
     </svg>
     <span x-show="!sidebarMinimized">Dispatch Serial Codes</span>
 </a>
+@endif
 
+@if(auth()->user()->role === 'admin')
 <!-- User Master Link -->
 <a href="{{ route('users.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('users.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -74,7 +96,9 @@
     </svg>
     <span x-show="!sidebarMinimized">User Master</span>
 </a>
+@endif
 
+@if(auth()->user()->hasPermission('barcodes'))
 <!-- Barcode Generator Link -->
 <a href="{{ route('barcodes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('barcodes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -85,3 +109,4 @@
     </svg>
     <span x-show="!sidebarMinimized">Barcode Generator</span>
 </a>
+@endif

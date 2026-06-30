@@ -172,9 +172,9 @@
                 <!-- Print Dimensions (mm) -->
                 <div class="border-t border-slate-100 dark:border-slate-800/50 pt-4 space-y-4">
                     <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Print Dimensions (mm)</h4>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Width (mm)</label>
+                            <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Width (mm)</label>
                             <input 
                                 type="number" 
                                 min="10" 
@@ -182,12 +182,12 @@
                                 x-model.number="printWidth"
                                 :disabled="!isEditing"
                                 @input="updateAndRender()"
-                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                                 placeholder="50"
                             >
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Height (mm)</label>
+                            <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Height (mm)</label>
                             <input 
                                 type="number" 
                                 min="10" 
@@ -195,8 +195,21 @@
                                 x-model.number="printHeight"
                                 :disabled="!isEditing"
                                 @input="updateAndRender()"
-                                class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                                 placeholder="25"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Gap (mm)</label>
+                            <input 
+                                type="number" 
+                                min="0" 
+                                max="50" 
+                                x-model.number="printGap"
+                                :disabled="!isEditing"
+                                @input="updateAndRender()"
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                                placeholder="3"
                             >
                         </div>
                     </div>
@@ -256,7 +269,7 @@
                 </div>
 
                 <!-- Barcode Grid Container (The Target of printing) -->
-                <div id="print-area" class="flex-1 flex flex-wrap gap-5 justify-center items-start overflow-y-auto p-4 max-h-[600px] border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50 dark:bg-slate-950/40">
+                <div id="print-area" :style="'gap: ' + printGap + 'mm !important;'" class="flex-1 flex flex-wrap gap-5 justify-center items-start overflow-y-auto p-4 max-h-[600px] border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50 dark:bg-slate-950/40">
                     <template x-for="(item, index) in items" :key="index">
                         <div class="barcode-card p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center shadow-sm relative group shrink-0">
                             <!-- Label top info -->
@@ -331,6 +344,7 @@
                 displayValue: getStorage('barcode_displayValue', 'true') === 'true',
                 printWidth: parseInt(getStorage('barcode_printWidth', '50')) || 50,
                 printHeight: parseInt(getStorage('barcode_printHeight', '25')) || 25,
+                printGap: parseInt(getStorage('barcode_printGap', '3')) || 3,
 
                 uidSkuMap: {!! json_encode($uidSkuMap) !!},
                 items: [],
@@ -358,6 +372,7 @@
                     setStorage('barcode_displayValue', this.displayValue);
                     setStorage('barcode_printWidth', this.printWidth);
                     setStorage('barcode_printHeight', this.printHeight);
+                    setStorage('barcode_printGap', this.printGap);
 
                     this.isEditing = false;
                 },
@@ -373,6 +388,7 @@
                     this.displayValue = getStorage('barcode_displayValue', 'true') === 'true';
                     this.printWidth = parseInt(getStorage('barcode_printWidth', '50')) || 50;
                     this.printHeight = parseInt(getStorage('barcode_printHeight', '25')) || 25;
+                    this.printGap = parseInt(getStorage('barcode_printGap', '3')) || 3;
 
                     this.updateAndRender();
                     this.isEditing = false;
@@ -463,7 +479,91 @@
                 },
 
                 printBarcodes() {
+                    const area = document.getElementById("print-area").cloneNode(true);
+                    const printDiv = document.createElement("div");
+                    printDiv.id = "temp-print-area";
+                    printDiv.style.setProperty('--print-w', `${this.printWidth || 50}mm`);
+                    printDiv.style.setProperty('--print-h', `${this.printHeight || 25}mm`);
+                    printDiv.appendChild(area);
+                    document.body.appendChild(printDiv);
+                    
+                    const style = document.createElement("style");
+                    style.id = "temp-print-style-bulk";
+                    style.innerHTML = `
+                        @media print {
+                            @page {
+                                margin: 0;
+                            }
+                            body > :not(#temp-print-area) {
+                                display: none !important;
+                            }
+                            #temp-print-area {
+                                position: static !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                background: white !important;
+                                text-align: left !important;
+                            }
+                            #temp-print-area #print-area {
+                                width: 100% !important;
+                                display: flex !important;
+                                flex-wrap: wrap !important;
+                                justify-content: flex-start !important;
+                                gap: ${this.printGap || 3}mm !important;
+                                border: none !important;
+                                background: white !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                overflow: visible !important;
+                                max-height: none !important;
+                            }
+                            .barcode-card {
+                                width: var(--print-w, 50mm) !important;
+                                height: var(--print-h, 25mm) !important;
+                                max-width: var(--print-w, 50mm) !important;
+                                max-height: var(--print-h, 25mm) !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                                padding: 0 !important;
+                                margin: 0 !important;
+                                display: flex !important;
+                                flex-direction: column !important;
+                                align-items: flex-start !important;
+                                justify-content: center !important;
+                                box-sizing: border-box !important;
+                                background: white !important;
+                                page-break-inside: avoid;
+                            }
+                            .barcode-card svg {
+                                max-width: 100% !important;
+                                max-height: 100% !important;
+                                width: auto !important;
+                                height: auto !important;
+                                object-fit: contain !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
+                            }
+                            .barcode-card .label-title {
+                                display: none !important;
+                            }
+                            .barcode-card .print-sku-title {
+                                display: block !important;
+                                font-size: 8px !important;
+                                text-transform: lowercase !important;
+                                margin-bottom: 0 !important;
+                                line-height: 1 !important;
+                                font-family: monospace !important;
+                                color: black !important;
+                            }
+                            .group-hover\\:opacity-100 {
+                                display: none !important;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
                     window.print();
+                    document.body.removeChild(printDiv);
+                    document.head.removeChild(style);
                 },
 
                 printSingleBarcode(index) {
@@ -479,37 +579,35 @@
                     style.id = "temp-print-style";
                     style.innerHTML = `
                         @media print {
-                            body * {
-                                visibility: hidden;
+                            @page {
+                                margin: 0;
                             }
-                            #temp-print-area, #temp-print-area * {
-                                visibility: visible;
+                            body > :not(#temp-print-area) {
+                                display: none !important;
                             }
                             #temp-print-area {
-                                position: absolute;
-                                left: 50%;
-                                top: 50%;
-                                transform: translate(-50%, -50%);
-                                padding: 0 !important;
-                                background: white !important;
-                                text-align: center;
-                            }
-                            #temp-print-area .barcode-card {
-                                width: var(--print-w, 50mm) !important;
-                                height: var(--print-h, 25mm) !important;
-                                max-width: var(--print-w, 50mm) !important;
-                                max-height: var(--print-h, 25mm) !important;
-                                border: none !important;
-                                box-shadow: none !important;
-                                padding: 0 !important;
-                                margin: 0 !important;
-                                display: flex !important;
-                                flex-direction: column !important;
-                                align-items: center !important;
-                                justify-content: center !important;
-                                box-sizing: border-box !important;
-                                background: white !important;
-                            }
+                                 position: static !important;
+                                 padding: 0 !important;
+                                 margin: 0 !important;
+                                 background: white !important;
+                                 text-align: left !important;
+                             }
+                             #temp-print-area .barcode-card {
+                                 width: var(--print-w, 50mm) !important;
+                                 height: var(--print-h, 25mm) !important;
+                                 max-width: var(--print-w, 50mm) !important;
+                                 max-height: var(--print-h, 25mm) !important;
+                                 border: none !important;
+                                 box-shadow: none !important;
+                                 padding: 0 !important;
+                                 margin: 0 !important;
+                                 display: flex !important;
+                                 flex-direction: column !important;
+                                 align-items: flex-start !important;
+                                 justify-content: center !important;
+                                 box-sizing: border-box !important;
+                                 background: white !important;
+                             }
                             #temp-print-area .barcode-card svg {
                                 max-width: 100% !important;
                                 max-height: 100% !important;
@@ -552,122 +650,4 @@
 
         // Component data is returned directly by the global barcodeApp function
     </script>
-
-    <!-- Printing CSS adjustments -->
-    <style>
-        @media print {
-            /* Hide layout items and no-print elements completely from DOM flow */
-            aside, header, .no-print {
-                display: none !important;
-            }
-            
-            /* Reset layout wrappers to collapse layout height and prevent extra pages */
-            html, body, .min-h-screen, .flex-1, main, .grid {
-                height: auto !important;
-                min-height: 0 !important;
-                overflow: visible !important;
-            }
-            
-            body > div > div {
-                padding-left: 0 !important;
-            }
-            
-            main {
-                padding: 0 !important;
-                margin: 0 !important;
-                max-width: 100% !important;
-                width: 100% !important;
-            }
-            
-            .grid {
-                display: block !important;
-            }
-            
-            .lg\:col-span-8 {
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-            
-            .lg\:col-span-8 > div {
-                border: none !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                background: transparent !important;
-            }
-
-            /* Make only the print area visible */
-            body * {
-                visibility: hidden;
-            }
-            
-            #print-area, #print-area * {
-                visibility: visible;
-            }
-            
-            #print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white !important;
-                color: black !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                display: flex !important;
-                flex-wrap: wrap !important;
-                gap: 15px !important;
-                border: none !important;
-                overflow: visible !important;
-                max-h-none !important;
-            }
-            
-            .barcode-card {
-                border: none !important;
-                box-shadow: none !important;
-                background: white !important;
-                color: black !important;
-                page-break-inside: avoid;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: var(--print-w, 50mm) !important;
-                height: var(--print-h, 25mm) !important;
-                max-width: var(--print-w, 50mm) !important;
-                max-height: var(--print-h, 25mm) !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
-                box-sizing: border-box !important;
-            }
-            
-            .barcode-card svg {
-                max-width: 100% !important;
-                max-height: 100% !important;
-                width: auto !important;
-                height: auto !important;
-                object-fit: contain !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            
-            .barcode-card .label-title {
-                display: none !important;
-            }
-            
-            .barcode-card .print-sku-title {
-                display: block !important;
-                font-size: 8px !important;
-                text-transform: lowercase !important;
-                margin-bottom: 0 !important;
-                line-height: 1 !important;
-                font-family: monospace !important;
-                color: #000000 !important;
-            }
-            
-            /* Hide the individual download hover overlays in print */
-            .barcode-card .group-hover\:opacity-100 {
-                display: none !important;
-            }
-        }
-    </style>
 </x-app-layout>

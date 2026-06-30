@@ -4,12 +4,142 @@ namespace App\Http\Controllers;
 
 use App\Models\InwardItemCode;
 use App\Models\Product;
+use App\Services\CsvExcelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class InwardItemCodeController extends Controller
 {
+    /**
+     * Export inward item codes to Excel/CSV.
+     */
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status');
+
+        $inwardItemCodes = InwardItemCode::with('product')
+            ->when($search, function ($query, $search) {
+                $query->where('uid', 'like', "%{$search}%")
+                    ->orWhereHas('product', function ($q) use ($search) {
+                        $q->where('product_name', 'like', "%{$search}%")
+                            ->orWhere('product_id', 'like', "%{$search}%")
+                            ->orWhere('sku', 'like', "%{$search}%");
+                    });
+            })
+            ->when($status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->get();
+
+        $headers = ['UID', 'Product ID', 'SKU', 'Product Name', 'Quantity', 'Status', 'Updated By', 'Created At'];
+        $data = [];
+
+        foreach ($inwardItemCodes as $item) {
+            $data[] = [
+                $item->uid,
+                $item->product->product_id ?? '',
+                $item->product->sku ?? '',
+                $item->product->product_name ?? '',
+                $item->quantity,
+                $item->status,
+                $item->updated_by ?? 'System',
+                $item->created_at ? $item->created_at->toDateTimeString() : '',
+            ];
+        }
+
+        return CsvExcelService::export($headers, $data, 'inward_item_codes_export_' . now()->format('Ymd_His') . '.csv');
+    }
+
+    /**
+     * Import inward item codes from Excel/CSV.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:4096',
+        ]);
+
+        try {
+            $records = CsvExcelService::import(
+                $request->file('file')->getRealPath(),
+                ['UID']
+            );
+
+            $imported = 0;
+            $errors = [];
+            $user = Auth::user()->name ?? 'System';
+
+            DB::beginTransaction();
+
+            foreach ($records as $index => $record) {
+                $rowNumber = $index + 2;
+
+                $uid = $record['UID'] ?? '';
+                $productIdCode = $record['Product ID'] ?? '';
+                $sku = $record['SKU'] ?? '';
+                $quantity = intval($record['Quantity'] ?? 1);
+                $status = $record['Status'] ?? 'In Stock';
+
+                if (empty($uid)) {
+                    $errors[] = "Row {$rowNumber}: UID is required.";
+                    continue;
+                }
+
+                // Check for UID uniqueness
+                if (InwardItemCode::where('uid', $uid)->exists()) {
+                    $errors[] = "Row {$rowNumber}: Duplicate UID '{$uid}'. It already exists.";
+                    continue;
+                }
+
+                if (empty($productIdCode) && empty($sku)) {
+                    $errors[] = "Row {$rowNumber}: Missing both Product ID and SKU.";
+                    continue;
+                }
+
+                $product = null;
+                if (!empty($sku)) {
+                    $product = Product::where('sku', $sku)->first();
+                }
+                if (!$product && !empty($productIdCode)) {
+                    $product = Product::where('product_id', $productIdCode)->first();
+                }
+
+                if (!$product) {
+                    $errors[] = "Row {$rowNumber}: Product not found with Product ID '{$productIdCode}' or SKU '{$sku}'.";
+                    continue;
+                }
+
+                InwardItemCode::create([
+                    'product_id' => $product->id,
+                    'uid' => $uid,
+                    'quantity' => $quantity,
+                    'status' => $status,
+                    'updated_by' => $user,
+                ]);
+
+                $imported++;
+            }
+
+            if (!empty($errors)) {
+                DB::rollBack();
+                return redirect()->route('inward-item-codes.index')
+                    ->with('error', 'Import failed due to validation errors. First few: ' . implode(' | ', array_slice($errors, 0, 5)));
+            }
+
+            DB::commit();
+
+            return redirect()->route('inward-item-codes.index')
+                ->with('success', "Inward item codes import completed successfully. Imported {$imported} records.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('inward-item-codes.index')
+                ->with('error', 'Import failed: ' . $e->getMessage());
+        }
+    }
     /**
      * Display a listing of the resource.
      */

@@ -3,11 +3,113 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Services\CsvExcelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
+    /**
+     * Export products to Excel/CSV.
+     */
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+
+        $products = Product::query()
+            ->when($search, function ($query, $search) {
+                $query->where('product_id', 'like', "%{$search}%")
+                    ->orWhere('product_name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->get();
+
+        $headers = ['Product ID', 'Product Name', 'SKU', 'FSN', 'ASIN', 'Updated By', 'Created At'];
+        $data = [];
+
+        foreach ($products as $product) {
+            $data[] = [
+                $product->product_id,
+                $product->product_name,
+                $product->sku,
+                $product->fsn,
+                $product->asin,
+                $product->updated_by ?? 'System',
+                $product->created_at ? $product->created_at->toDateTimeString() : '',
+            ];
+        }
+
+        return CsvExcelService::export($headers, $data, 'products_export_' . now()->format('Ymd_His') . '.csv');
+    }
+
+    /**
+     * Import products from Excel/CSV.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|max:4096',
+        ]);
+
+        try {
+            $records = CsvExcelService::import(
+                $request->file('file')->getRealPath(),
+                ['Product ID', 'Product Name', 'SKU']
+            );
+
+            $imported = 0;
+            $updated = 0;
+            $user = Auth::user()->name ?? 'System';
+
+            foreach ($records as $record) {
+                $productId = $record['Product ID'] ?? '';
+                $productName = $record['Product Name'] ?? '';
+                $sku = $record['SKU'] ?? '';
+
+                if (empty($productId) || empty($sku)) {
+                    continue;
+                }
+
+                // Upsert logic based on SKU or Product ID
+                $product = Product::where('sku', $sku)
+                    ->orWhere('product_id', $productId)
+                    ->first();
+
+                if ($product) {
+                    $product->update([
+                        'product_id' => $productId,
+                        'product_name' => !empty($productName) ? $productName : $product->product_name,
+                        'sku' => $sku,
+                        'fsn' => $record['FSN'] ?? $product->fsn,
+                        'asin' => $record['ASIN'] ?? $product->asin,
+                        'updated_by' => $user,
+                    ]);
+                    $updated++;
+                } else {
+                    if (empty($productName)) {
+                        continue; // Product Name is required for creation
+                    }
+                    Product::create([
+                        'product_id' => $productId,
+                        'product_name' => $productName,
+                        'sku' => $sku,
+                        'fsn' => $record['FSN'] ?? null,
+                        'asin' => $record['ASIN'] ?? null,
+                        'updated_by' => $user,
+                    ]);
+                    $imported++;
+                }
+            }
+
+            return redirect()->route('products.index')
+                ->with('success', "Products import completed. Imported: {$imported}, Updated: {$updated}.");
+
+        } catch (\Exception $e) {
+            return redirect()->route('products.index')
+                ->with('error', 'Import failed: ' . $e->getMessage());
+        }
+    }
     /**
      * Display a listing of the resource.
      */

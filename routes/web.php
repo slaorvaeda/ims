@@ -8,6 +8,7 @@ use App\Http\Controllers\DispatchItemCodeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\AnalyticsController;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\InwardItemCode;
@@ -135,17 +136,49 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // IMS Resource CRUD routes
-    Route::resource('products', ProductController::class);
-    Route::resource('purchases', PurchaseController::class);
-    Route::post('/inward-item-codes/scan-dispatch', [InwardItemCodeController::class, 'scanDispatch'])->name('inward-item-codes.scan-dispatch');
-    Route::resource('inward-item-codes', InwardItemCodeController::class);
-    Route::resource('sales', SaleController::class);
-    Route::resource('dispatch-item-codes', DispatchItemCodeController::class);
-    Route::resource('users', UserController::class);
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+    // IMS Resource CRUD routes with permission checks
+    Route::middleware('permission:products')->group(function () {
+        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
+        Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
+        Route::resource('products', ProductController::class);
+    });
+
+    Route::middleware('permission:purchases')->group(function () {
+        Route::get('/purchases/export', [PurchaseController::class, 'export'])->name('purchases.export');
+        Route::post('/purchases/import', [PurchaseController::class, 'import'])->name('purchases.import');
+        Route::resource('purchases', PurchaseController::class);
+    });
+
+    Route::middleware('permission:inward_item_codes')->group(function () {
+        Route::get('/inward-item-codes/export', [InwardItemCodeController::class, 'export'])->name('inward-item-codes.export');
+        Route::post('/inward-item-codes/import', [InwardItemCodeController::class, 'import'])->name('inward-item-codes.import');
+        Route::post('/inward-item-codes/scan-dispatch', [InwardItemCodeController::class, 'scanDispatch'])->name('inward-item-codes.scan-dispatch');
+        Route::resource('inward-item-codes', InwardItemCodeController::class);
+    });
+
+    Route::middleware('permission:sales')->group(function () {
+        Route::get('/sales/export', [SaleController::class, 'export'])->name('sales.export');
+        Route::post('/sales/import', [SaleController::class, 'import'])->name('sales.import');
+        Route::resource('sales', SaleController::class);
+    });
+
+    Route::middleware('permission:dispatch_item_codes')->group(function () {
+        Route::get('/dispatch-item-codes/export', [DispatchItemCodeController::class, 'export'])->name('dispatch-item-codes.export');
+        Route::post('/dispatch-item-codes/import', [DispatchItemCodeController::class, 'import'])->name('dispatch-item-codes.import');
+        Route::post('/dispatch-item-codes/scan-cancel', [DispatchItemCodeController::class, 'scanCancel'])->name('dispatch-item-codes.scan-cancel');
+        Route::resource('dispatch-item-codes', DispatchItemCodeController::class);
+    });
     
-    // Barcode Generator route
-    Route::get('/barcodes', [BarcodeController::class, 'index'])->name('barcodes.index');
+    Route::middleware('admin')->group(function () {
+        Route::resource('users', UserController::class);
+    });
+    
+    // Barcode Generator route with permission check
+    Route::middleware('permission:barcodes')->group(function () {
+        Route::get('/barcodes', [BarcodeController::class, 'index'])->name('barcodes.index');
+    });
 });
 
 require __DIR__.'/auth.php';

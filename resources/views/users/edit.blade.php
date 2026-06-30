@@ -7,7 +7,7 @@
 
     <div class="max-w-2xl mx-auto">
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 sm:p-8 shadow-sm">
-            <form method="POST" action="{{ route('users.update', $user->id) }}" class="space-y-6">
+            <form method="POST" action="{{ route('users.update', $user->id) }}" class="space-y-6" x-data="{ role: '{{ old('role', $user->role) }}' }">
                 @csrf
                 @method('PUT')
 
@@ -85,6 +85,52 @@
                         <option value="Inactive" {{ old('status', $user->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                     @error('status')
+                        <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Role -->
+                <div>
+                    <label for="role" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">User Role</label>
+                    <select 
+                        id="role" 
+                        name="role" 
+                        required 
+                        x-model="role"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                    >
+                        <option value="operator" {{ old('role', $user->role) == 'operator' ? 'selected' : '' }}>Operator</option>
+                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Administrator</option>
+                    </select>
+                    @error('role')
+                        <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Operator Permissions Checklist -->
+                <div x-show="role === 'operator'" x-transition class="space-y-4 p-5 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-150 dark:border-slate-800/50 rounded-2xl">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Operator Permissions</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        @php
+                            $availablePermissions = [
+                                'products' => 'Products Master',
+                                'purchases' => 'Purchase History',
+                                'inward_item_codes' => 'Inward Serial Codes',
+                                'sales' => 'Sales History',
+                                'dispatch_item_codes' => 'Dispatch Serial Codes',
+                                'barcodes' => 'Barcode Generator',
+                            ];
+                        @endphp
+                        @foreach($availablePermissions as $value => $label)
+                            <label class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
+                                <input type="checkbox" name="permissions[]" value="{{ $value }}" 
+                                       {{ in_array($value, old('permissions', is_array($user->permissions) ? $user->permissions : ['products', 'purchases', 'inward_item_codes', 'sales', 'dispatch_item_codes', 'barcodes'])) ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950">
+                                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $label }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    @error('permissions')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
                     @enderror
                 </div>

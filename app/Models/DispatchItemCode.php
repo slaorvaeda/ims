@@ -15,6 +15,7 @@ class DispatchItemCode extends Model
         'uid',
         'quantity',
         'status',
+        'mark',
         'updated_by',
     ];
 

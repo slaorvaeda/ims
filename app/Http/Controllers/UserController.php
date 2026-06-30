@@ -45,6 +45,9 @@ class UserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'status' => ['required', 'string', 'in:Active,Inactive'],
+            'role' => ['required', 'string', 'in:admin,operator'],
+            'permissions' => ['nullable', 'array'],
+            'permissions.*' => ['string', 'in:products,purchases,inward_item_codes,sales,dispatch_item_codes,barcodes'],
         ]);
 
         User::create([
@@ -52,6 +55,8 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'status' => $request->status,
+            'role' => $request->role,
+            'permissions' => $request->role === 'admin' ? null : $request->input('permissions', []),
         ]);
 
         return redirect()->route('users.index')
@@ -83,11 +88,16 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'status' => ['required', 'string', 'in:Active,Inactive'],
+            'role' => ['required', 'string', 'in:admin,operator'],
+            'permissions' => ['nullable', 'array'],
+            'permissions.*' => ['string', 'in:products,purchases,inward_item_codes,sales,dispatch_item_codes,barcodes'],
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
         $user->status = $request->status;
+        $user->role = $request->role;
+        $user->permissions = $request->role === 'admin' ? null : $request->input('permissions', []);
 
         if ($request->filled('password')) {
             $request->validate([
