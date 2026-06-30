@@ -21,12 +21,33 @@
                     >
                         <option value="">-- Choose a Product --</option>
                         @foreach ($products as $product)
-                            <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
+                            <option value="{{ $product->id }}" data-brand-id="{{ $product->brand_id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
                                 {{ $product->product_name }} ({{ $product->product_id }})
                             </option>
                         @endforeach
                     </select>
                     @error('product_id')
+                        <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Brand Selection -->
+                <div>
+                    <label for="brand_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Select Brand</label>
+                    <select 
+                        id="brand_id" 
+                        name="brand_id" 
+                        required 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                    >
+                        <option value="">-- Choose a Brand --</option>
+                        @foreach ($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->name }} ({{ $brand->sub ?: 'No Subtitle' }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('brand_id')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -178,9 +199,6 @@
 
     <!-- Script to dynamically generate UID preview sequence and autofill -->
     <script>
-        const nextUids = @json($nextUids);
-        const globalNextUid = @json($globalNextUid);
-
         function toggleManualUid() {
             const checkBox = document.getElementById('manual_uid_check');
             const uidInput = document.getElementById('start_uid');
@@ -196,27 +214,37 @@
                 uidInput.classList.add('bg-slate-100', 'dark:bg-slate-950/20', 'text-slate-500', 'dark:text-slate-400');
                 uidInput.classList.remove('bg-slate-50', 'dark:bg-slate-950/60', 'text-slate-800', 'dark:text-slate-200');
                 
-                autofillUid();
+                fetchNextUid();
             }
         }
 
-        function autofillUid() {
-            const productSelect = document.getElementById('product_id');
+        function fetchNextUid() {
+            const brandSelect = document.getElementById('brand_id');
             const uidInput = document.getElementById('start_uid');
             const checkBox = document.getElementById('manual_uid_check');
 
-            // Only autofill if manual override checkbox is unchecked
-            if (!checkBox.checked) {
-                const productId = productSelect.value;
-                if (productId && nextUids[productId]) {
-                    uidInput.value = nextUids[productId];
-                } else if (productId) {
-                    uidInput.value = globalNextUid;
-                } else {
-                    uidInput.value = '';
-                }
-                generateSequencePreview();
+            if (checkBox.checked) {
+                return;
             }
+
+            const brandId = brandSelect.value;
+            if (!brandId) {
+                uidInput.value = '';
+                generateSequencePreview();
+                return;
+            }
+
+            fetch(`{{ route('purchases.next-uid') }}?brand_id=${brandId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!checkBox.checked) {
+                        uidInput.value = data.next_uid;
+                        generateSequencePreview();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching next UID:', error);
+                });
         }
 
         function generateSequencePreview() {
@@ -228,7 +256,7 @@
             const qty = parseInt(qtyInput.value) || 0;
 
             if (!startUid || qty <= 0) {
-                previewContainer.innerHTML = '<span class="text-xs text-slate-400 italic">Select a product and enter quantity to preview list...</span>';
+                previewContainer.innerHTML = '<span class="text-xs text-slate-400 italic">Select a brand and enter quantity to preview list...</span>';
                 return;
             }
 
@@ -264,16 +292,32 @@
             previewContainer.innerHTML = html;
         }
 
+        function handleProductChange() {
+            const productSelect = document.getElementById('product_id');
+            const brandSelect = document.getElementById('brand_id');
+            
+            if (productSelect.selectedIndex > 0) {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                const brandId = selectedOption.getAttribute('data-brand-id');
+                if (brandId) {
+                    brandSelect.value = brandId;
+                    fetchNextUid();
+                }
+            }
+        }
+
         // Attach listeners and setup page load
         window.addEventListener('DOMContentLoaded', () => {
             const productSelect = document.getElementById('product_id');
+            const brandSelect = document.getElementById('brand_id');
             const qtyInput = document.getElementById('quantity');
             
-            productSelect.addEventListener('change', autofillUid);
+            productSelect.addEventListener('change', handleProductChange);
+            brandSelect.addEventListener('change', fetchNextUid);
             qtyInput.addEventListener('input', generateSequencePreview);
             
             // Run initially if fields are already filled (e.g. from validation error/old input)
-            autofillUid();
+            fetchNextUid();
             generateSequencePreview();
         });
     </script>

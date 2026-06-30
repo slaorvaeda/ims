@@ -98,11 +98,13 @@
                         <tr class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                             <th class="py-4 px-6">ID</th>
                             <th class="py-4 px-6">Date</th>
-                            <th class="py-4 px-6">Product</th>
+                            <th class="py-4 px-6 min-w-[280px]">Product</th>
+                            <th class="py-4 px-6 min-w-[180px]">Brand</th>
                             <th class="py-4 px-6">Vendor ID</th>
                             <th class="py-4 px-6">Quantity</th>
                             <th class="py-4 px-6">Price</th>
                             <th class="py-4 px-6">Amount</th>
+                            <th class="py-4 px-6">Status</th>
                             <th class="py-4 px-6">Updated By</th>
                             <th class="py-4 px-6 text-right">Actions</th>
                         </tr>
@@ -118,10 +120,37 @@
                                         <span class="text-xs text-slate-400 font-mono">ID: {{ $purchase->product->product_id ?? '-' }}</span>
                                     </div>
                                 </td>
+                                <td class="py-4.5 px-6">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-slate-900 dark:text-white">{{ $purchase->brand->name ?? '-' }}</span>
+                                        @if($purchase->brand && $purchase->brand->sub)
+                                            <span class="text-xs text-slate-400 font-mono">Subtitle: {{ $purchase->brand->sub }}</span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td class="py-4.5 px-6 font-medium">{{ $purchase->vendor_id }}</td>
                                 <td class="py-4.5 px-6 font-semibold">{{ $purchase->quantity }}</td>
                                 <td class="py-4.5 px-6 font-semibold">₹{{ number_format($purchase->price, 2) }}</td>
                                 <td class="py-4.5 px-6 font-bold text-indigo-600 dark:text-indigo-400">₹{{ number_format($purchase->amount, 2) }}</td>
+                                <td class="py-4.5 px-6">
+                                    @if ($purchase->status == 'Good Inventory')
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
+                                            Good Inventory
+                                        </span>
+                                    @elseif ($purchase->status == 'Damaged')
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-900/50">
+                                            Damaged
+                                        </span>
+                                    @elseif ($purchase->status == 'Returned')
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/50">
+                                            Returned
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
+                                            {{ $purchase->status }}
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="py-4.5 px-6">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-xs">{{ $purchase->updated_by ?? 'System' }}</span>
@@ -149,7 +178,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                <td colspan="11" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                                     No purchase history registered.
                                 </td>
                             </tr>

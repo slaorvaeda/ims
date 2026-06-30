@@ -33,7 +33,9 @@ class AnalyticsController extends Controller
         $products = Product::orderBy('product_name')->get();
         
         // Fetch unique portals and vendors for dropdowns
-        $portals = Sale::select('portal_id')->distinct()->whereNotNull('portal_id')->pluck('portal_id');
+        $portalsDb = \App\Models\PortalVendor::where('type', 'Portal')->orderBy('name')->pluck('name')->toArray();
+        $portalsSales = Sale::select('portal_id')->distinct()->whereNotNull('portal_id')->pluck('portal_id')->toArray();
+        $portals = array_values(array_unique(array_merge($portalsDb, $portalsSales)));
         $vendors = Purchase::select('vendor_id')->distinct()->whereNotNull('vendor_id')->pluck('vendor_id');
 
         // Format dates for query limits
@@ -87,10 +89,15 @@ class AnalyticsController extends Controller
         $filteredSales = $salesQuery->get();
 
         // C. Inwards
-        $inwardsQuery = InwardItemCode::with('product')
+        $inwardsQuery = InwardItemCode::with(['product', 'portal'])
             ->whereBetween('created_at', [$start, $end])
             ->when($productId, function ($q) use ($productId) {
                 $q->where('product_id', $productId);
+            })
+            ->when($portalId, function ($q) use ($portalId) {
+                $q->whereHas('portal', function ($sub) use ($portalId) {
+                    $sub->where('name', $portalId);
+                });
             })
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
@@ -106,13 +113,18 @@ class AnalyticsController extends Controller
         $filteredInwards = $inwardsQuery->get();
 
         // D. Dispatches
-        $dispatchesQuery = DispatchItemCode::with('product')
+        $dispatchesQuery = DispatchItemCode::with(['product', 'portal'])
             ->where(function ($q) {
                 $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
             })
             ->whereBetween('created_at', [$start, $end])
             ->when($productId, function ($q) use ($productId) {
                 $q->where('product_id', $productId);
+            })
+            ->when($portalId, function ($q) use ($portalId) {
+                $q->whereHas('portal', function ($sub) use ($portalId) {
+                    $sub->where('name', $portalId);
+                });
             })
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
@@ -134,6 +146,33 @@ class AnalyticsController extends Controller
         $totalUnitsSold = $filteredSales->sum('quantity');
         $totalUnitsInwarded = $filteredInwards->sum('quantity');
         $totalUnitsDispatched = abs($filteredDispatches->sum('quantity'));
+        
+        $totalUnitsDamaged = $filteredPurchases->where('status', 'Damaged')->sum('quantity');
+        $damagedPurchases = $filteredPurchases->where('status', 'Damaged')->values();
+        
+        $totalRTGSold = DispatchItemCode::where(function ($q) {
+                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+            })
+            ->whereBetween('created_at', [$start, $end])
+            ->when($productId, function ($q) use ($productId) {
+                $q->where('product_id', $productId);
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('uid', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($dq) use ($search) {
+                            $dq->where('product_name', 'like', "%{$search}%")
+                              ->orWhere('product_id', 'like', "%{$search}%")
+                              ->orWhere('sku', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->whereIn('uid', function ($q) {
+                $q->select('uid')->from('inward_item_codes')->where('mark', 'Returned');
+            })
+            ->count();
+
+        $totalInwardRTG = $filteredInwards->where('status', 'RTG')->sum('quantity');
 
         // 4. Combined Activity Log Collection
         $activities = new Collection();
@@ -150,6 +189,7 @@ class AnalyticsController extends Controller
                     'quantity' => $p->quantity,
                     'amount' => $p->amount,
                     'entity_name' => $p->vendor_id,
+                    'portal' => null,
                     'updated_by' => $p->updated_by ?? 'System'
                 ]);
             }
@@ -166,7 +206,8 @@ class AnalyticsController extends Controller
                     'sku' => $s->product->sku ?? '',
                     'quantity' => $s->quantity,
                     'amount' => null,
-                    'entity_name' => $s->portal_id,
+                    'entity_name' => null,
+                    'portal' => $s->portal_id,
                     'updated_by' => $s->updated_by ?? 'System'
                 ]);
             }
@@ -184,6 +225,7 @@ class AnalyticsController extends Controller
                     'quantity' => $i->quantity,
                     'amount' => null,
                     'entity_name' => $i->uid,
+                    'portal' => $i->portal->name ?? null,
                     'updated_by' => $i->updated_by ?? 'System'
                 ]);
             }
@@ -201,6 +243,7 @@ class AnalyticsController extends Controller
                     'quantity' => abs($d->quantity),
                     'amount' => null,
                     'entity_name' => $d->uid,
+                    'portal' => $d->portal->name ?? null,
                     'updated_by' => $d->updated_by ?? 'System'
                 ]);
             }
@@ -290,6 +333,10 @@ class AnalyticsController extends Controller
             'totalUnitsSold',
             'totalUnitsInwarded',
             'totalUnitsDispatched',
+            'totalUnitsDamaged',
+            'damagedPurchases',
+            'totalRTGSold',
+            'totalInwardRTG',
             'paginatedActivities',
             'chartLabels',
             'chartSales',

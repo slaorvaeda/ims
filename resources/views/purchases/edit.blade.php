@@ -22,12 +22,33 @@
                     >
                         <option value="">-- Choose a Product --</option>
                         @foreach ($products as $product)
-                            <option value="{{ $product->id }}" {{ old('product_id', $purchase->product_id) == $product->id ? 'selected' : '' }}>
+                            <option value="{{ $product->id }}" data-brand-id="{{ $product->brand_id }}" {{ old('product_id', $purchase->product_id) == $product->id ? 'selected' : '' }}>
                                 {{ $product->product_name }} ({{ $product->product_id }})
                             </option>
                         @endforeach
                     </select>
                     @error('product_id')
+                        <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Brand Selection -->
+                <div>
+                    <label for="brand_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Select Brand</label>
+                    <select 
+                        id="brand_id" 
+                        name="brand_id" 
+                        required 
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                    >
+                        <option value="">-- Choose a Brand --</option>
+                        @foreach ($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ old('brand_id', $purchase->brand_id) == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->name }} ({{ $brand->sub ?: 'No Subtitle' }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('brand_id')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -117,3 +138,20 @@
         </div>
     </div>
 </x-app-layout>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productSelect = document.getElementById('product_id');
+            const brandSelect = document.getElementById('brand_id');
+
+            productSelect.addEventListener('change', () => {
+                if (productSelect.selectedIndex > 0) {
+                    const selectedOption = productSelect.options[productSelect.selectedIndex];
+                    const brandId = selectedOption.getAttribute('data-brand-id');
+                    if (brandId) {
+                        brandSelect.value = brandId;
+                    }
+                }
+            });
+        });
+    </script>

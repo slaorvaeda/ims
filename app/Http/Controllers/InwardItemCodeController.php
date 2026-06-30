@@ -34,7 +34,7 @@ class InwardItemCodeController extends Controller
             ->latest()
             ->get();
 
-        $headers = ['UID', 'Product ID', 'SKU', 'Product Name', 'Quantity', 'Status', 'Updated By', 'Created At'];
+        $headers = ['UID', 'Product ID', 'SKU', 'Product Name', 'Quantity', 'Status', 'Mark', 'Updated By', 'Created At'];
         $data = [];
 
         foreach ($inwardItemCodes as $item) {
@@ -45,6 +45,7 @@ class InwardItemCodeController extends Controller
                 $item->product->product_name ?? '',
                 $item->quantity,
                 $item->status,
+                $item->mark,
                 $item->updated_by ?? 'System',
                 $item->created_at ? $item->created_at->toDateTimeString() : '',
             ];
@@ -82,6 +83,7 @@ class InwardItemCodeController extends Controller
                 $sku = $record['SKU'] ?? '';
                 $quantity = intval($record['Quantity'] ?? 1);
                 $status = $record['Status'] ?? 'In Stock';
+                $mark = $record['Mark'] ?? null;
 
                 if (empty($uid)) {
                     $errors[] = "Row {$rowNumber}: UID is required.";
@@ -117,6 +119,7 @@ class InwardItemCodeController extends Controller
                     'uid' => $uid,
                     'quantity' => $quantity,
                     'status' => $status,
+                    'mark' => $mark,
                     'updated_by' => $user,
                 ]);
 
@@ -148,7 +151,7 @@ class InwardItemCodeController extends Controller
         $search = $request->input('search');
         $status = $request->input('status');
 
-        $inwardItemCodes = InwardItemCode::with('product')
+        $inwardItemCodes = InwardItemCode::with(['product', 'portal'])
             ->when($search, function ($query, $search) {
                 $query->where('uid', 'like', "%{$search}%")
                     ->orWhereHas('product', function ($q) use ($search) {
@@ -162,7 +165,9 @@ class InwardItemCodeController extends Controller
             ->orderBy('id', 'asc')
             ->paginate(15);
 
-        return view('inward_item_codes.index', compact('inwardItemCodes', 'search', 'status'));
+        $portals = \App\Models\PortalVendor::where('type', 'Portal')->orderBy('name')->get();
+
+        return view('inward_item_codes.index', compact('inwardItemCodes', 'search', 'status', 'portals'));
     }
 
     /**
@@ -242,9 +247,11 @@ class InwardItemCodeController extends Controller
     {
         $request->validate([
             'scan_uid' => 'required|string|max:255',
+            'portal_vendor_id' => 'required|exists:portal_vendors,id',
         ]);
 
         $uid = trim($request->input('scan_uid'));
+        $portalVendorId = $request->input('portal_vendor_id');
 
         // Find available InwardItemCode with its product loaded
         $inwardItem = InwardItemCode::with('product')->where('uid', $uid)->first();
@@ -258,21 +265,25 @@ class InwardItemCodeController extends Controller
         }
 
         // Run in transaction to update status in Inward and insert in Dispatch
-        DB::transaction(function () use ($inwardItem, $uid) {
-            // Update Inward status
+        DB::transaction(function () use ($inwardItem, $uid, $portalVendorId) {
+            // Update Inward status and portal
             $inwardItem->update([
                 'status' => 'Sold',
+                'portal_vendor_id' => $portalVendorId,
             ]);
 
             // Create Dispatch record
             \App\Models\DispatchItemCode::create([
                 'product_id' => $inwardItem->product_id,
+                'portal_vendor_id' => $portalVendorId,
                 'uid' => $uid,
                 'quantity' => -1,
                 'status' => 'Sold',
                 'updated_by' => Auth::user()->name ?? 'System',
             ]);
         });
+
+        $inwardItem->load('portal');
 
         // Fire WebSocket event for live update (wrapped in try-catch to prevent broadcast failures from failing the web request)
         $operator = Auth::user()->name ?? 'System';

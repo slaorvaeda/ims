@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Brand;
 use App\Services\CsvExcelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -117,7 +118,7 @@ class ProductController extends Controller
     {
         $search = $request->input('search');
 
-        $products = Product::query()
+        $products = Product::with('brand')
             ->when($search, function ($query, $search) {
                 $query->where('product_id', 'like', "%{$search}%")
                     ->orWhere('product_name', 'like', "%{$search}%")
@@ -134,7 +135,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+        $brands = Brand::orderBy('name')->get();
+        return view('products.create', compact('brands'));
     }
 
     /**
@@ -144,6 +146,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|string|unique:products,product_id|max:255',
+            'brand_id' => 'required|exists:brands,id',
             'product_name' => 'required|string|max:255',
             'sku' => 'required|string|unique:products,sku|max:255',
             'fsn' => 'nullable|string|max:255',
@@ -171,7 +174,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        return view('products.edit', compact('product'));
+        $brands = Brand::orderBy('name')->get();
+        return view('products.edit', compact('product', 'brands'));
     }
 
     /**
@@ -181,6 +185,7 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|string|max:255|unique:products,product_id,' . $product->id,
+            'brand_id' => 'required|exists:brands,id',
             'product_name' => 'required|string|max:255',
             'sku' => 'required|string|max:255|unique:products,sku,' . $product->id,
             'fsn' => 'nullable|string|max:255',

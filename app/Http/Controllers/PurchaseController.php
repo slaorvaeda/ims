@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Purchase;
 use App\Models\Product;
 use App\Models\InwardItemCode;
+use App\Models\Brand;
 use App\Services\CsvExcelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +32,7 @@ class PurchaseController extends Controller
             ->latest()
             ->get();
 
-        $headers = ['Date', 'Product ID', 'SKU', 'Product Name', 'Vendor ID', 'Quantity', 'Price', 'Amount', 'Updated By', 'Created At'];
+        $headers = ['Date', 'Product ID', 'SKU', 'Product Name', 'Vendor ID', 'Quantity', 'Price', 'Amount', 'Status', 'Mark', 'Updated By', 'Created At'];
         $data = [];
 
         foreach ($purchases as $purchase) {
@@ -44,6 +45,8 @@ class PurchaseController extends Controller
                 $purchase->quantity,
                 $purchase->price,
                 $purchase->amount,
+                $purchase->status,
+                $purchase->mark,
                 $purchase->updated_by ?? 'System',
                 $purchase->created_at ? $purchase->created_at->toDateTimeString() : '',
             ];
@@ -117,6 +120,8 @@ class PurchaseController extends Controller
                 }
 
                 $amount = floatval($record['Amount'] ?? ($price * $quantity));
+                $status = $record['Status'] ?? 'Good Inventory';
+                $mark = $record['Mark'] ?? (($status === 'Damaged' || $status === 'Returned') ? $status : null);
 
                 Purchase::create([
                     'product_id' => $product->id,
@@ -125,6 +130,8 @@ class PurchaseController extends Controller
                     'quantity' => $quantity,
                     'price' => $price,
                     'amount' => $amount,
+                    'status' => $status,
+                    'mark' => $mark,
                     'updated_by' => $user,
                 ]);
 
@@ -156,7 +163,7 @@ class PurchaseController extends Controller
     {
         $search = $request->input('search');
 
-        $purchases = Purchase::with('product')
+        $purchases = Purchase::with(['product', 'brand'])
             ->when($search, function ($query, $search) {
                 $query->where('vendor_id', 'like', "%{$search}%")
                     ->orWhereHas('product', function ($q) use ($search) {
@@ -176,6 +183,7 @@ class PurchaseController extends Controller
     public function create()
     {
         $products = Product::all();
+        $brands = Brand::orderBy('name')->get();
         
         $nextUids = [];
         $lastGlobalItem = InwardItemCode::orderBy('id', 'desc')->first();
@@ -211,7 +219,51 @@ class PurchaseController extends Controller
             }
         }
 
-        return view('purchases.create', compact('products', 'nextUids', 'globalNextUid'));
+        return view('purchases.create', compact('products', 'brands', 'nextUids', 'globalNextUid'));
+    }
+
+    /**
+     * Get the next UID for the selected brand's subtitle.
+     */
+    public function getNextUid(Request $request)
+    {
+        $brandId = $request->query('brand_id');
+        $brand = Brand::find($brandId);
+        $subtitle = $brand ? $brand->sub : 'Zig';
+        
+        $nextUid = $this->getNextUidForSubtitle($subtitle);
+        
+        return response()->json(['next_uid' => $nextUid]);
+    }
+
+    /**
+     * Helper to find the next available UID for a given subtitle.
+     */
+    protected function getNextUidForSubtitle($subtitle)
+    {
+        if (empty($subtitle)) {
+            $subtitle = 'Zig';
+        }
+        
+        $lastItem = InwardItemCode::where('uid', 'like', $subtitle . '%')
+            ->orderByRaw('LENGTH(uid) DESC')
+            ->orderBy('uid', 'desc')
+            ->first();
+            
+        if ($lastItem) {
+            $lastUid = $lastItem->uid;
+            if (preg_match('/^(.*?)(\d+)$/', $lastUid, $matches)) {
+                $prefix = $matches[1];
+                $numberStr = $matches[2];
+                $nextNum = (int)$numberStr + 1;
+                $padLength = strlen($numberStr);
+                return $prefix . str_pad((string)$nextNum, $padLength, '0', STR_PAD_LEFT);
+            } else {
+                return $lastUid . '0001';
+            }
+        }
+        
+        return $subtitle . '0001';
     }
 
     /**
@@ -221,6 +273,7 @@ class PurchaseController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
+            'brand_id' => 'required|exists:brands,id',
             'date' => 'required|date',
             'vendor_id' => 'required|string|max:255',
             'quantity' => 'required|integer|min:1',
@@ -230,12 +283,26 @@ class PurchaseController extends Controller
         ]);
 
         $validated['amount'] = $validated['quantity'] * $validated['price'];
+        $validated['brand_id'] = $request->input('brand_id');
         $validated['updated_by'] = Auth::user()->name ?? 'System';
 
         $startUid = $request->input('start_uid');
         $quantity = (int)$validated['quantity'];
         $status = $request->input('status', 'Good Inventory');
+        $validated['status'] = $status;
+        $validated['mark'] = ($status === 'Damaged' || $status === 'Returned') ? $status : null;
 
+        if ($status === 'Damaged') {
+            // Damaged products: store purchase, do not generate codes, do not create inward codes
+            DB::transaction(function () use ($validated) {
+                Purchase::create($validated);
+            });
+
+            return redirect()->route('purchases.index')
+                ->with('success', 'Purchase record logged for damaged inventory successfully. No inward codes were generated.');
+        }
+
+        // For Good Inventory or Returned:
         // Extract prefix and numerical suffix
         if (preg_match('/^(.*?)(\d+)$/', $startUid, $matches)) {
             $prefix = $matches[1];
@@ -264,8 +331,17 @@ class PurchaseController extends Controller
             ])->withInput();
         }
 
+        // Map status and mark for InwardItemCode
+        $inwardStatus = $status;
+        $inwardMark = null;
+
+        if ($status === 'Returned') {
+            $inwardStatus = 'RTG';
+            $inwardMark = 'Returned';
+        }
+
         // Create purchase and corresponding inward records inside a transaction
-        DB::transaction(function () use ($validated, $uids, $status) {
+        DB::transaction(function () use ($validated, $uids, $inwardStatus, $inwardMark) {
             Purchase::create($validated);
 
             $updatedBy = Auth::user()->name ?? 'System';
@@ -274,7 +350,8 @@ class PurchaseController extends Controller
                     'product_id' => $validated['product_id'],
                     'uid' => $uid,
                     'quantity' => 1,
-                    'status' => $status,
+                    'status' => $inwardStatus,
+                    'mark' => $inwardMark,
                     'updated_by' => $updatedBy,
                 ]);
             }
@@ -303,7 +380,8 @@ class PurchaseController extends Controller
     public function edit(Purchase $purchase)
     {
         $products = Product::all();
-        return view('purchases.edit', compact('purchase', 'products'));
+        $brands = Brand::orderBy('name')->get();
+        return view('purchases.edit', compact('purchase', 'products', 'brands'));
     }
 
     /**
@@ -313,6 +391,7 @@ class PurchaseController extends Controller
     {
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
+            'brand_id' => 'required|exists:brands,id',
             'date' => 'required|date',
             'vendor_id' => 'required|string|max:255',
             'quantity' => 'required|integer|min:1',
@@ -320,6 +399,7 @@ class PurchaseController extends Controller
         ]);
 
         $validated['amount'] = $validated['quantity'] * $validated['price'];
+        $validated['brand_id'] = $request->input('brand_id');
         $validated['updated_by'] = Auth::user()->name ?? 'System';
 
         $purchase->update($validated);

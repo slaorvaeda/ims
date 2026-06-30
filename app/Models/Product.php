@@ -12,12 +12,21 @@ class Product extends Model
 
     protected $fillable = [
         'product_id',
+        'brand_id',
         'product_name',
         'sku',
         'fsn',
         'asin',
         'updated_by',
     ];
+
+    /**
+     * Get the brand associated with the product.
+     */
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
 
     /**
      * Get the purchase history for the product.

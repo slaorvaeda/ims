@@ -12,11 +12,14 @@ class Purchase extends Model
 
     protected $fillable = [
         'product_id',
+        'brand_id',
         'date',
         'vendor_id',
         'quantity',
         'price',
         'amount',
+        'status',
+        'mark',
         'updated_by',
     ];
 
@@ -26,5 +29,13 @@ class Purchase extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get the brand associated with the purchase.
+     */
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
     }
 }

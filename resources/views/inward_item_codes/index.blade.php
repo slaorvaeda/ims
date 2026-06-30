@@ -24,36 +24,61 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400">Scan or type a serial code to automatically record dispatch as Sold.</p>
             </div>
             
-            <form id="scan-dispatch-form" action="{{ route('inward-item-codes.scan-dispatch') }}" method="POST" class="w-full md:w-auto flex flex-wrap sm:flex-nowrap gap-3 items-center">
+            <form id="scan-dispatch-form" action="{{ route('inward-item-codes.scan-dispatch') }}" method="POST" class="w-full md:w-auto flex flex-col gap-2 items-stretch md:items-end">
                 @csrf
-                <div class="relative w-full md:w-80">
-                    <input 
-                        type="text" 
-                        name="scan_uid" 
-                        placeholder="Scan Barcode (e.g. Zig0001)..." 
-                        autofocus
-                        required
-                        @focus="inputFocused = true"
-                        @blur="inputFocused = false"
-                        class="w-full pl-5 pr-28 py-3.5 bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all font-mono"
-                    >
-                    <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none select-none">
-                        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 rounded-lg text-[9px] font-bold border border-emerald-100/50 dark:border-emerald-900/50 shadow-sm" x-show="inputFocused" x-cloak>
-                            <span class="relative flex h-1.5 w-1.5">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                            </span>
-                            <span>ACTIVE</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 rounded-lg text-[9px] font-bold border border-rose-100/50 dark:border-rose-900/50 shadow-sm" x-show="!inputFocused" x-cloak>
-                            <span class="h-1.5 w-1.5 rounded-full bg-rose-400"></span>
-                            <span>OFFLINE</span>
+                <!-- Scan Input Row -->
+                <div class="flex items-center justify-start md:justify-end gap-3 w-full">
+                    <div class="relative flex-1 md:w-80 max-w-md">
+                        <input 
+                            type="text" 
+                            name="scan_uid" 
+                            placeholder="Scan Barcode (e.g. Zig0001)..." 
+                            autofocus
+                            required
+                            @focus="inputFocused = true"
+                            @blur="inputFocused = false"
+                            class="w-full pl-5 pr-28 py-3.5 bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all font-mono shadow-sm"
+                        >
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none select-none">
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 rounded-lg text-[9px] font-bold border border-emerald-100/50 dark:border-emerald-900/50 shadow-sm" x-show="inputFocused" x-cloak>
+                                <span class="relative flex h-1.5 w-1.5">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                </span>
+                                <span>ACTIVE</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 rounded-lg text-[9px] font-bold border border-rose-100/50 dark:border-rose-900/50 shadow-sm" x-show="!inputFocused" x-cloak>
+                                <span class="h-1.5 w-1.5 rounded-full bg-rose-400"></span>
+                                <span>OFFLINE</span>
+                            </div>
                         </div>
                     </div>
+                    <button type="submit" class="px-6 py-3.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-800 dark:hover:bg-slate-100 shadow-md shrink-0">
+                        Dispatch
+                    </button>
                 </div>
-                <button type="submit" class="px-6 py-3.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-800 dark:hover:bg-slate-100 shadow-md shrink-0">
-                    Dispatch
-                </button>
+
+                <!-- Portal Radio Selection Under Input -->
+                <div class="flex flex-wrap items-center justify-start md:justify-end gap-1.5 pt-2 border-t border-dashed border-slate-100 dark:border-slate-800/80 w-full">
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-2">Select Portal:</span>
+                    @forelse($portals as $portal)
+                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                            <input 
+                                type="radio" 
+                                name="portal_vendor_id" 
+                                value="{{ $portal->id }}" 
+                                required 
+                                {{ $loop->first ? 'checked' : '' }}
+                                class="sr-only peer"
+                            >
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
+                                {{ $portal->name }}
+                            </span>
+                        </label>
+                    @empty
+                        <span class="text-xs text-rose-500 italic">No portals registered!</span>
+                    @endforelse
+                </div>
             </form>
         </div>
 
@@ -86,6 +111,7 @@
                             <option value="Good Inventory" {{ $status == 'Good Inventory' ? 'selected' : '' }}>Good Inventory</option>
                             <option value="Damaged" {{ $status == 'Damaged' ? 'selected' : '' }}>Damaged</option>
                             <option value="Sold" {{ $status == 'Sold' ? 'selected' : '' }}>Sold</option>
+                            <option value="RTG" {{ $status == 'RTG' ? 'selected' : '' }}>RTG</option>
                         </select>
                     </div>
 
@@ -229,6 +255,8 @@
                             <th class="py-4 px-6">Product Name</th>
                             <th class="py-4 px-6">Quantity</th>
                             <th class="py-4 px-6">Status</th>
+                            <th class="py-4 px-6">Portal</th>
+                            <th class="py-4 px-6">Mark</th>
                             <th class="py-4 px-6">Updated By</th>
                             <th class="py-4 px-6 text-right">Actions</th>
                         </tr>
@@ -272,10 +300,32 @@
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
                                             Sold
                                         </span>
+                                    @elseif ($item->status == 'RTG')
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/50">
+                                            RTG
+                                        </span>
                                     @else
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
                                             {{ $item->status }}
                                         </span>
+                                    @endif
+                                </td>
+                                <td class="py-4.5 px-6 font-semibold" id="inward-portal-{{ $item->uid }}">
+                                    @if ($item->portal)
+                                        <span class="px-2.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-100/30 dark:border-indigo-900/30 text-xs">
+                                            {{ $item->portal->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-400 dark:text-slate-500 font-normal">-</span>
+                                    @endif
+                                </td>
+                                <td class="py-4.5 px-6 font-mono text-xs font-semibold">
+                                    @if ($item->mark)
+                                        <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                                            {{ $item->mark }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-400 dark:text-slate-500 font-normal">-</span>
                                     @endif
                                 </td>
                                 <td class="py-4.5 px-6" id="inward-updater-{{ $item->uid }}">
@@ -316,7 +366,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                                     No inward serial items registered.
                                 </td>
                             </tr>
@@ -357,6 +407,10 @@
                                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
                                         Sold
                                     </span>
+                                @elseif ($item->status == 'RTG')
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/50">
+                                        RTG
+                                    </span>
                                 @else
                                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
                                         {{ $item->status }}
@@ -380,9 +434,14 @@
                                 <span class="text-[10px] text-slate-400 font-mono">Code: {{ $item->product->product_id ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center text-[10px] text-slate-400">
-                                <span>Qty: {{ $item->quantity }}</span>
+                                <span>Qty: {{ $item->quantity }}@if($item->mark) | Mark: {{ $item->mark }}@endif</span>
                                 <span id="card-updater-{{ $item->uid }}">By: {{ $item->updated_by ?? 'System' }}</span>
                             </div>
+                            @if ($item->portal)
+                                <div class="text-[10px] text-slate-500 font-medium" id="card-portal-{{ $item->uid }}">
+                                    Portal: <span class="text-indigo-600 dark:text-indigo-400 font-semibold">{{ $item->portal->name }}</span>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Actions Overlay -->
@@ -1035,6 +1094,36 @@
                             }, 300);
                         }
 
+                        // Update Table Portal Cell
+                        const tablePortal = document.getElementById(`inward-portal-${e.uid}`);
+                        if (tablePortal && e.portalName && e.portalName !== 'N/A') {
+                            tablePortal.innerHTML = `
+                                <span class="px-2.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-100/30 dark:border-indigo-900/30 text-xs">
+                                    ${e.portalName}
+                                </span>
+                            `;
+                        }
+
+                        // Update Card Portal Details
+                        const cardPortal = document.getElementById(`card-portal-${e.uid}`);
+                        if (cardPortal && e.portalName && e.portalName !== 'N/A') {
+                            cardPortal.innerHTML = `
+                                Portal: <span class="text-indigo-600 dark:text-indigo-400 font-semibold">${e.portalName}</span>
+                            `;
+                        } else if (e.portalName && e.portalName !== 'N/A') {
+                            const cardUpdater = document.getElementById(`card-updater-${e.uid}`);
+                            if (cardUpdater) {
+                                const cardBottom = cardUpdater.closest('.flex-col');
+                                if (cardBottom) {
+                                    const portalDiv = document.createElement('div');
+                                    portalDiv.id = `card-portal-${e.uid}`;
+                                    portalDiv.className = 'text-[10px] text-slate-500 font-medium';
+                                    portalDiv.innerHTML = `Portal: <span class="text-indigo-600 dark:text-indigo-400 font-semibold">${e.portalName}</span>`;
+                                    cardBottom.appendChild(portalDiv);
+                                }
+                            }
+                        }
+
                         // 3. Update Table Updater Details
                         const tableUpdater = document.getElementById(`inward-updater-${e.uid}`);
                         if (tableUpdater) {
@@ -1075,6 +1164,23 @@
                         }
                     });
             }
+
+            // Global form interceptor to inject selected portal_vendor_id to all scan-dispatch forms
+            document.addEventListener('submit', (event) => {
+                const form = event.target;
+                if (form.action && form.action.includes('scan-dispatch')) {
+                    if (!form.querySelector('input[name="portal_vendor_id"]')) {
+                        const selectedPortal = document.querySelector('input[name="portal_vendor_id"]:checked');
+                        if (selectedPortal) {
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'portal_vendor_id';
+                            hiddenInput.value = selectedPortal.value;
+                            form.appendChild(hiddenInput);
+                        }
+                    }
+                }
+            });
         });
     </script>
     </div> <!-- Closing Alpine x-data container -->

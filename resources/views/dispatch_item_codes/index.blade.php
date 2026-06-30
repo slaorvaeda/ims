@@ -194,6 +194,7 @@
                             <th class="py-4 px-6">Product Name</th>
                             <th class="py-4 px-6">Quantity</th>
                             <th class="py-4 px-6">Status</th>
+                            <th class="py-4 px-6">Portal</th>
                             <th class="py-4 px-6">Mark</th>
                             <th class="py-4 px-6">Dispatched By</th>
                             <th class="py-4 px-6 text-right">Actions</th>
@@ -234,6 +235,15 @@
                                         {{ $item->status }}
                                     </span>
                                 </td>
+                                <td class="py-4.5 px-6 font-semibold">
+                                    @if ($item->portal)
+                                        <span class="px-2.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-100/30 dark:border-indigo-900/30 text-xs font-semibold">
+                                            {{ $item->portal->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-400 dark:text-slate-500 font-normal">-</span>
+                                    @endif
+                                </td>
                                 <td class="py-4.5 px-6 font-mono text-xs font-semibold">
                                     @if ($item->mark)
                                         <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
@@ -270,7 +280,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                <td colspan="10" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                                     No dispatch serial items registered.
                                 </td>
                             </tr>

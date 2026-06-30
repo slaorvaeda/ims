@@ -13,7 +13,7 @@
     <!-- Include Chart.js via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="space-y-8">
+    <div class="space-y-8" x-data="{ showDamagedModal: false }">
         <!-- Advanced Filters & Parameters Section -->
         <div class="p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm">
             <h3 class="font-heading font-bold text-base text-slate-800 dark:text-white mb-4 flex items-center gap-2">
@@ -21,58 +21,99 @@
                 Control & Filtering Panel
             </h3>
             
-            <form method="GET" action="{{ route('analytics.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <!-- Start Date -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-400 uppercase">Start Date</label>
-                    <input type="date" name="start_date" value="{{ $startDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all">
+            <form method="GET" action="{{ route('analytics.index') }}" class="flex flex-col gap-3">
+                <!-- Main Filters Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                    <!-- Start Date -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Start Date</label>
+                        <input type="date" name="start_date" value="{{ $startDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                    </div>
+
+                    <!-- End Date -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400 uppercase">End Date</label>
+                        <input type="date" name="end_date" value="{{ $endDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                    </div>
+
+                    <!-- Product -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Product</label>
+                        <select name="product_id" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                            <option value="">All Products</option>
+                            @foreach($products as $prod)
+                                <option value="{{ $prod->id }}" {{ $productId == $prod->id ? 'selected' : '' }}>{{ $prod->product_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Type filter -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Activity Type</label>
+                        <select name="type" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                            <option value="">All Types</option>
+                            <option value="Purchase" {{ $type == 'Purchase' ? 'selected' : '' }}>Purchases</option>
+                            <option value="Sale" {{ $type == 'Sale' ? 'selected' : '' }}>Sales</option>
+                            <option value="Inward" {{ $type == 'Inward' ? 'selected' : '' }}>Inwards (Serial)</option>
+                            <option value="Dispatch" {{ $type == 'Dispatch' ? 'selected' : '' }}>Dispatches (Serial)</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- End Date -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-400 uppercase">End Date</label>
-                    <input type="date" name="end_date" value="{{ $endDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all">
+                <!-- Search and Buttons Row (Aligned to the Right) -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-start md:justify-end gap-3 w-full mt-1">
+                    <div class="relative flex-1 md:w-80 max-w-md">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            value="{{ $search }}" 
+                            placeholder="Search keyword (Vendor, Portal, UID, SKU)..." 
+                            class="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                        >
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-indigo-900/10 text-center shrink-0">
+                            Apply Filters
+                        </button>
+                        @if($startDate || $endDate || $productId || $portalId || $vendorId || $search || $type)
+                            <a href="{{ route('analytics.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-xs text-center transition-all shrink-0">
+                                Reset
+                            </a>
+                        @endif
+                    </div>
                 </div>
 
-                <!-- Product -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-400 uppercase">Product</label>
-                    <select name="product_id" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all">
-                        <option value="">All Products</option>
-                        @foreach($products as $prod)
-                            <option value="{{ $prod->id }}" {{ $productId == $prod->id ? 'selected' : '' }}>{{ $prod->product_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Type filter -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-400 uppercase">Activity Type</label>
-                    <select name="type" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all">
-                        <option value="">All Types</option>
-                        <option value="Purchase" {{ $type == 'Purchase' ? 'selected' : '' }}>Purchases</option>
-                        <option value="Sale" {{ $type == 'Sale' ? 'selected' : '' }}>Sales</option>
-                        <option value="Inward" {{ $type == 'Inward' ? 'selected' : '' }}>Inwards (Serial)</option>
-                        <option value="Dispatch" {{ $type == 'Dispatch' ? 'selected' : '' }}>Dispatches (Serial)</option>
-                    </select>
-                </div>
-
-                <!-- Search -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-400 uppercase">Keyword Search</label>
-                    <input type="text" name="search" value="{{ $search }}" placeholder="Vendor, Portal, UID, SKU..." class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all">
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex items-end gap-2">
-                    <button type="submit" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-indigo-900/10 text-center">
-                        Apply
-                    </button>
-                    @if($startDate || $endDate || $productId || $portalId || $vendorId || $search || $type)
-                        <a href="{{ route('analytics.index') }}" class="py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-xs text-center transition-all">
-                            Reset
-                        </a>
-                    @endif
+                <!-- Portal Radio Selection Under Input (Aligned to the Right) -->
+                <div class="flex flex-wrap items-center justify-start md:justify-end gap-1.5 pt-2 border-t border-dashed border-slate-100 dark:border-slate-800/80 w-full">
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-2">Filter by Portal:</span>
+                    <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <input 
+                            type="radio" 
+                            name="portal_id" 
+                            value="" 
+                            {{ empty($portalId) ? 'checked' : '' }}
+                            class="sr-only peer"
+                            onchange="this.form.submit()"
+                        >
+                        <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
+                            All Portals
+                        </span>
+                    </label>
+                    @foreach($portals as $pName)
+                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                            <input 
+                                type="radio" 
+                                name="portal_id" 
+                                value="{{ $pName }}" 
+                                {{ $portalId === $pName ? 'checked' : '' }}
+                                class="sr-only peer"
+                                onchange="this.form.submit()"
+                            >
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
+                                {{ $pName }}
+                            </span>
+                        </label>
+                    @endforeach
                 </div>
             </form>
         </div>
@@ -124,6 +165,34 @@
                 </div>
                 <div class="w-12 h-12 bg-rose-100/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Metric Highlight Cards (Second Row: Damaged and Returns) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Total Damaged Stock -->
+            <div class="p-6 bg-gradient-to-br from-amber-50/60 to-white dark:from-amber-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all cursor-pointer hover:border-amber-500/50 group" @click="showDamagedModal = true" title="Click to view damaged stock details">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Damaged Stock</span>
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsDamaged) }} Units</h3>
+                    <p class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Logged as damaged purchases</p>
+                    <span class="text-[9px] text-slate-400 group-hover:text-amber-500 transition-colors">Click to view details</span>
+                </div>
+                <div class="w-12 h-12 bg-amber-100/60 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+            </div>
+
+            <!-- Total Returned Stock -->
+            <div class="p-6 bg-gradient-to-br from-fuchsia-50/60 to-white dark:from-fuchsia-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Returned Stock</span>
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalInwardRTG) }} Units</h3>
+                    <p class="text-[10px] text-fuchsia-600 dark:text-fuchsia-400 font-semibold">{{ number_format($totalRTGSold) }}  RTG products sold</p>
+                </div>
+                <div class="w-12 h-12 bg-fuchsia-100/60 dark:bg-fuchsia-950/40 text-fuchsia-600 dark:text-fuchsia-400 rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 15v-6m0 0l-3 3m3-3l3 3m-9 0h6m-9-3V9m0 0l-3 3m3-3l3 3m-3 0h6m-3-3v6M4 4h16v16H4V4z"/></svg>
                 </div>
             </div>
         </div>
@@ -210,6 +279,7 @@
                                     @endif
                                 </a>
                             </th>
+                            <th class="py-4 px-6">Portal</th>
                             <th class="py-4 px-6">Author</th>
                         </tr>
                     </thead>
@@ -252,8 +322,17 @@
                                 </td>
                                 <td class="py-4 px-6">
                                     <span class="font-bold text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-200/50 dark:border-slate-700/50 font-mono">
-                                        {{ $activity['entity_name'] }}
+                                        {{ $activity['entity_name'] ?: '-' }}
                                     </span>
+                                </td>
+                                <td class="py-4 px-6">
+                                    @if(!empty($activity['portal']))
+                                        <span class="px-2.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-100/30 dark:border-indigo-900/30 text-xs font-semibold">
+                                            {{ $activity['portal'] }}
+                                        </span>
+                                    @else
+                                        <span class="text-slate-400 dark:text-slate-500 font-normal">-</span>
+                                    @endif
                                 </td>
                                 <td class="py-4 px-6 text-xs font-semibold">
                                     {{ $activity['updated_by'] }}
@@ -261,7 +340,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                                     No transaction/scanning activity found matching current filters.
                                 </td>
                             </tr>
@@ -276,6 +355,65 @@
                     {{ $paginatedActivities->links() }}
                 </div>
             @endif
+        </div>
+
+        <!-- Damaged Purchases Details Modal -->
+        <div x-show="showDamagedModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200" x-cloak style="display: none;">
+            <div @click.away="showDamagedModal = false" class="w-full max-w-5xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 sm:p-8 shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-150">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/80">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white font-heading">Damaged Stock Purchases</h3>
+                        <p class="text-xs text-slate-400 mt-1">Detailed list of damaged purchase orders</p>
+                    </div>
+                    <button @click="showDamagedModal = false" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto py-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Date</th>
+                                    <th class="py-3 px-4">Product Details</th>
+                                    <th class="py-3 px-4">Vendor ID</th>
+                                    <th class="py-3 px-4 text-right">Quantity</th>
+                                    <th class="py-3 px-4 text-right">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                                @forelse($damagedPurchases as $dp)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 text-slate-700 dark:text-slate-300 transition-colors">
+                                        <td class="py-3.5 px-4 font-medium whitespace-nowrap">{{ $dp->date }}</td>
+                                        <td class="py-3.5 px-4">
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-slate-900 dark:text-white">{{ $dp->product->product_name ?? 'Unknown Product' }}</span>
+                                                <span class="text-[10px] text-slate-400 font-mono">ID: {{ $dp->product->product_id ?? '-' }} | SKU: {{ $dp->product->sku ?? '-' }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3.5 px-4 font-medium">{{ $dp->vendor_id }}</td>
+                                        <td class="py-3.5 px-4 text-right font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">{{ $dp->quantity }} Units</td>
+                                        <td class="py-3.5 px-4 text-right font-bold text-slate-900 dark:text-white whitespace-nowrap">₹{{ number_format($dp->amount, 2) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                            No damaged purchases found in this filter range.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex justify-end">
+                    <button @click="showDamagedModal = false" class="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-2xl text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all">
+                        Close
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -99,6 +99,7 @@
                             <th class="py-4 px-6">ID</th>
                             <th class="py-4 px-6">Product ID</th>
                             <th class="py-4 px-6">Product Name</th>
+                            <th class="py-4 px-6">Brand</th>
                             <th class="py-4 px-6">SKU</th>
                             <th class="py-4 px-6">FSN</th>
                             <th class="py-4 px-6">ASIN</th>
@@ -116,6 +117,14 @@
                                     </span>
                                 </td>
                                 <td class="py-4.5 px-6 font-bold text-slate-900 dark:text-white">{{ $product->product_name }}</td>
+                                <td class="py-4.5 px-6">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-slate-900 dark:text-white">{{ $product->brand->name ?? '-' }}</span>
+                                        @if($product->brand && $product->brand->sub)
+                                            <span class="text-xs text-slate-400 font-mono">Subtitle: {{ $product->brand->sub }}</span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td class="py-4.5 px-6 font-mono text-xs">{{ $product->sku }}</td>
                                 <td class="py-4.5 px-6 font-mono text-xs">{{ $product->fsn ?? '-' }}</td>
                                 <td class="py-4.5 px-6 font-mono text-xs">{{ $product->asin ?? '-' }}</td>
@@ -146,7 +155,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                <td colspan="9" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                                     No products found in the catalog.
                                 </td>
                             </tr>

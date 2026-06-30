@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\OperatorController;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\InwardItemCode;
@@ -138,6 +139,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 
+    // Operator Routes
+    Route::get('/operators', [OperatorController::class, 'index'])->name('operators.index');
+    Route::post('/operators/brands', [OperatorController::class, 'storeBrand'])->name('operators.store-brand');
+    Route::put('/operators/brands/{brand}', [OperatorController::class, 'updateBrand'])->name('operators.update-brand');
+    Route::delete('/operators/brands/{brand}', [OperatorController::class, 'destroyBrand'])->name('operators.destroy-brand');
+    Route::post('/operators/portal-vendors', [OperatorController::class, 'storePortalVendor'])->name('operators.store-portal-vendor');
+    Route::put('/operators/portal-vendors/{portalVendor}', [OperatorController::class, 'updatePortalVendor'])->name('operators.update-portal-vendor');
+    Route::delete('/operators/portal-vendors/{portalVendor}', [OperatorController::class, 'destroyPortalVendor'])->name('operators.destroy-portal-vendor');
+
     // IMS Resource CRUD routes with permission checks
     Route::middleware('permission:products')->group(function () {
         Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
@@ -148,6 +158,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:purchases')->group(function () {
         Route::get('/purchases/export', [PurchaseController::class, 'export'])->name('purchases.export');
         Route::post('/purchases/import', [PurchaseController::class, 'import'])->name('purchases.import');
+        Route::get('/purchases/next-uid', [PurchaseController::class, 'getNextUid'])->name('purchases.next-uid');
         Route::resource('purchases', PurchaseController::class);
     });
 

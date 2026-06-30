@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\PortalVendor;
 
 class DispatchItemCode extends Model
 {
@@ -12,6 +13,7 @@ class DispatchItemCode extends Model
 
     protected $fillable = [
         'product_id',
+        'portal_vendor_id',
         'uid',
         'quantity',
         'status',
@@ -25,5 +27,13 @@ class DispatchItemCode extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get the portal associated with the dispatch item.
+     */
+    public function portal(): BelongsTo
+    {
+        return $this->belongsTo(PortalVendor::class, 'portal_vendor_id');
     }
 }

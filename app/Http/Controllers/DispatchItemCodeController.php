@@ -19,7 +19,7 @@ class DispatchItemCodeController extends Controller
     {
         $search = $request->input('search');
 
-        $dispatchItemCodes = DispatchItemCode::with('product')
+        $dispatchItemCodes = DispatchItemCode::with(['product', 'portal'])
             ->where(function ($q) {
                 $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
             })
@@ -36,7 +36,7 @@ class DispatchItemCodeController extends Controller
             ->latest()
             ->get();
 
-        $headers = ['UID', 'Product ID', 'SKU', 'Product Name', 'Quantity', 'Status', 'Updated By', 'Created At'];
+        $headers = ['UID', 'Product ID', 'SKU', 'Product Name', 'Quantity', 'Status', 'Portal', 'Updated By', 'Created At'];
         $data = [];
 
         foreach ($dispatchItemCodes as $item) {
@@ -47,6 +47,7 @@ class DispatchItemCodeController extends Controller
                 $item->product->product_name ?? '',
                 $item->quantity,
                 $item->status,
+                $item->portal->name ?? '',
                 $item->updated_by ?? 'System',
                 $item->created_at ? $item->created_at->toDateTimeString() : '',
             ];
@@ -151,7 +152,7 @@ class DispatchItemCodeController extends Controller
     {
         $search = $request->input('search');
 
-        $dispatchItemCodes = DispatchItemCode::with('product')
+        $dispatchItemCodes = DispatchItemCode::with(['product', 'portal'])
             ->where(function ($q) {
                 $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
             })
@@ -308,16 +309,18 @@ class DispatchItemCodeController extends Controller
 
         // Run in transaction to update dispatch record mark to 'cancelled' and update Inward status to 'Good Inventory'
         DB::transaction(function () use ($dispatchItem, $uid) {
-            // Update dispatch record mark to 'cancelled'
+            // Update dispatch record mark to 'cancelled' and clear portal
             $dispatchItem->update([
                 'mark' => 'cancelled',
+                'portal_vendor_id' => null,
             ]);
 
-            // Find matching InwardItemCode and set back to 'Good Inventory'
+            // Find matching InwardItemCode and set back to 'Good Inventory' and clear portal
             $inwardItem = InwardItemCode::where('uid', $uid)->first();
             if ($inwardItem) {
                 $inwardItem->update([
                     'status' => 'Good Inventory',
+                    'portal_vendor_id' => null,
                 ]);
             }
         });
@@ -333,16 +336,18 @@ class DispatchItemCodeController extends Controller
         $uid = $dispatchItemCode->uid;
 
         DB::transaction(function () use ($dispatchItemCode, $uid) {
-            // Update dispatch record mark to 'cancelled' instead of deleting it
+            // Update dispatch record mark to 'cancelled' instead of deleting it and clear portal
             $dispatchItemCode->update([
                 'mark' => 'cancelled',
+                'portal_vendor_id' => null,
             ]);
 
-            // Find matching InwardItemCode and set back to 'Good Inventory'
+            // Find matching InwardItemCode and set back to 'Good Inventory' and clear portal
             $inwardItem = InwardItemCode::where('uid', $uid)->first();
             if ($inwardItem) {
                 $inwardItem->update([
                     'status' => 'Good Inventory',
+                    'portal_vendor_id' => null,
                 ]);
             }
         });
