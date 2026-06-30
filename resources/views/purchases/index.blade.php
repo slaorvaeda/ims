@@ -344,7 +344,7 @@
                                 <div class="label-title text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5" x-text="'Label #' + (index + 1)"></div>
                                 
                                 <!-- SKU/UID top text -->
-                                <div class="print-sku-title text-[8px] text-slate-500 dark:text-slate-400 font-mono mb-1 text-center" x-text="productSku ? productSku.toLowerCase() : productName.toLowerCase()"></div>
+                                <div class="print-sku-title text-base font-black text-slate-800 dark:text-slate-200 font-mono mb-1 text-center tracking-wide" x-text="productSku ? productSku.toLowerCase() : productName.toLowerCase()"></div>
                                 
                                 <!-- SVG Barcode Container -->
                                 <svg :id="'modal-barcode-' + index" class="barcode-svg max-w-full bg-white p-1 rounded"></svg>
@@ -435,6 +435,9 @@
                                     width: this.barWidth,
                                     height: this.barHeight,
                                     displayValue: this.displayValue,
+                                    fontSize: 24,
+                                    fontOptions: "bold",
+                                    textMargin: 4,
                                     margin: 10,
                                     marginTop: 2,
                                     background: "#ffffff",
@@ -526,7 +529,7 @@
                                     margin: 0 !important;
                                     display: flex !important;
                                     flex-direction: column !important;
-                                    align-items: flex-start !important;
+                                    align-items: center !important;
                                     justify-content: center !important;
                                     box-sizing: border-box !important;
                                     background: white !important;
@@ -546,12 +549,16 @@
                                 }
                                 .modal-barcode-card .print-sku-title {
                                     display: block !important;
-                                    font-size: 8px !important;
+                                    font-size: 14px !important;
+                                    font-weight: 900 !important;
                                     text-transform: lowercase !important;
-                                    margin-bottom: 0 !important;
-                                    line-height: 1 !important;
+                                    text-align: center !important;
+                                    width: 100% !important;
+                                    margin-bottom: 3px !important;
+                                    line-height: 1.1 !important;
                                     font-family: monospace !important;
                                     color: black !important;
+                                    letter-spacing: 0.05em !important;
                                 }
                                 .group-hover\\:opacity-100 {
                                     display: none !important;
@@ -599,7 +606,7 @@
                                     margin: 0 !important;
                                     display: flex !important;
                                     flex-direction: column !important;
-                                    align-items: flex-start !important;
+                                    align-items: center !important;
                                     justify-content: center !important;
                                     box-sizing: border-box !important;
                                     background: white !important;
@@ -618,12 +625,16 @@
                                 }
                                 #temp-print-area .print-sku-title {
                                     display: block !important;
-                                    font-size: 8px !important;
+                                    font-size: 14px !important;
+                                    font-weight: 900 !important;
                                     text-transform: lowercase !important;
-                                    margin-bottom: 0 !important;
-                                    line-height: 1 !important;
+                                    text-align: center !important;
+                                    width: 100% !important;
+                                    margin-bottom: 3px !important;
+                                    line-height: 1.1 !important;
                                     font-family: monospace !important;
                                     color: black !important;
+                                    letter-spacing: 0.05em !important;
                                 }
                                 .group-hover\\:opacity-100 {
                                     display: none !important;
