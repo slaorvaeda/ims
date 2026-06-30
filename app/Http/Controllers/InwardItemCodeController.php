@@ -294,6 +294,9 @@ class InwardItemCodeController extends Controller
             \Illuminate\Support\Facades\Log::warning('BarcodeDispatched web broadcast failed: ' . $broadcastException->getMessage());
         }
 
+        // Store the dispatched portal in session to remember it for subsequent scans
+        session(['last_dispatched_portal_id' => $portalVendorId]);
+
         return back()->with('success', "Successfully dispatched Serial Code '{$uid}' as Sold.");
     }
 

@@ -208,7 +208,7 @@
                     <div class="space-y-6">
                         <div>
                             <h3 class="text-base font-bold text-slate-900 dark:text-white font-heading">Print Purchase Barcodes</h3>
-                            <p class="text-xs text-slate-400 mt-1">Generated for: <span class="font-semibold text-slate-600 dark:text-slate-300">{{ session('new_purchase_product_name') }}</span></p>
+                            <p class="text-xs text-slate-400 mt-1">Generated for: <span class="font-semibold text-slate-600 dark:text-slate-300">{{ session('new_purchase_product_name') }} ({{ session('new_purchase_product_sku') }})</span></p>
                         </div>
 
                         <!-- Styling Options -->
@@ -344,7 +344,7 @@
                                 <div class="label-title text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5" x-text="'Label #' + (index + 1)"></div>
                                 
                                 <!-- SKU/UID top text -->
-                                <div class="print-sku-title text-[8px] text-slate-500 dark:text-slate-400 font-mono mb-1 text-center" x-text="productName.toLowerCase()"></div>
+                                <div class="print-sku-title text-[8px] text-slate-500 dark:text-slate-400 font-mono mb-1 text-center" x-text="productSku ? productSku.toLowerCase() : productName.toLowerCase()"></div>
                                 
                                 <!-- SVG Barcode Container -->
                                 <svg :id="'modal-barcode-' + index" class="barcode-svg max-w-full bg-white p-1 rounded"></svg>
@@ -395,6 +395,7 @@
                     isOpen: true,
                     items: @json(session('new_purchase_uids')),
                     productName: @json(session('new_purchase_product_name')),
+                    productSku: @json(session('new_purchase_product_sku')),
                     format: getStorage('barcode_format', 'CODE128'),
                     barWidth: parseInt(getStorage('barcode_barWidth', '2')) || 2,
                     barHeight: parseInt(getStorage('barcode_barHeight', '60')) || 60,

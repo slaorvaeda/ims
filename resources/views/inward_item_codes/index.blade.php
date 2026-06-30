@@ -68,8 +68,9 @@
                                 name="portal_vendor_id" 
                                 value="{{ $portal->id }}" 
                                 required 
-                                {{ $loop->first ? 'checked' : '' }}
+                                {{ (session('last_dispatched_portal_id') == $portal->id || (!session()->has('last_dispatched_portal_id') && $loop->first)) ? 'checked' : '' }}
                                 class="sr-only peer"
+                                onchange="localStorage.setItem('selected_portal_id', this.value)"
                             >
                             <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
                                 {{ $portal->name }}
@@ -1181,6 +1182,20 @@
                     }
                 }
             });
+
+            // Restore last selected portal from localStorage
+            const savedPortalId = localStorage.getItem('selected_portal_id');
+            if (savedPortalId) {
+                const radio = document.querySelector(`input[name="portal_vendor_id"][value="${savedPortalId}"]`);
+                if (radio) {
+                    radio.checked = true;
+                }
+            } else {
+                const checkedRadio = document.querySelector('input[name="portal_vendor_id"]:checked');
+                if (checkedRadio) {
+                    localStorage.setItem('selected_portal_id', checkedRadio.value);
+                }
+            }
         });
     </script>
     </div> <!-- Closing Alpine x-data container -->

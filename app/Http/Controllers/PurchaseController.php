@@ -186,37 +186,14 @@ class PurchaseController extends Controller
         $brands = Brand::orderBy('name')->get();
         
         $nextUids = [];
-        $lastGlobalItem = InwardItemCode::orderBy('id', 'desc')->first();
-        $globalNextUid = 'Zig0001';
-        if ($lastGlobalItem) {
-            $lastUid = $lastGlobalItem->uid;
-            if (preg_match('/^(.*?)(\d+)$/', $lastUid, $matches)) {
-                $prefix = $matches[1];
-                $numberStr = $matches[2];
-                $nextNum = (int)$numberStr + 1;
-                $padLength = strlen($numberStr);
-                $globalNextUid = $prefix . str_pad((string)$nextNum, $padLength, '0', STR_PAD_LEFT);
-            } else {
-                $globalNextUid = $lastUid . '0001';
-            }
-        }
+        $defaultBrand = $brands->first();
+        $defaultSubtitle = $defaultBrand ? $defaultBrand->sub : 'Zig';
+        $globalNextUid = $this->getNextUidForSubtitle($defaultSubtitle);
 
         foreach ($products as $product) {
-            $lastItem = InwardItemCode::where('product_id', $product->id)->orderBy('id', 'desc')->first();
-            if ($lastItem) {
-                $lastUid = $lastItem->uid;
-                if (preg_match('/^(.*?)(\d+)$/', $lastUid, $matches)) {
-                    $prefix = $matches[1];
-                    $numberStr = $matches[2];
-                    $nextNum = (int)$numberStr + 1;
-                    $padLength = strlen($numberStr);
-                    $nextUids[$product->id] = $prefix . str_pad((string)$nextNum, $padLength, '0', STR_PAD_LEFT);
-                } else {
-                    $nextUids[$product->id] = $lastUid . '0001';
-                }
-            } else {
-                $nextUids[$product->id] = $globalNextUid;
-            }
+            $productBrand = $product->brand;
+            $productSubtitle = $productBrand ? $productBrand->sub : $defaultSubtitle;
+            $nextUids[$product->id] = $this->getNextUidForSubtitle($productSubtitle);
         }
 
         return view('purchases.create', compact('products', 'brands', 'nextUids', 'globalNextUid'));
@@ -245,25 +222,23 @@ class PurchaseController extends Controller
             $subtitle = 'Zig';
         }
         
-        $lastItem = InwardItemCode::where('uid', 'like', $subtitle . '%')
+        $monthAndYear = now()->format('n') . now()->format('y');
+        $searchPrefix = $subtitle . '-' . $monthAndYear . '-';
+        
+        $lastItem = InwardItemCode::where('uid', 'like', $searchPrefix . '%')
             ->orderByRaw('LENGTH(uid) DESC')
             ->orderBy('uid', 'desc')
             ->first();
             
         if ($lastItem) {
             $lastUid = $lastItem->uid;
-            if (preg_match('/^(.*?)(\d+)$/', $lastUid, $matches)) {
-                $prefix = $matches[1];
-                $numberStr = $matches[2];
-                $nextNum = (int)$numberStr + 1;
-                $padLength = strlen($numberStr);
-                return $prefix . str_pad((string)$nextNum, $padLength, '0', STR_PAD_LEFT);
-            } else {
-                return $lastUid . '0001';
-            }
+            $parts = explode('-', $lastUid);
+            $lastNum = (int)end($parts);
+            $nextNum = $lastNum + 1;
+            return $searchPrefix . str_pad((string)$nextNum, 4, '0', STR_PAD_LEFT);
         }
         
-        return $subtitle . '0001';
+        return $searchPrefix . '0001';
     }
 
     /**
@@ -359,11 +334,13 @@ class PurchaseController extends Controller
 
         $product = Product::find($validated['product_id']);
         $productName = $product ? $product->product_name : 'Product';
+        $productSku = $product ? ($product->sku ?? $product->product_name) : 'Product';
 
         return redirect()->route('purchases.index')
             ->with('success', 'Purchase record logged and corresponding ' . $quantity . ' inward serial codes successfully created.')
             ->with('new_purchase_uids', $uids)
-            ->with('new_purchase_product_name', $productName);
+            ->with('new_purchase_product_name', $productName)
+            ->with('new_purchase_product_sku', $productSku);
     }
 
     /**
