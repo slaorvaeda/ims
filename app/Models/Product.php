@@ -15,6 +15,7 @@ class Product extends Model
         'brand_id',
         'product_name',
         'sku',
+        'selling_price',
         'fsn',
         'asin',
         'updated_by',

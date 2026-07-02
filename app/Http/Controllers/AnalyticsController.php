@@ -146,6 +146,39 @@ class AnalyticsController extends Controller
         $totalUnitsSold = $filteredSales->sum('quantity');
         $totalUnitsInwarded = $filteredInwards->sum('quantity');
         $totalUnitsDispatched = abs($filteredDispatches->sum('quantity'));
+
+        // Calculate Total Sales Revenue based on product selling_price
+        $totalSalesValue = $filteredSales->sum(function ($sale) {
+            return $sale->quantity * ($sale->product->selling_price ?? 0);
+        });
+
+        // Calculate real-time Available Stock matching active filters (Inwarded codes not dispatched)
+        $dispatchedUidsQuery = DispatchItemCode::where(function ($q) {
+            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+        });
+        $inwardsStockQuery = InwardItemCode::where(function ($q) {
+            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+        });
+
+        if ($productId) {
+            $dispatchedUidsQuery->where('product_id', $productId);
+            $inwardsStockQuery->where('product_id', $productId);
+        }
+        if ($portalId) {
+            $dispatchedUidsQuery->whereHas('portal', function ($sub) use ($portalId) {
+                $sub->where('name', $portalId);
+            });
+            $inwardsStockQuery->whereHas('portal', function ($sub) use ($portalId) {
+                $sub->where('name', $portalId);
+            });
+        }
+        if ($search) {
+            $dispatchedUidsQuery->where('uid', 'like', "%{$search}%");
+            $inwardsStockQuery->where('uid', 'like', "%{$search}%");
+        }
+
+        $dispatchedUids = $dispatchedUidsQuery->pluck('uid')->toArray();
+        $totalUnitsAvailable = $inwardsStockQuery->whereNotIn('uid', $dispatchedUids)->count();
         
         $totalUnitsDamaged = $filteredPurchases->where('status', 'Damaged')->sum('quantity');
         $damagedPurchases = $filteredPurchases->where('status', 'Damaged')->values();
@@ -173,6 +206,59 @@ class AnalyticsController extends Controller
             ->count();
 
         $totalInwardRTG = $filteredInwards->where('status', 'RTG')->sum('quantity');
+
+        // Calculate per-product Stock Breakdown (Inward, Outward/Sold, Available) for the dashboard modal
+        $productsQuery = Product::with(['brand']);
+        if ($productId) {
+            $productsQuery->where('id', $productId);
+        }
+        if ($search) {
+            $productsQuery->where(function ($q) use ($search) {
+                $q->where('product_name', 'like', "%{$search}%")
+                  ->orWhere('product_id', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%");
+            });
+        }
+
+        $stockBreakdown = $productsQuery->get()
+            ->map(function ($product) use ($portalId) {
+                $inwardQuery = InwardItemCode::where('product_id', $product->id)
+                    ->where(function ($q) {
+                        $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+                    });
+                
+                $dispatchQuery = DispatchItemCode::where('product_id', $product->id)
+                    ->where(function ($q) {
+                        $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+                    });
+
+                if ($portalId) {
+                    $inwardQuery->whereHas('portal', function ($sub) use ($portalId) {
+                        $sub->where('name', $portalId);
+                    });
+                    $dispatchQuery->whereHas('portal', function ($sub) use ($portalId) {
+                        $sub->where('name', $portalId);
+                    });
+                }
+                
+                $inwardCount = $inwardQuery->count();
+                $dispatchCount = $dispatchQuery->count();
+                $availableCount = max(0, $inwardCount - $dispatchCount);
+
+                return [
+                    'product_name' => $product->product_name,
+                    'product_id_code' => $product->product_id,
+                    'sku' => $product->sku,
+                    'brand_name' => $product->brand->name ?? 'N/A',
+                    'inward' => $inwardCount,
+                    'outward' => $dispatchCount,
+                    'available' => $availableCount
+                ];
+            })
+            ->filter(function ($item) {
+                return $item['inward'] > 0 || $item['outward'] > 0 || $item['available'] > 0;
+            })
+            ->values();
 
         // 4. Combined Activity Log Collection
         $activities = new Collection();
@@ -331,12 +417,15 @@ class AnalyticsController extends Controller
             'totalUnitsPurchased',
             'totalSalesCount',
             'totalUnitsSold',
+            'totalSalesValue',
+            'totalUnitsAvailable',
             'totalUnitsInwarded',
             'totalUnitsDispatched',
             'totalUnitsDamaged',
             'damagedPurchases',
             'totalRTGSold',
             'totalInwardRTG',
+            'stockBreakdown',
             'paginatedActivities',
             'chartLabels',
             'chartSales',

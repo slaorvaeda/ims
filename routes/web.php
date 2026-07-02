@@ -117,6 +117,38 @@ Route::get('/dashboard', function () {
         $chartActivityDispatch[] = $outCount;
     }
 
+    // Calculate per-product Stock Breakdown (Inward, Outward/Sold, Available) for the dashboard modal
+    $stockBreakdown = Product::with(['brand'])->get()
+        ->map(function ($product) {
+            $inwardCount = InwardItemCode::where('product_id', $product->id)
+                ->where(function ($q) {
+                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+                })
+                ->count();
+            
+            $dispatchCount = DispatchItemCode::where('product_id', $product->id)
+                ->where(function ($q) {
+                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
+                })
+                ->count();
+
+            $availableCount = max(0, $inwardCount - $dispatchCount);
+
+            return [
+                'product_name' => $product->product_name,
+                'product_id_code' => $product->product_id,
+                'sku' => $product->sku,
+                'brand_name' => $product->brand->name ?? 'N/A',
+                'inward' => $inwardCount,
+                'outward' => $dispatchCount,
+                'available' => $availableCount
+            ];
+        })
+        ->filter(function ($item) {
+            return $item['inward'] > 0 || $item['outward'] > 0 || $item['available'] > 0;
+        })
+        ->values();
+
     return view('dashboard', compact(
         'stats',
         'chartMonthlyMonths',
@@ -128,7 +160,8 @@ Route::get('/dashboard', function () {
         'chartPortalSales',
         'chartActivityDays',
         'chartActivityInward',
-        'chartActivityDispatch'
+        'chartActivityDispatch',
+        'stockBreakdown'
     ));
 })->middleware(['auth', 'verified'])->name('dashboard');
 

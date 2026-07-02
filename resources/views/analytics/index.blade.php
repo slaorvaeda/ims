@@ -13,7 +13,7 @@
     <!-- Include Chart.js via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="space-y-8" x-data="{ showDamagedModal: false }">
+    <div class="space-y-8" x-data="{ showDamagedModal: false, showStockModal: false }">
         <!-- Advanced Filters & Parameters Section -->
         <div class="p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm">
             <h3 class="font-heading font-bold text-base text-slate-800 dark:text-white mb-4 flex items-center gap-2">
@@ -119,7 +119,7 @@
         </div>
 
         <!-- KPI Metric Highlight Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             <!-- Total Purchases Cost -->
             <div class="p-6 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
                 <div class="space-y-1">
@@ -132,15 +132,15 @@
                 </div>
             </div>
 
-            <!-- Total Units Sold -->
+            <!-- Total Sales Value -->
             <div class="p-6 bg-gradient-to-br from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
                 <div class="space-y-1">
-                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Sales Orders Volume</span>
-                    <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsSold) }} Units</h3>
-                    <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{{ $totalSalesCount }} orders recorded</p>
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Sales Inflow</span>
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white">₹{{ number_format($totalSalesValue, 2) }}</h3>
+                    <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{{ number_format($totalUnitsSold) }} units sold ({{ $totalSalesCount }} orders)</p>
                 </div>
                 <div class="w-12 h-12 bg-emerald-100/60 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
 
@@ -165,6 +165,18 @@
                 </div>
                 <div class="w-12 h-12 bg-rose-100/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"/></svg>
+                </div>
+            </div>
+
+            <!-- Available Stock -->
+            <div class="p-6 bg-gradient-to-br from-teal-50/60 to-white dark:from-teal-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all cursor-pointer hover:border-teal-500/50 group" @click="showStockModal = true" title="Click to view detailed stock per product">
+                <div class="space-y-1">
+                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Available Stock</span>
+                    <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsAvailable) }} Units</h3>
+                    <p class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">Active stock on hand</p>
+                </div>
+                <div class="w-12 h-12 bg-teal-100/60 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
             </div>
         </div>
@@ -410,6 +422,71 @@
 
                 <div class="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex justify-end">
                     <button @click="showDamagedModal = false" class="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-2xl text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Inventory Stock Details Modal -->
+        <div x-show="showStockModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200" x-cloak style="display: none;">
+            <div @click.away="showStockModal = false" class="w-full max-w-5xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 sm:p-8 shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-150">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/80">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white font-heading">Active Inventory Stock</h3>
+                        <p class="text-xs text-slate-400 mt-1">Detailed list of inwarded, sold/outwarded, and available stock per product</p>
+                    </div>
+                    <button @click="showStockModal = false" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto py-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
+                                    <th class="py-3 px-4">Brand</th>
+                                    <th class="py-3 px-4">Product Details</th>
+                                    <th class="py-3 px-4 text-center">Inwarded (Stock In)</th>
+                                    <th class="py-3 px-4 text-center">Sold/Outwarded (Stock Out)</th>
+                                    <th class="py-3 px-4 text-center">Available Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                                @forelse($stockBreakdown as $sb)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 text-slate-700 dark:text-slate-300 transition-colors">
+                                        <td class="py-3.5 px-4 font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">{{ $sb['brand_name'] }}</td>
+                                        <td class="py-3.5 px-4">
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-slate-900 dark:text-white">{{ $sb['product_name'] }}</span>
+                                                <span class="text-[10px] text-slate-400 font-mono">ID: {{ $sb['product_id_code'] }} | SKU: {{ $sb['sku'] }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-center font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                            <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-black">{{ number_format($sb['inward']) }}</span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-center font-bold text-rose-600 dark:text-rose-400 whitespace-nowrap">
+                                            <span class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/30 rounded-full text-xs font-black">{{ number_format($sb['outward']) }}</span>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-center font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                                            <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/30 rounded-full text-xs font-black">{{ number_format($sb['available']) }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                            No stock data matching your filter criteria.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex justify-end">
+                    <button @click="showStockModal = false" class="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-2xl text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all">
                         Close
                     </button>
                 </div>

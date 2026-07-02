@@ -594,7 +594,7 @@
                             .barcode-card .print-sku-title {
                                 display: block !important;
                                 font-size: 8px !important;
-                                text-transform: lowercase !important;
+                                text-transform: uppercase !important;
                                 margin-bottom: 0 !important;
                                 line-height: 1 !important;
                                 font-family: monospace !important;
@@ -733,7 +733,7 @@
                             #temp-print-area .print-sku-title {
                                 display: block !important;
                                 font-size: 8px !important;
-                                text-transform: lowercase !important;
+                                text-transform: uppercase !important;
                                 margin-bottom: 0 !important;
                                 line-height: 1 !important;
                                 font-family: monospace !important;

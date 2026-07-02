@@ -344,7 +344,7 @@
                                 <div class="label-title text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1.5" x-text="'Label #' + (index + 1)"></div>
                                 
                                 <!-- SKU/UID top text -->
-                                <div class="print-sku-title text-base font-black text-slate-800 dark:text-slate-200 font-mono mb-1 text-center tracking-wide" x-text="productSku ? productSku.toLowerCase() : productName.toLowerCase()"></div>
+                                <div class="print-sku-title text-base font-black text-slate-800 dark:text-slate-200 font-mono mb-1 text-center tracking-wide" x-text="productSku ? productSku.toUpperCase() : productName.toUpperCase()"></div>
                                 
                                 <!-- SVG Barcode Container -->
                                 <svg :id="'modal-barcode-' + index" class="barcode-svg max-w-full bg-white p-1 rounded"></svg>
@@ -551,7 +551,7 @@
                                     display: block !important;
                                     font-size: 14px !important;
                                     font-weight: 900 !important;
-                                    text-transform: lowercase !important;
+                                    text-transform: uppercase !important;
                                     text-align: center !important;
                                     width: 100% !important;
                                     margin-bottom: 3px !important;
@@ -627,7 +627,7 @@
                                     display: block !important;
                                     font-size: 14px !important;
                                     font-weight: 900 !important;
-                                    text-transform: lowercase !important;
+                                    text-transform: uppercase !important;
                                     text-align: center !important;
                                     width: 100% !important;
                                     margin-bottom: 3px !important;
