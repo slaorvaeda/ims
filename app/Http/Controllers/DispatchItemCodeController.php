@@ -166,7 +166,8 @@ class DispatchItemCodeController extends Controller
                 });
             })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('dispatch_item_codes.index', compact('dispatchItemCodes', 'search'));
     }

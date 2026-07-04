@@ -22,7 +22,8 @@ class UserController extends Controller
                     ->orWhere('email', 'like', "%{$search}%");
             })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('users.index', compact('users', 'search'));
     }

@@ -144,14 +144,17 @@ class SaleController extends Controller
 
         $sales = Sale::with('product')
             ->when($search, function ($query, $search) {
-                $query->where('portal_id', 'like', "%{$search}%")
-                    ->orWhereHas('product', function ($q) use ($search) {
-                        $q->where('product_name', 'like', "%{$search}%")
-                            ->orWhere('product_id', 'like', "%{$search}%");
-                    });
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('portal_id', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($q) use ($search) {
+                            $q->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('product_id', 'like', "%{$search}%");
+                        });
+                });
             })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('sales.index', compact('sales', 'search'));
     }

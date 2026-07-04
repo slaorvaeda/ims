@@ -125,7 +125,8 @@ class ProductController extends Controller
                     ->orWhere('sku', 'like', "%{$search}%");
             })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('products.index', compact('products', 'search'));
     }

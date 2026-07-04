@@ -165,14 +165,17 @@ class PurchaseController extends Controller
 
         $purchases = Purchase::with(['product', 'brand'])
             ->when($search, function ($query, $search) {
-                $query->where('vendor_id', 'like', "%{$search}%")
-                    ->orWhereHas('product', function ($q) use ($search) {
-                        $q->where('product_name', 'like', "%{$search}%")
-                            ->orWhere('product_id', 'like', "%{$search}%");
-                    });
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('vendor_id', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($q) use ($search) {
+                            $q->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('product_id', 'like', "%{$search}%");
+                        });
+                });
             })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('purchases.index', compact('purchases', 'search'));
     }

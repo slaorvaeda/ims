@@ -18,20 +18,58 @@ class InwardItemCodeController extends Controller
     {
         $search = $request->input('search');
         $status = $request->input('status');
+        $portalId = $request->input('portal_id');
+        $productId = $request->input('product_id');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        $inwardItemCodes = InwardItemCode::with('product')
+        $validSortFields = ['id', 'uid', 'status', 'created_at', 'updated_at', 'updated_by'];
+        $sortBy = in_array($request->input('sort_by'), $validSortFields) ? $request->input('sort_by') : 'id';
+        $sortDir = in_array(strtolower($request->input('sort_dir')), ['asc', 'desc']) ? strtolower($request->input('sort_dir')) : 'asc';
+
+        $inwardItemCodes = InwardItemCode::with(['product', 'portal'])
             ->when($search, function ($query, $search) {
-                $query->where('uid', 'like', "%{$search}%")
-                    ->orWhereHas('product', function ($q) use ($search) {
-                        $q->where('product_name', 'like', "%{$search}%")
-                            ->orWhere('product_id', 'like', "%{$search}%")
-                            ->orWhere('sku', 'like', "%{$search}%");
-                    });
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('uid', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($q) use ($search) {
+                            $q->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('product_id', 'like', "%{$search}%")
+                                ->orWhere('sku', 'like', "%{$search}%");
+                        });
+                });
             })
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->latest()
+            ->when($portalId, function ($query, $portalId) {
+                $query->where('portal_vendor_id', $portalId);
+            })
+            ->when($productId, function ($query, $productId) {
+                $query->where('product_id', $productId);
+            })
+            ->when($startDate || $endDate, function ($query) use ($startDate, $endDate, $status) {
+                $utcStart = $startDate ? \Carbon\Carbon::parse($startDate)->startOfDay()->utc() : null;
+                $utcEnd = $endDate ? \Carbon\Carbon::parse($endDate)->endOfDay()->utc() : null;
+
+                if ($status === 'Sold' || $status === 'Damaged') {
+                    if ($utcStart) $query->where('updated_at', '>=', $utcStart);
+                    if ($utcEnd) $query->where('updated_at', '<=', $utcEnd);
+                } elseif ($status === 'Good Inventory') {
+                    if ($utcStart) $query->where('created_at', '>=', $utcStart);
+                    if ($utcEnd) $query->where('created_at', '<=', $utcEnd);
+                } else {
+                    $query->where(function ($q) use ($utcStart, $utcEnd) {
+                        $q->where(function ($sub) use ($utcStart, $utcEnd) {
+                            if ($utcStart) $sub->where('created_at', '>=', $utcStart);
+                            if ($utcEnd) $sub->where('created_at', '<=', $utcEnd);
+                        })->orWhere(function ($sub) use ($utcStart, $utcEnd) {
+                            if ($utcStart) $sub->where('updated_at', '>=', $utcStart);
+                            if ($utcEnd) $sub->where('updated_at', '<=', $utcEnd);
+                        });
+                    });
+                }
+            })
+            ->orderBy($sortBy, $sortDir)
             ->get();
 
         $headers = ['UID', 'Product ID', 'SKU', 'Product Name', 'Quantity', 'Status', 'Mark', 'Updated By', 'Created At'];
@@ -150,24 +188,76 @@ class InwardItemCodeController extends Controller
     {
         $search = $request->input('search');
         $status = $request->input('status');
+        $portalId = $request->input('portal_id');
+        $productId = $request->input('product_id');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $validSortFields = ['id', 'uid', 'status', 'created_at', 'updated_at', 'updated_by'];
+        $sortBy = in_array($request->input('sort_by'), $validSortFields) ? $request->input('sort_by') : 'id';
+        $sortDir = in_array(strtolower($request->input('sort_dir')), ['asc', 'desc']) ? strtolower($request->input('sort_dir')) : 'asc';
 
         $inwardItemCodes = InwardItemCode::with(['product', 'portal'])
             ->when($search, function ($query, $search) {
-                $query->where('uid', 'like', "%{$search}%")
-                    ->orWhereHas('product', function ($q) use ($search) {
-                        $q->where('product_name', 'like', "%{$search}%")
-                            ->orWhere('product_id', 'like', "%{$search}%");
-                    });
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('uid', 'like', "%{$search}%")
+                        ->orWhereHas('product', function ($q) use ($search) {
+                            $q->where('product_name', 'like', "%{$search}%")
+                                ->orWhere('product_id', 'like', "%{$search}%");
+                        });
+                });
             })
             ->when($status, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->orderBy('id', 'asc')
-            ->paginate(15);
+            ->when($portalId, function ($query, $portalId) {
+                $query->where('portal_vendor_id', $portalId);
+            })
+            ->when($productId, function ($query, $productId) {
+                $query->where('product_id', $productId);
+            })
+            ->when($startDate || $endDate, function ($query) use ($startDate, $endDate, $status) {
+                $utcStart = $startDate ? \Carbon\Carbon::parse($startDate)->startOfDay()->utc() : null;
+                $utcEnd = $endDate ? \Carbon\Carbon::parse($endDate)->endOfDay()->utc() : null;
+
+                if ($status === 'Sold' || $status === 'Damaged') {
+                    if ($utcStart) $query->where('updated_at', '>=', $utcStart);
+                    if ($utcEnd) $query->where('updated_at', '<=', $utcEnd);
+                } elseif ($status === 'Good Inventory') {
+                    if ($utcStart) $query->where('created_at', '>=', $utcStart);
+                    if ($utcEnd) $query->where('created_at', '<=', $utcEnd);
+                } else {
+                    $query->where(function ($q) use ($utcStart, $utcEnd) {
+                        $q->where(function ($sub) use ($utcStart, $utcEnd) {
+                            if ($utcStart) $sub->where('created_at', '>=', $utcStart);
+                            if ($utcEnd) $sub->where('created_at', '<=', $utcEnd);
+                        })->orWhere(function ($sub) use ($utcStart, $utcEnd) {
+                            if ($utcStart) $sub->where('updated_at', '>=', $utcStart);
+                            if ($utcEnd) $sub->where('updated_at', '<=', $utcEnd);
+                        });
+                    });
+                }
+            })
+            ->orderBy($sortBy, $sortDir)
+            ->paginate(15)
+            ->withQueryString();
 
         $portals = \App\Models\PortalVendor::where('type', 'Portal')->orderBy('name')->get();
+        $products = Product::orderBy('product_name')->get();
 
-        return view('inward_item_codes.index', compact('inwardItemCodes', 'search', 'status', 'portals'));
+        return view('inward_item_codes.index', compact(
+            'inwardItemCodes',
+            'search',
+            'status',
+            'portals',
+            'products',
+            'portalId',
+            'productId',
+            'sortBy',
+            'sortDir',
+            'startDate',
+            'endDate'
+        ));
     }
 
     /**

@@ -83,76 +83,194 @@
             </form>
         </div>
 
-        <!-- View Toggle & Search Panel Wrapper -->
-        <div class="flex flex-col xl:flex-row justify-between items-stretch xl:items-center gap-4">
+        <!-- Search Toolbar and Filter Options Wrapper -->
+        <div class="w-full">
             <!-- Search and Filters Panel -->
-            <div class="flex-1 p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-                <form method="GET" action="{{ route('inward-item-codes.index') }}" class="w-full flex flex-col sm:flex-row gap-4 items-center">
-                    <div class="relative flex-1 w-full">
-                        <input 
-                            type="text" 
-                            name="search" 
-                            value="{{ $search }}" 
-                            placeholder="Search by UID or Product..." 
-                            class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
-                        >
-                        <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                    
-                    <!-- Status Filter Dropdown -->
-                    <div class="w-full sm:w-48">
-                        <select 
-                            name="status" 
-                            onchange="this.form.submit()"
-                            class="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-sm focus:outline-none focus:border-indigo-500 transition-all"
-                        >
-                            <option value="">All Statuses</option>
-                            <option value="Good Inventory" {{ $status == 'Good Inventory' ? 'selected' : '' }}>Good Inventory</option>
-                            <option value="Damaged" {{ $status == 'Damaged' ? 'selected' : '' }}>Damaged</option>
-                            <option value="Sold" {{ $status == 'Sold' ? 'selected' : '' }}>Sold</option>
-                            <option value="RTG" {{ $status == 'RTG' ? 'selected' : '' }}>RTG</option>
-                        </select>
+            <div class="w-full p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex flex-col gap-4">
+                <form method="GET" action="{{ route('inward-item-codes.index') }}" class="w-full flex flex-col gap-4">
+                    <!-- Top row: Search input and toggles -->
+                    <div class="flex flex-col xl:flex-row gap-3 items-center w-full">
+                        <div class="relative flex-1 w-full">
+                            <input 
+                                type="text" 
+                                name="search" 
+                                value="{{ $search }}" 
+                                placeholder="Search UID or Product..." 
+                                class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all shadow-sm"
+                            >
+                            <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        
+                        <div class="flex flex-wrap w-full xl:w-auto items-center gap-2">
+                            <button type="submit" class="flex-1 xl:flex-none px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10 whitespace-nowrap">
+                                Apply Search
+                            </button>
+                            
+                            <button type="button" @click="showFilterSort = !showFilterSort" :class="showFilterSort ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border-indigo-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent'" class="px-5 py-3.5 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                                <span>Filter & Sort</span>
+                            </button>
+
+                            <button type="button" @click="showExcelTools = !showExcelTools" :class="showExcelTools ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent'" class="px-5 py-3.5 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                <span>Excel Tools</span>
+                            </button>
+
+                            <div class="flex p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-sm shrink-0">
+                                <button 
+                                    type="button"
+                                    @click="setViewMode('list')"
+                                    title="List View"
+                                    :class="viewMode === 'list' ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                                    class="p-2.5 rounded-xl transition-all flex items-center justify-center"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                </button>
+                                <button 
+                                    type="button"
+                                    @click="setViewMode('card')"
+                                    title="Card View"
+                                    :class="viewMode === 'card' ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                                    class="p-2.5 rounded-xl transition-all flex items-center justify-center"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex w-full sm:w-auto items-center gap-2">
-                        <button type="submit" class="w-full sm:w-auto px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10 whitespace-nowrap">
-                            Apply Search
-                        </button>
-                        @if ($search || $status)
-                            <a href="{{ route('inward-item-codes.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm text-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
-                                Clear
-                            </a>
-                        @endif
-                        <button type="button" @click="showExcelTools = !showExcelTools" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border border-slate-200/40 dark:border-slate-700/40 shrink-0">
-                            <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                            <span>Excel Import/Export</span>
-                        </button>
+                    <!-- Collapsible Filter & Sort Options Panel -->
+                    <div x-show="showFilterSort" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-4"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-4"
+                         class="p-6 bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800/80 rounded-2xl flex flex-col gap-6"
+                         x-cloak>
+                        
+                        <!-- Filters Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                            <!-- Status Filter Dropdown -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Status</label>
+                                <select 
+                                    name="status" 
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                >
+                                    <option value="">All Statuses</option>
+                                    <option value="Good Inventory" {{ $status == 'Good Inventory' ? 'selected' : '' }}>Good Inventory</option>
+                                    <option value="Damaged" {{ $status == 'Damaged' ? 'selected' : '' }}>Damaged</option>
+                                    <option value="Sold" {{ $status == 'Sold' ? 'selected' : '' }}>Sold</option>
+                                    <option value="RTG" {{ $status == 'RTG' ? 'selected' : '' }}>RTG</option>
+                                </select>
+                            </div>
+
+                            <!-- Linked Product Filter -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Linked Product</label>
+                                <select 
+                                    name="product_id" 
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                >
+                                    <option value="">All Products</option>
+                                    @foreach($products as $prod)
+                                        <option value="{{ $prod->id }}" {{ $productId == $prod->id ? 'selected' : '' }}>
+                                            {{ $prod->product_name }} ({{ $prod->product_id }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Dispatched Portal Filter -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dispatched Portal</label>
+                                <select 
+                                    name="portal_id" 
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                >
+                                    <option value="">All Portals</option>
+                                    @foreach($portals as $port)
+                                        <option value="{{ $port->id }}" {{ $portalId == $port->id ? 'selected' : '' }}>
+                                            {{ $port->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Start Date Filter -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Start Date</label>
+                                <input 
+                                    type="date" 
+                                    name="start_date" 
+                                    value="{{ $startDate }}" 
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                />
+                            </div>
+
+                            <!-- End Date Filter -->
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">End Date</label>
+                                <input 
+                                    type="date" 
+                                    name="end_date" 
+                                    value="{{ $endDate }}" 
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Sorting Row -->
+                        <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 pt-4 border-t border-slate-200/60 dark:border-slate-800/80">
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Sort By -->
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">Sort By</label>
+                                    <select 
+                                        name="sort_by" 
+                                        class="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                    >
+                                        <option value="id" {{ $sortBy == 'id' ? 'selected' : '' }}>ID</option>
+                                        <option value="uid" {{ $sortBy == 'uid' ? 'selected' : '' }}>UID</option>
+                                        <option value="status" {{ $sortBy == 'status' ? 'selected' : '' }}>Status</option>
+                                        <option value="created_at" {{ $sortBy == 'created_at' ? 'selected' : '' }}>Date Created</option>
+                                        <option value="updated_at" {{ $sortBy == 'updated_at' ? 'selected' : '' }}>Date Updated</option>
+                                        <option value="updated_by" {{ $sortBy == 'updated_by' ? 'selected' : '' }}>Updated By</option>
+                                    </select>
+                                </div>
+
+                                <!-- Sort Direction -->
+                                <div class="flex items-center gap-2">
+                                    <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">Order</label>
+                                    <select 
+                                        name="sort_dir" 
+                                        class="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                    >
+                                        <option value="asc" {{ $sortDir == 'asc' ? 'selected' : '' }}>Ascending</option>
+                                        <option value="desc" {{ $sortDir == 'desc' ? 'selected' : '' }}>Descending</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 self-end sm:self-auto">
+                                @if ($search || $status || $portalId || $productId || $startDate || $endDate || $sortBy !== 'id' || $sortDir !== 'asc')
+                                    <a href="{{ route('inward-item-codes.index') }}" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-center">
+                                        Clear Filters
+                                    </a>
+                                @endif
+                                
+                                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-indigo-900/10 whitespace-nowrap">
+                                    Apply Options
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
-            
-            <!-- Toggle Buttons -->
-            <div class="flex p-1 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-sm self-end xl:self-center shrink-0">
-                <button 
-                    @click="setViewMode('list')"
-                    :class="viewMode === 'list' ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
-                    class="px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center gap-2"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    <span>List View</span>
-                </button>
-                <button 
-                    @click="setViewMode('card')"
-                    :class="viewMode === 'card' ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
-                    class="px-4 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center gap-2"
-                >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
-                    <span>Card View</span>
-                </button>
-            </div>
-        </div>
 
         <!-- Excel Tools Panel (Toggleable) -->
         <div x-show="showExcelTools" 
@@ -173,7 +291,7 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400">
                     Download all inward serial codes matching the current search & status criteria as an Excel-compatible CSV file.
                 </p>
-                <a href="{{ route('inward-item-codes.export', ['search' => request('search'), 'status' => request('status')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-950/10">
+                <a href="{{ route('inward-item-codes.export', ['search' => request('search'), 'status' => request('status'), 'portal_id' => request('portal_id'), 'product_id' => request('product_id'), 'sort_by' => request('sort_by'), 'sort_dir' => request('sort_dir'), 'start_date' => request('start_date'), 'end_date' => request('end_date')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-950/10">
                     Export Filtered Serial Codes
                 </a>
             </div>
@@ -586,6 +704,7 @@
             return {
                 isOpen: false,
                 showExcelTools: false,
+                showFilterSort: {{ ($status || $portalId || $productId || $startDate || $endDate || $sortBy !== 'id' || $sortDir !== 'asc') ? 'true' : 'false' }},
                 uid: '',
                 productName: '',
                 printWidth: parseInt(getStorage('barcode_printWidth', '50')) || 50,
