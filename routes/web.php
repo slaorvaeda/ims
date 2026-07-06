@@ -86,16 +86,26 @@ Route::get('/dashboard', function () {
     }
 
     // 3. Sales Portals Distribution
-    $portalSales = Sale::selectRaw('portal_id, SUM(quantity) as total_qty')
-        ->groupBy('portal_id')
-        ->get();
-        
+    $portals = \App\Models\PortalVendor::where('type', 'Portal')->orderBy('name')->get();
+    
+    $salesCounts = InwardItemCode::where('status', 'Sold')
+        ->whereNotNull('portal_vendor_id')
+        ->selectRaw('portal_vendor_id, COUNT(*) as total_qty')
+        ->groupBy('portal_vendor_id')
+        ->pluck('total_qty', 'portal_vendor_id')
+        ->toArray();
+
     $chartPortalNames = [];
     $chartPortalSales = [];
     
-    foreach ($portalSales as $sale) {
-        $chartPortalNames[] = $sale->portal_id;
-        $chartPortalSales[] = (int) $sale->total_qty;
+    foreach ($portals as $portal) {
+        $chartPortalNames[] = $portal->name;
+        $chartPortalSales[] = (int) ($salesCounts[$portal->id] ?? 0);
+    }
+
+    if (empty($chartPortalNames)) {
+        $chartPortalNames = ['No Portals'];
+        $chartPortalSales = [0];
     }
 
     // 4. Daily Activity Log (Last 7 Days)

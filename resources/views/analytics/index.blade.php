@@ -23,7 +23,7 @@
             
             <form method="GET" action="{{ route('analytics.index') }}" class="flex flex-col gap-3">
                 <!-- Main Filters Row -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
                     <!-- Start Date -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-400 uppercase">Start Date</label>
@@ -36,13 +36,39 @@
                         <input type="date" name="end_date" value="{{ $endDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
                     </div>
 
+                    <!-- Brand -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-400 uppercase">Brand</label>
+                        <select 
+                            name="brand_id" 
+                            id="brand-filter-select"
+                            onchange="filterProducts()"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                        >
+                            <option value="">All Brands</option>
+                            @foreach($brands as $b)
+                                <option value="{{ $b->id }}" {{ $brandId == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <!-- Product -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-400 uppercase">Product</label>
-                        <select name="product_id" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                        <select 
+                            name="product_id" 
+                            id="product-filter-select"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                        >
                             <option value="">All Products</option>
                             @foreach($products as $prod)
-                                <option value="{{ $prod->id }}" {{ $productId == $prod->id ? 'selected' : '' }}>{{ $prod->product_name }}</option>
+                                <option 
+                                    value="{{ $prod->id }}" 
+                                    data-brand-id="{{ $prod->brand_id }}" 
+                                    {{ $productId == $prod->id ? 'selected' : '' }}
+                                >
+                                    {{ $prod->product_name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -75,7 +101,7 @@
                         <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-indigo-900/10 text-center shrink-0">
                             Apply Filters
                         </button>
-                        @if($startDate || $endDate || $productId || $portalId || $vendorId || $search || $type)
+                        @if($startDate || $endDate || $productId || $brandId || $portalId || $vendorId || $search || $type)
                             <a href="{{ route('analytics.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-xs text-center transition-all shrink-0">
                                 Reset
                             </a>
@@ -606,6 +632,47 @@
                     }
                 }
             });
+
+            // 3. Dynamic Brand to Product options filter
+            const brandSelect = document.getElementById('brand-filter-select');
+            const productSelect = document.getElementById('product-filter-select');
+            
+            if (brandSelect && productSelect) {
+                const originalOptions = Array.from(productSelect.options);
+                
+                window.filterProducts = function() {
+                    const selectedBrandId = brandSelect.value;
+                    const currentSelectedProductValue = productSelect.value;
+                    
+                    productSelect.innerHTML = '';
+                    
+                    let isCurrentProductStillValid = false;
+                    originalOptions.forEach(option => {
+                        const optionBrandId = option.getAttribute('data-brand-id');
+                        
+                        // Check if the product has a valid brand associated
+                        const hasBrand = optionBrandId !== null && optionBrandId !== '';
+                        
+                        // Show option if no brand is filtered, or if the product has a brand that matches the selection
+                        const isMatch = !selectedBrandId || (hasBrand && optionBrandId == selectedBrandId);
+                        
+                        if (option.value === '' || isMatch) {
+                            productSelect.appendChild(option.cloneNode(true));
+                            if (option.value === currentSelectedProductValue) {
+                                isCurrentProductStillValid = true;
+                            }
+                        }
+                    });
+                    
+                    if (isCurrentProductStillValid) {
+                        productSelect.value = currentSelectedProductValue;
+                    } else {
+                        productSelect.value = '';
+                    }
+                };
+                
+                window.filterProducts();
+            }
         });
     </script>
 </x-app-layout>

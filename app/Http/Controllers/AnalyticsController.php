@@ -20,6 +20,7 @@ class AnalyticsController extends Controller
         $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
         $productId = $request->input('product_id');
+        $brandId = $request->input('brand_id');
         $portalId = $request->input('portal_id');
         $vendorId = $request->input('vendor_id');
         $search = $request->input('search');
@@ -31,6 +32,7 @@ class AnalyticsController extends Controller
 
         // Fetch helper models for filters dropdown
         $products = Product::orderBy('product_name')->get();
+        $brands = \App\Models\Brand::orderBy('name')->get();
         
         // Fetch unique portals and vendors for dropdowns
         $portalsDb = \App\Models\PortalVendor::where('type', 'Portal')->orderBy('name')->pluck('name')->toArray();
@@ -52,6 +54,11 @@ class AnalyticsController extends Controller
             })
             ->when($vendorId, function ($q) use ($vendorId) {
                 $q->where('vendor_id', $vendorId);
+            })
+            ->when($brandId, function ($q) use ($brandId) {
+                $q->whereHas('product', function ($p) use ($brandId) {
+                    $p->where('brand_id', $brandId);
+                });
             })
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
@@ -75,6 +82,11 @@ class AnalyticsController extends Controller
             ->when($portalId, function ($q) use ($portalId) {
                 $q->where('portal_id', $portalId);
             })
+            ->when($brandId, function ($q) use ($brandId) {
+                $q->whereHas('product', function ($p) use ($brandId) {
+                    $p->where('brand_id', $brandId);
+                });
+            })
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
                     $sub->where('portal_id', 'like', "%{$search}%")
@@ -97,6 +109,11 @@ class AnalyticsController extends Controller
             ->when($portalId, function ($q) use ($portalId) {
                 $q->whereHas('portal', function ($sub) use ($portalId) {
                     $sub->where('name', $portalId);
+                });
+            })
+            ->when($brandId, function ($q) use ($brandId) {
+                $q->whereHas('product', function ($p) use ($brandId) {
+                    $p->where('brand_id', $brandId);
                 });
             })
             ->when($search, function ($q) use ($search) {
@@ -124,6 +141,11 @@ class AnalyticsController extends Controller
             ->when($portalId, function ($q) use ($portalId) {
                 $q->whereHas('portal', function ($sub) use ($portalId) {
                     $sub->where('name', $portalId);
+                });
+            })
+            ->when($brandId, function ($q) use ($brandId) {
+                $q->whereHas('product', function ($p) use ($brandId) {
+                    $p->where('brand_id', $brandId);
                 });
             })
             ->when($search, function ($q) use ($search) {
@@ -172,6 +194,14 @@ class AnalyticsController extends Controller
                 $sub->where('name', $portalId);
             });
         }
+        if ($brandId) {
+            $dispatchedUidsQuery->whereHas('product', function ($p) use ($brandId) {
+                $p->where('brand_id', $brandId);
+            });
+            $inwardsStockQuery->whereHas('product', function ($p) use ($brandId) {
+                $p->where('brand_id', $brandId);
+            });
+        }
         if ($search) {
             $dispatchedUidsQuery->where('uid', 'like', "%{$search}%");
             $inwardsStockQuery->where('uid', 'like', "%{$search}%");
@@ -189,6 +219,11 @@ class AnalyticsController extends Controller
             ->whereBetween('created_at', [$start, $end])
             ->when($productId, function ($q) use ($productId) {
                 $q->where('product_id', $productId);
+            })
+            ->when($brandId, function ($q) use ($brandId) {
+                $q->whereHas('product', function ($p) use ($brandId) {
+                    $p->where('brand_id', $brandId);
+                });
             })
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($sub) use ($search) {
@@ -209,6 +244,9 @@ class AnalyticsController extends Controller
 
         // Calculate per-product Stock Breakdown (Inward, Outward/Sold, Available) for the dashboard modal
         $productsQuery = Product::with(['brand']);
+        if ($brandId) {
+            $productsQuery->where('brand_id', $brandId);
+        }
         if ($productId) {
             $productsQuery->where('id', $productId);
         }
@@ -371,8 +409,12 @@ class AnalyticsController extends Controller
             $dateStr = $tempDate->toDateString();
             $label = $tempDate->format('M d');
             
-            // Sum sales & purchases quantities on this day
-            $sQty = $filteredSales->where('order_date', $dateStr)->sum('quantity');
+            // Sum dispatched & purchases quantities on this day
+            $sQty = $filteredDispatches->filter(function($d) use ($dateStr) {
+                return $d->created_at->toDateString() === $dateStr;
+            })->sum(function($d) {
+                return abs($d->quantity);
+            });
             $pQty = $filteredPurchases->where('date', $dateStr)->sum('quantity');
 
             $chartData[$dateStr] = [
@@ -389,11 +431,13 @@ class AnalyticsController extends Controller
 
         // Portal Breakdown for Pie Chart (Sales Quantity per Portal)
         $portalData = [];
-        $groupedSales = $filteredSales->groupBy('portal_id');
-        foreach ($groupedSales as $pId => $group) {
+        $groupedDispatches = $filteredDispatches->groupBy(function($d) {
+            return $d->portal->name ?? 'Unknown';
+        });
+        foreach ($groupedDispatches as $portalName => $group) {
             $portalData[] = [
-                'portal' => $pId ?? 'Unknown',
-                'qty' => $group->sum('quantity')
+                'portal' => $portalName,
+                'qty' => $group->sum(function($d) { return abs($d->quantity); })
             ];
         }
 
@@ -402,11 +446,13 @@ class AnalyticsController extends Controller
 
         return view('analytics.index', compact(
             'products',
+            'brands',
             'portals',
             'vendors',
             'startDate',
             'endDate',
             'productId',
+            'brandId',
             'portalId',
             'vendorId',
             'search',
