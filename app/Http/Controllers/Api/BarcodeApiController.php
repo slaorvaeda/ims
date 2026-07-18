@@ -142,13 +142,13 @@ class BarcodeApiController extends Controller
                     'portal_vendor_id' => null,
                 ]);
 
-                // Find matching InwardItemCode and set back to 'Good Inventory' and clear portal and mark as cancelled
+                // Find matching InwardItemCode and set back to 'Good Inventory' and clear portal and mark as active (null)
                 $inwardItem = InwardItemCode::where('uid', $uid)->first();
                 if ($inwardItem) {
                     $inwardItem->update([
                         'status' => 'Good Inventory',
                         'portal_vendor_id' => null,
-                        'mark' => 'cancelled',
+                        'mark' => null,
                     ]);
                 }
             });
