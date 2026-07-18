@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\OperatorController;
+use App\Http\Controllers\ReportController;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\InwardItemCode;
@@ -233,6 +234,12 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:barcodes')->group(function () {
         Route::get('/barcodes', [BarcodeController::class, 'index'])->name('barcodes.index');
     });
+
+    // Unified Reports Routes
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export/stock', [ReportController::class, 'exportStock'])->name('reports.export.stock');
+    Route::get('/reports/export/inward', [ReportController::class, 'exportInward'])->name('reports.export.inward');
+    Route::get('/reports/export/dispatch', [ReportController::class, 'exportDispatch'])->name('reports.export.dispatch');
 });
 
 require __DIR__.'/auth.php';

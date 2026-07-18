@@ -1,0 +1,43 @@
+name: Deploy Laravel App to BigRock Subdomain
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml, ctype, iconv, mysql, zip
+          coverage: none
+
+      - name: Install Composer Dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Package Application Files
+        run: |
+          zip -r build.zip . -x "node_modules/*" -x ".git/*" -x ".env" -x "*.sql" -x "*.pdf" -x "*.png" -x "*.xlsx" -x "storage/logs/*"
+
+      - name: Setup SSH Configuration
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.BIGROCK_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 66.116.229.214 >> ~/.ssh/known_hosts
+
+      - name: Upload Build Package
+        run: |
+          scp -i ~/.ssh/id_ed25519 build.zip a178473e@66.116.229.214:~/ims.indivoltappliances.com/build.zip
+
+      - name: Extract Build and Run Optimizations on Server
+        run: |
+          ssh -i ~/.ssh/id_ed25519 a178473e@66.116.229.214 "unzip -o ~/ims.indivoltappliances.com/build.zip -d ~/ims.indivoltappliances.com/ && rm -f ~/ims.indivoltappliances.com/build.zip && chmod -R 775 ~/ims.indivoltappliances.com/storage ~/ims.indivoltappliances.com/bootstrap/cache && cd ~/ims.indivoltappliances.com && /opt/cpanel/ea-php84/root/usr/bin/php artisan config:cache && /opt/cpanel/ea-php84/root/usr/bin/php artisan route:cache && /opt/cpanel/ea-php84/root/usr/bin/php artisan view:cache"
