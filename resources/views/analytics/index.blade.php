@@ -13,7 +13,7 @@
     <!-- Include Chart.js via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="space-y-8" x-data="{ showDamagedModal: false, showStockModal: false }">
+    <div class="space-y-8" x-data="{ showDamagedModal: false, showStockModal: false, showDispatchModal: false }">
         <!-- Advanced Filters & Parameters Section -->
         <div class="p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm">
             <h3 class="font-heading font-bold text-base text-slate-800 dark:text-white mb-4 flex items-center gap-2">
@@ -183,13 +183,13 @@
             </div>
 
             <!-- Dispatch Unit Serial Codes -->
-            <div class="p-6 bg-gradient-to-br from-rose-50/60 to-white dark:from-rose-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
+            <div class="p-6 bg-gradient-to-br from-rose-50/60 to-white dark:from-rose-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all cursor-pointer hover:border-rose-500/50 group" @click="showDispatchModal = true" title="Click to view detailed dispatches per product">
                 <div class="space-y-1">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Serial Units Dispatched</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsDispatched) }} Units</h3>
                     <p class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">Shipped scanning activity</p>
                 </div>
-                <div class="w-12 h-12 bg-rose-100/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-rose-100/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center group-hover:bg-rose-200 dark:group-hover:bg-rose-900/60 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"/></svg>
                 </div>
             </div>
@@ -513,6 +513,63 @@
 
                 <div class="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex justify-end">
                     <button @click="showStockModal = false" class="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-2xl text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Serial Units Dispatched Details Modal -->
+        <div x-show="showDispatchModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200" x-cloak style="display: none;">
+            <div @click.away="showDispatchModal = false" class="w-full max-w-5xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-6 sm:p-8 shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-150">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/80">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white font-heading">Serial Units Dispatched Details</h3>
+                        <p class="text-xs text-slate-400 mt-1">Detailed list of units dispatched per product matching your active filters</p>
+                    </div>
+                    <button @click="showDispatchModal = false" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto py-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-100 dark:border-slate-800/80 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
+                                    <th class="py-3 px-4">Brand</th>
+                                    <th class="py-3 px-4">Product Details</th>
+                                    <th class="py-3 px-4 text-center">Dispatched (Stock Out)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
+                                @forelse($dispatchBreakdown as $db)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 text-slate-700 dark:text-slate-300 transition-colors">
+                                        <td class="py-3.5 px-4 font-bold text-rose-600 dark:text-rose-400 whitespace-nowrap">{{ $db['brand_name'] }}</td>
+                                        <td class="py-3.5 px-4">
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-slate-900 dark:text-white">{{ $db['product_name'] }}</span>
+                                                <span class="text-[10px] text-slate-400 font-mono">ID: {{ $db['product_id_code'] }} | SKU: {{ $db['sku'] }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3.5 px-4 text-center font-bold text-rose-600 dark:text-rose-400 whitespace-nowrap">
+                                            <span class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/30 rounded-full text-xs font-black">{{ number_format($db['dispatch_count']) }} Units</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                            No dispatches found matching your filter criteria.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-800/50 flex justify-end">
+                    <button @click="showDispatchModal = false" class="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-2xl text-xs hover:bg-slate-800 dark:hover:bg-slate-100 transition-all">
                         Close
                     </button>
                 </div>

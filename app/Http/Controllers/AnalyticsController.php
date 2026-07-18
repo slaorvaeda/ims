@@ -428,6 +428,21 @@ class AnalyticsController extends Controller
         $portalLabels = array_column($portalData, 'portal');
         $portalValues = array_column($portalData, 'qty');
 
+        // Calculate per-product dispatch breakdown from already filtered dispatches (for the Dispatch Modal)
+        $dispatchBreakdown = $filteredDispatches->groupBy('product_id')
+            ->map(function ($items) {
+                $firstItem = $items->first();
+                return [
+                    'brand_name' => $firstItem->product->brand->name ?? 'N/A',
+                    'product_name' => $firstItem->product->product_name ?? 'Unknown Product',
+                    'product_id_code' => $firstItem->product->product_id ?? 'N/A',
+                    'sku' => $firstItem->product->sku ?? 'N/A',
+                    'dispatch_count' => $items->sum(function ($item) { return abs($item->quantity); }),
+                ];
+            })
+            ->sortByDesc('dispatch_count')
+            ->values();
+
         return view('analytics.index', compact(
             'products',
             'brands',
@@ -456,6 +471,7 @@ class AnalyticsController extends Controller
             'totalRTGSold',
             'totalInwardRTG',
             'stockBreakdown',
+            'dispatchBreakdown',
             'paginatedActivities',
             'chartLabels',
             'chartSales',
