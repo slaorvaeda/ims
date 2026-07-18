@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.46-37, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 9.5.0, for macos26.0 (arm64)
 --
--- Host: localhost    Database: a178473e_inven
+-- Host: thomas.proxy.rlwy.net    Database: railway
 -- ------------------------------------------------------
--- Server version	8.0.46-37
+-- Server version	9.4.0
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,15 +14,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-/*!50717 SELECT COUNT(*) INTO @rocksdb_has_p_s_session_variables FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'performance_schema' AND TABLE_NAME = 'session_variables' */;
-/*!50717 SET @rocksdb_get_is_supported = IF (@rocksdb_has_p_s_session_variables, 'SELECT COUNT(*) INTO @rocksdb_is_supported FROM performance_schema.session_variables WHERE VARIABLE_NAME=\'rocksdb_bulk_load\'', 'SELECT 0') */;
-/*!50717 PREPARE s FROM @rocksdb_get_is_supported */;
-/*!50717 EXECUTE s */;
-/*!50717 DEALLOCATE PREPARE s */;
-/*!50717 SET @rocksdb_enable_bulk_load = IF (@rocksdb_is_supported, 'SET SESSION rocksdb_bulk_load = 1', 'SET @rocksdb_dummy_bulk_load = 0') */;
-/*!50717 PREPARE s FROM @rocksdb_enable_bulk_load */;
-/*!50717 EXECUTE s */;
-/*!50717 DEALLOCATE PREPARE s */;
 
 --
 -- Table structure for table `brands`
@@ -33,8 +24,8 @@ DROP TABLE IF EXISTS `brands`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `brands` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sub` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sub` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -60,8 +51,8 @@ DROP TABLE IF EXISTS `cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache` (
-  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL,
   PRIMARY KEY (`key`),
   KEY `cache_expiration_index` (`expiration`)
@@ -85,8 +76,8 @@ DROP TABLE IF EXISTS `cache_locks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache_locks` (
-  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` bigint NOT NULL,
   PRIMARY KEY (`key`),
   KEY `cache_locks_expiration_index` (`expiration`)
@@ -112,11 +103,11 @@ DROP TABLE IF EXISTS `dispatch_item_codes`;
 CREATE TABLE `dispatch_item_codes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `product_id` bigint unsigned NOT NULL,
-  `uid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` int NOT NULL DEFAULT '-1',
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `updated_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mark` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `portal_vendor_id` bigint unsigned DEFAULT NULL,
@@ -148,11 +139,11 @@ DROP TABLE IF EXISTS `failed_jobs`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`),
@@ -179,11 +170,11 @@ DROP TABLE IF EXISTS `inward_item_codes`;
 CREATE TABLE `inward_item_codes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `product_id` bigint unsigned NOT NULL,
-  `uid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` int NOT NULL DEFAULT '1',
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `updated_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mark` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `portal_vendor_id` bigint unsigned DEFAULT NULL,
@@ -215,13 +206,13 @@ DROP TABLE IF EXISTS `job_batches`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `job_batches` (
-  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_jobs` int NOT NULL,
   `pending_jobs` int NOT NULL,
   `failed_jobs` int NOT NULL,
-  `failed_job_ids` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `options` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `failed_job_ids` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options` mediumtext COLLATE utf8mb4_unicode_ci,
   `cancelled_at` int DEFAULT NULL,
   `created_at` int NOT NULL,
   `finished_at` int DEFAULT NULL,
@@ -247,8 +238,8 @@ DROP TABLE IF EXISTS `jobs`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `queue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `attempts` smallint unsigned NOT NULL,
   `reserved_at` int unsigned DEFAULT NULL,
   `available_at` int unsigned NOT NULL,
@@ -276,7 +267,7 @@ DROP TABLE IF EXISTS `migrations`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -300,8 +291,8 @@ DROP TABLE IF EXISTS `password_reset_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -325,11 +316,11 @@ DROP TABLE IF EXISTS `personal_access_tokens`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `tokenable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tokenable_id` bigint unsigned NOT NULL,
-  `name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `abilities` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `name` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -360,8 +351,8 @@ DROP TABLE IF EXISTS `portal_vendors`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `portal_vendors` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -388,13 +379,13 @@ DROP TABLE IF EXISTS `products`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `products` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `product_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `product_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sku` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sku` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `selling_price` decimal(10,2) NOT NULL DEFAULT '0.00',
-  `fsn` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `asin` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `updated_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `fsn` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `asin` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `brand_id` bigint unsigned DEFAULT NULL,
@@ -412,7 +403,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'PRT-0001','Flipkart SmartBuy Neo-Wave with 2 Year Warranty Ultra High Speed 300 mm Wall Fan (Black | Pack of 1)','FK001-NeoWaveWF-Blk',0.00,'FANGHUM92J5BZCSY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:32:32',1),(2,'PRT-0002','zigma Charm Plus with 1 Year Warranty Ultra High Speed 300 mm Wall Fan (White & Blue | Pack of 1)','Zigma-Glory-WallFan-12inch-WhtBlu',0.00,'FANGXJV8BZXZF5AB',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:33:51',3),(3,'PRT-0003','zigma Bullet Heavy Duty ISI CERTIFIED with 12 Months Warranty Ultra High Speed 400 mm Pedestal Fan (Black | Pack of 1)','Zigma-Bullet-SS-Grey',0.00,'FANGYMZDU5DJGZPT',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:34:06',3),(4,'PRT-0004','zigma Charm Anti Dust 12`` with 12 Months Warranty Ultra High Speed 300 mm Wall Fan (White | Pack of 1)','Zigma-Charm-WallFan-12inch-Wht',0.00,'FANGYTC9FF6RZP2T',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:34:26',3),(5,'PRT-0005','Flipkart SmartBuy Neo-Wave with 2 Year Warranty Ultra High Speed 300 mm Wall Fan (White | Pack of 1)','FK001-NeoWaveWF-Wht',0.00,'FANGHUMAYSV37KCC',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:34:39',1),(6,'PRT-0006','zigma TIKTIK Quiet Portable with 1 Year Warranty Ultra High Speed 300 mm Table Fan (Beige | Pack of 1)','Zigma-Tiktik-AP-12inch-Bge',0.00,'FANG9GDPGHMHPGGY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:06',3),(7,'PRT-0007','Kenstar Wind Blaze with 2 Year Warranty 400 mm Pedestal Fan (Maroon | Pack of 1)','Ken-K0001-WinBlaze-Mrn',0.00,'FANH946DXQFDTMQJ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:16',4),(8,'PRT-0008','zigma Bullet Heavy Duty ISI CERTIFIED with 1 Year Warranty 400 mm Pedestal Fan (Beige & Black | Pack of 1)','Zigma-Bullet-SS-Beige',0.00,'FANHKZW6BBGBTXZS',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:27',3),(9,'PRT-0009','zigma TIKTIK Quiet Portable with 12 Months Warranty Ultra High Speed 300 mm Table Fan (Black | Pack of 1)','Zigma-Tiktik-AP-12inch-Blk',0.00,'FANFR9GFGFMUSMPJ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:52',3),(10,'PRT-0010','zigma Charm Plus with 1 Year Warranty Ultra High Speed 300 mm Wall Fan (Black & Grey | Pack of 1)','Zigma-Glory-WallFan-12inch-GryBlk',0.00,'FANGXJZVTCZQVYZX',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:10',3),(11,'PRT-0011','Kenstar Wind Blaze Vector with 12 Months Warranty 400 mm Pedestal Fan (White, Blue | Pack of 1)','Ken-K0005-WinBlazeVector-WhtBlu',0.00,'FANHM2Y2AZUAJEFT',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:26',4),(12,'PRT-0012','zigma Fresh Aire | Dust Protection | Kitchen Use | Bathroom Use | Industrial Use 225 mm Exhaust Fan (Mouse Grey)','Zigma-Fresh-Aire-225MM-Grey',0.00,'EXFHKJD9YRAXTFEK',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:41',3),(13,'PRT-0013','Flipkart SmartBuy Potent with 12 Months Warranty 300 mm Wall Fan (White, Beige | Pack of 1)','FK010-Potent-WhtBeige',0.00,'FANHM3YS7JGS4GR5',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:51',1),(14,'PRT-0014','Flipkart SmartBuy Falcon Swing Oscillating with 1 Year Warranty 400 mm Pedestal Fan (Black Maroon | Pack of 1)','FKSB-Falcon-Swing-Mrn',0.00,'FANHMHC8FKZCXCFE',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:39:02',1),(15,'PRT-0015','zigma Charm Anti Dust 12`` with 12 Months Warranty Ultra High Speed 300 mm Wall Fan (Black | Pack of 1)','Zigma-Charm-WallFan-12inch-Blk',0.00,'FANGYTC7ZYEX56NP',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:37:59',3),(16,'PRT-0016','Flipkart SmartBuy Atomic with 1 Year Warranty Ultra High Speed 300 mm Table Fan (Beige | Pack of 1)','FK004-Atomic300AP-Bge',0.00,'FANGHR5WEABCSQDY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:40:09',1),(17,'PRT-0017','Kenstar Wind Blaze with 12 Months Warranty 400 mm Pedestal Fan (Black Yelllow | Pack of 1)','Ken-K0001-WinBlaze-Yllow',0.00,'FANHMYR5KZN9A7YG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:39:17',4),(18,'PRT-0018','zigma Grace 2 in 1 convertible with Oscillation with 12 Months Warranty 400 mm Pedestal Fan (Black & Maroon | Pack of 1)','Zigma-Grace-SS-Mrn',0.00,'FANGYGEY8U2XHTCD',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:40:41',3),(19,'PRT-0019','zigma Aero Quite with 3 Year Warranty 1200 mm Ceiling Fan (5 Star | Wallnut | Pack of 1)','Zig-AeroQuite-4Blade',0.00,'FANHZ96527GE6UGB',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:43:21',3),(20,'PRT-0020','zigma Turbo Elegence with 1 Year Warranty 400 mm Pedestal Fan (Light Grey | Pack of 1)','Zigma-Turbo-400MM-Grey',0.00,'FANHKEDJCMBFKHFZ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:40:59',3),(21,'PRT-0021','zigma VentilAir | Silent Operation | Eco Friendly | Dust Protection | Kitchen Use 250 mm Exhaust Fan (White)','Zigma-VentilAir-250MM-Wht',0.00,'EXFHKJCHV9DBCHGD',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:42:17',3),(22,'PRT-0022','Kenstar Draft Speed Neo with 12 Months Warranty 400 mm Wall Fan (White, Blue | Pack of 1)','Ken-DraftNeo16WF-Whtblu',0.00,'FANHNZYD3D26DDC5',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:41:57',4),(23,'PRT-0023','zigma Inspira 1000 W Dry Iron (White, Red)','Zigma-DI-Inspira-WhtRed',0.00,'IRNHZFGGYZ5DHPTG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:42:51',3),(24,'PRT-0024','zigma Maxx Neo Electric Kettle (1.8 L, Silver)','Zig-Maxx Kettle-1.8SS',0.00,'EKTHZFJ3GHQUWAHM',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:41:37',3),(25,'PRT-0025','Zigma Steel Electronic Gas Lighter (Multicolor, Pack of 1)','Zig-Rchrg-Lighter',0.00,'GALHZ4PRP28W8FAZ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:41:17',3),(26,'PRT-0026','zigma Nexon 1000 W Dry Iron (Blue, Black)','Zig-DI-Nexon-BliBLK',0.00,'IRNHZFZSJYHGPH6X',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:37:48',3),(27,'PRT-0027','Flipkart SmartBuy Atomic with 1 Year Warranty Ultra High Speed 300 mm Table Fan (Charcoal Grey | Pack of 1)','FK003-Atomic300AP-Blk',0.00,'FANGHR69DTS5JGKC',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:57:19',1),(28,'PRT-0028','zigma VentilAir | Dust Protection | Kitchen Use | Bathroom Use | Industrial Use 200 mm Exhaust Fan (White)','Zigma-VentilAir-200MM-Wht',0.00,'EXFHKTH8G6GHN676','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(29,'PRT-0029','zigma Axil Air | Bathroom Use 150 mm Exhaust Fan (Ivory)','Zigma-AxilAir-150-Ivy',0.00,'EXFHHB6TFCUUWSQZ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-11 05:38:03',3),(30,'PRT-0030','Flipkart SmartBuy FALCON with 2 Year Warranty Ultra High Speed 400 mm Pedestal Fan (Black | Pack of 1)','FK002-Falcon400Bullet-Blk',0.00,'FANGXHC46THMH3ST',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:57:32',1),(31,'PRT-0031','Flipkart SmartBuy Prime Electric Kettle (1.8 L, Silver)','EK-18-MaxSSKettle',0.00,'EKTG4AJ6XPSDJFVS',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:57:47',1),(32,'PRT-0032','zigma Axil Air | Bathroom Use 150 mm Exhaust Fan (White)','Zigma-AxilAir-150-Wht',0.00,'EXFHH2HWEAZBSZ2C',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-11 05:38:18',3),(33,'PRT-0033','Flipkart SmartBuy 2000 W Radiant Cooktop Touch Panel (Silver, Black, Egnite (Infrared) Induction Cooktop Touch Panel 2000 Watt (All Utensil use-able))','FKSB-0010-Infra2000-Black',0.00,'ICTHFB7D5D6UZZGV',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:58:03',1),(34,'PRT-0034','zigma TIKTIK Quiet Portable with 12 Months Warranty Ultra High Speed 300 mm Table Fan (White | Pack of 1)','Zigma-Tiktik-AP-12inch-ivy',0.00,'FANFR8YZTYKG4PHY','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(35,'PRT-0035','zigma Fresh Aire | Dust Protection | Kitchen Use | Bathroom Use | Industrial Use 300 mm Exhaust Fan (Mouse Grey)','Zigma-Fresh-Aire-300MM-Grey',0.00,'EXFHKKKWXZZQGCAT',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-10 11:59:02',3),(36,'PRT-0036','zigma ION with 6 Months Warranty 230 mm Table Fan (White | Pack of 1)','Zigma-PigME-wht',0.00,'FANHKGBDDY6FRBG3','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(37,'PRT-0037','zigma Curve with 1 Year Warranty 400 mm Wall Fan (Pale Beige | Pack of 1)','Zigma-Wall-Curve400MM-MGrey',0.00,'FANHKEVZHCSZDTSR','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(38,'PRT-0038','zigma 1625 ISI with 12 Months Warranty Ultra High Speed 400 mm Pedestal Fan (Black | Pack of 1)','Zigma-Bullet-SS-LgtGrey',0.00,'FANFRH97PZZHWRDM','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(39,'PRT-0039','zigma VentilAir | Kitchen Use | Bathroom Use 150 mm Exhaust Fan (White)','Zigma-VentilAir-150MM-Wht',0.00,'EXFHKTHZVYETYVF6','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(40,'PRT-0040','Syntro Nutrify Air Fryer (3.2 L)','S0008-Nutrify-AFBLK',0.00,'AFRHM57MTDTSHFEU',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:32:16',2),(41,'PRT-0041','Syntro Ultra Pro Heavy Weight 1000 W Dry Iron (Beige, Black)','S0010-UltraPro-Beige',0.00,'IRNHM33FMH9ES8HF',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:54:43',2),(42,'PRT-0042','Syntro Air Max with 12 Months Warranty 300 mm Table Fan (Sand Grey | Pack of 1)','SYN0020-AIRMAX',0.00,'FANHMZC5W7DKFDZG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-01 07:09:55',2),(43,'PRT-0043','Syntro NEO with 12 Months Warranty 400 mm Wall Fan (Grey Black | Pack of 1)','S0005-Neo-400mm',0.00,'FANHHHBYUJKFP6MK',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-02 11:07:33',2),(44,'PRT-0044','Syntro Smart Pro Light Weight 1000 W Dry Iron (White, Black)','S0008-SmartPro-WhtBlk',0.00,'IRNHM33NNQQXNGJG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:54:59',2),(45,'PRT-0045','Syntro Aero Max with 1 Year Warranty 400 mm Pedestal Fan (Maroon, Black | Pack of 1)','S0001-AeroMax',0.00,'FANHH4YHYMQTFEWM',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:55:26',2),(46,'PRT-0046','Syntro AERON with 12 Months Warranty 300 mm Wall Fan (BLACK | Pack of 1)','S0003-Aeron',0.00,'FANHHGY9WVKBNCUN',NULL,'Pankaj','2026-06-30 11:18:42','2026-06-30 11:25:07',2),(47,'PRT-0047','Syntro 10-Litre Oven Toaster Grill OTG Healthify, Black ()','S0011-OTG10L',0.00,'OTNHMAUCQVAN2ABW',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:55:40',2),(48,'PRT-0048','Syntro Turbo Pro Heavy Weight 1000 W Dry Iron (White, SS)','S0009-TurboPro-WhtIrn',0.00,'IRNHM32MNSUGZRTW',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-02 06:15:18',2),(49,'PRT-0049','Syntro 17-Litre Oven Toaster Grill OTG HEALTHIFY 17 LTR, Black, Silver ()','Syntro-0022-OTG17L',0.00,'OTNHNYDAJTRTTFAP',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-01 10:19:24',2),(50,'PRT-0050','Syntro Aero lite with 1 Year Warranty 300 mm Table Fan (Green, Dark Green | Pack of 1)','S0007-Aerolite',0.00,'FANHHU7U6FGYECFQ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:56:15',2),(51,'PRT-0051','Syntro Steel Pro Light Weight 1000 W Dry Iron (Golden Yellow)','S0008-StellPro-YlwIrn',0.00,'IRNHM32E9TCHCWRG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:56:32',2),(52,'PRT-0052','Syntro VENTI | Kitchen Use | Bathroom Use 200 mm Exhaust Fan (WHITE)','SYNT-0021-VENTI200',0.00,'EXFHMZJJGQHZHPWY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:56:48',2),(53,'PRT-0053','Syntro VENTI | Kitchen Use | Bathroom Use 150 mm Exhaust Fan (WHITE)','SYNTRO VENTI 150MM (6INCH)',0.00,NULL,NULL,'Pankaj','2026-07-03 09:11:19','2026-07-03 09:11:19',2),(54,'PRT-0054','SYNTRO SPARK LIGHTER','SYNTRO SPARK LIGHTER',0.00,NULL,NULL,'Pankaj','2026-07-03 10:18:30','2026-07-03 10:18:30',2),(55,'PRT-0055','SYNTRO FLAME GAS LIGHTER','SYNTRO FLAME GAS LIGHTER',0.00,NULL,NULL,'Pankaj','2026-07-03 10:20:52','2026-07-03 10:20:52',2),(56,'PRT-0056','zigma  Electric Kettle ZEK 721       1.5LTR','ZEK 721',0.00,NULL,NULL,'Pankaj','2026-07-10 05:55:37','2026-07-10 05:55:37',3),(57,'PRT-0057','ZIGMA GEYSER NEER 10LTR','ZIGMA NEER 10LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:30:40','2026-07-10 12:30:40',3),(58,'PRT-0058','ZIGMA GEYSER JIFFY 3 LTR','JIFFY 3 LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:31:44','2026-07-10 12:31:44',3),(59,'PRT-0059','ZIGMA GEYSER CLASSIC 6 LTR','ZIGMA GEYSER CLASSIC 6 LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:32:54','2026-07-10 12:32:54',3),(60,'PRT-0060','ZIGMA CLASSIC GEYSER 10LTR','ZIGMA CLASSIC GEYSER 10LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:33:47','2026-07-10 12:33:47',3),(61,'PRT-0062','ZIGMA SPARK LIGHTER','ZIGMA SPARK LIGHTER',0.00,NULL,NULL,'Pankaj','2026-07-11 05:04:54','2026-07-11 05:04:54',3),(62,'PRT-0061','ZG-Flame-Lighter','ZG-Flame-Lighter',0.00,NULL,NULL,'Pankaj','2026-07-11 05:06:32','2026-07-11 05:06:32',3),(63,'PRT-0063','SYNTRO LPG GAS PIPE','SYNTRO LPG GAS PIPE',0.00,NULL,NULL,'Pankaj','2026-07-11 08:57:36','2026-07-11 08:57:36',2),(64,'PRT-0064','ZIGMA LPG GAS PIPE','ZIGMA LPG GAS PIPE',0.00,NULL,NULL,'Pankaj','2026-07-11 08:58:07','2026-07-11 08:58:07',3),(65,'PRT-0065','zigma Z-30 Quiet Performance Quiet Performance Fan Room Heater','Zigma-Z30-Wht',0.00,NULL,NULL,'Pankaj','2026-07-16 04:49:47','2026-07-16 04:49:47',3);
+INSERT INTO `products` VALUES (1,'PRT-0001','Flipkart SmartBuy Neo-Wave with 2 Year Warranty Ultra High Speed 300 mm Wall Fan (Black | Pack of 1)','FK001-NeoWaveWF-Blk',0.00,'FANGHUM92J5BZCSY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:32:32',1),(2,'PRT-0002','zigma Charm Plus with 1 Year Warranty Ultra High Speed 300 mm Wall Fan (White & Blue | Pack of 1)','Zigma-Glory-WallFan-12inch-WhtBlu',0.00,'FANGXJV8BZXZF5AB',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:33:51',3),(3,'PRT-0003','zigma Bullet Heavy Duty ISI CERTIFIED with 12 Months Warranty Ultra High Speed 400 mm Pedestal Fan (Black | Pack of 1)','Zigma-Bullet-SS-Grey',0.00,'FANGYMZDU5DJGZPT',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:34:06',3),(4,'PRT-0004','zigma Charm Anti Dust 12`` with 12 Months Warranty Ultra High Speed 300 mm Wall Fan (White | Pack of 1)','Zigma-Charm-WallFan-12inch-Wht',0.00,'FANGYTC9FF6RZP2T',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:34:26',3),(5,'PRT-0005','Flipkart SmartBuy Neo-Wave with 2 Year Warranty Ultra High Speed 300 mm Wall Fan (White | Pack of 1)','FK001-NeoWaveWF-Wht',0.00,'FANGHUMAYSV37KCC',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:34:39',1),(6,'PRT-0006','zigma TIKTIK Quiet Portable with 1 Year Warranty Ultra High Speed 300 mm Table Fan (Beige | Pack of 1)','Zigma-Tiktik-AP-12inch-Bge',0.00,'FANG9GDPGHMHPGGY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:06',3),(7,'PRT-0007','Kenstar Wind Blaze with 2 Year Warranty 400 mm Pedestal Fan (Maroon | Pack of 1)','Ken-K0001-WinBlaze-Mrn',0.00,'FANH946DXQFDTMQJ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:16',4),(8,'PRT-0008','zigma Bullet Heavy Duty ISI CERTIFIED with 1 Year Warranty 400 mm Pedestal Fan (Beige & Black | Pack of 1)','Zigma-Bullet-SS-Beige',0.00,'FANHKZW6BBGBTXZS',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:27',3),(9,'PRT-0009','zigma TIKTIK Quiet Portable with 12 Months Warranty Ultra High Speed 300 mm Table Fan (Black | Pack of 1)','Zigma-Tiktik-AP-12inch-Blk',0.00,'FANFR9GFGFMUSMPJ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:35:52',3),(10,'PRT-0010','zigma Charm Plus with 1 Year Warranty Ultra High Speed 300 mm Wall Fan (Black & Grey | Pack of 1)','Zigma-Glory-WallFan-12inch-GryBlk',0.00,'FANGXJZVTCZQVYZX',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:10',3),(11,'PRT-0011','Kenstar Wind Blaze Vector with 12 Months Warranty 400 mm Pedestal Fan (White, Blue | Pack of 1)','Ken-K0005-WinBlazeVector-WhtBlu',0.00,'FANHM2Y2AZUAJEFT',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:26',4),(12,'PRT-0012','zigma Fresh Aire | Dust Protection | Kitchen Use | Bathroom Use | Industrial Use 225 mm Exhaust Fan (Mouse Grey)','Zigma-Fresh-Aire-225MM-Grey',0.00,'EXFHKJD9YRAXTFEK',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:41',3),(13,'PRT-0013','Flipkart SmartBuy Potent with 12 Months Warranty 300 mm Wall Fan (White, Beige | Pack of 1)','FK010-Potent-WhtBeige',0.00,'FANHM3YS7JGS4GR5',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:38:51',1),(14,'PRT-0014','Flipkart SmartBuy Falcon Swing Oscillating with 1 Year Warranty 400 mm Pedestal Fan (Black Maroon | Pack of 1)','FKSB-Falcon-Swing-Mrn',0.00,'FANHMHC8FKZCXCFE',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:39:02',1),(15,'PRT-0015','zigma Charm Anti Dust 12`` with 12 Months Warranty Ultra High Speed 300 mm Wall Fan (Black | Pack of 1)','Zigma-Charm-WallFan-12inch-Blk',0.00,'FANGYTC7ZYEX56NP',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:37:59',3),(16,'PRT-0016','Flipkart SmartBuy Atomic with 1 Year Warranty Ultra High Speed 300 mm Table Fan (Beige | Pack of 1)','FK004-Atomic300AP-Bge',0.00,'FANGHR5WEABCSQDY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:40:09',1),(17,'PRT-0017','Kenstar Wind Blaze with 12 Months Warranty 400 mm Pedestal Fan (Black Yelllow | Pack of 1)','Ken-K0001-WinBlaze-Yllow',0.00,'FANHMYR5KZN9A7YG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:39:17',4),(18,'PRT-0018','zigma Grace 2 in 1 convertible with Oscillation with 12 Months Warranty 400 mm Pedestal Fan (Black & Maroon | Pack of 1)','Zigma-Grace-SS-Mrn',0.00,'FANGYGEY8U2XHTCD',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:40:41',3),(19,'PRT-0019','zigma Aero Quite with 3 Year Warranty 1200 mm Ceiling Fan (5 Star | Wallnut | Pack of 1)','Zig-AeroQuite-4Blade',0.00,'FANHZ96527GE6UGB',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:43:21',3),(20,'PRT-0020','zigma Turbo Elegence with 1 Year Warranty 400 mm Pedestal Fan (Light Grey | Pack of 1)','Zigma-Turbo-400MM-Grey',0.00,'FANHKEDJCMBFKHFZ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:40:59',3),(21,'PRT-0021','zigma VentilAir | Silent Operation | Eco Friendly | Dust Protection | Kitchen Use 250 mm Exhaust Fan (White)','Zigma-VentilAir-250MM-Wht',0.00,'EXFHKJCHV9DBCHGD',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:42:17',3),(22,'PRT-0022','Kenstar Draft Speed Neo with 12 Months Warranty 400 mm Wall Fan (White, Blue | Pack of 1)','Ken-DraftNeo16WF-Whtblu',0.00,'FANHNZYD3D26DDC5',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:41:57',4),(23,'PRT-0023','zigma Inspira 1000 W Dry Iron (White, Red)','Zigma-DI-Inspira-WhtRed',0.00,'IRNHZFGGYZ5DHPTG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:42:51',3),(24,'PRT-0024','zigma Maxx Neo Electric Kettle (1.8 L, Silver)','Zig-Maxx Kettle-1.8SS',0.00,'EKTHZFJ3GHQUWAHM',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:41:37',3),(25,'PRT-0025','Zigma Steel Electronic Gas Lighter (Multicolor, Pack of 1)','Zig-Rchrg-Lighter',0.00,'GALHZ4PRP28W8FAZ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:41:17',3),(26,'PRT-0026','zigma Nexon 1000 W Dry Iron (Blue, Black)','Zig-DI-Nexon-BliBLK',0.00,'IRNHZFZSJYHGPH6X',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:37:48',3),(27,'PRT-0027','Flipkart SmartBuy Atomic with 1 Year Warranty Ultra High Speed 300 mm Table Fan (Charcoal Grey | Pack of 1)','FK003-Atomic300AP-Blk',0.00,'FANGHR69DTS5JGKC',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:57:19',1),(28,'PRT-0028','zigma VentilAir | Dust Protection | Kitchen Use | Bathroom Use | Industrial Use 200 mm Exhaust Fan (White)','Zigma-VentilAir-200MM-Wht',0.00,'EXFHKTH8G6GHN676','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(29,'PRT-0029','zigma Axil Air | Bathroom Use 150 mm Exhaust Fan (Ivory)','Zigma-AxilAir-150-Ivy',0.00,'EXFHHB6TFCUUWSQZ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-11 05:38:03',3),(30,'PRT-0030','Flipkart SmartBuy FALCON with 2 Year Warranty Ultra High Speed 400 mm Pedestal Fan (Black | Pack of 1)','FK002-Falcon400Bullet-Blk',0.00,'FANGXHC46THMH3ST',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:57:32',1),(31,'PRT-0031','Flipkart SmartBuy Prime Electric Kettle (1.8 L, Silver)','EK-18-MaxSSKettle',0.00,'EKTG4AJ6XPSDJFVS',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:57:47',1),(32,'PRT-0032','zigma Axil Air | Bathroom Use 150 mm Exhaust Fan (White)','Zigma-AxilAir-150-Wht',0.00,'EXFHH2HWEAZBSZ2C',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-11 05:38:18',3),(33,'PRT-0033','Flipkart SmartBuy 2000 W Radiant Cooktop Touch Panel (Silver, Black, Egnite (Infrared) Induction Cooktop Touch Panel 2000 Watt (All Utensil use-able))','FKSB-0010-Infra2000-Black',0.00,'ICTHFB7D5D6UZZGV',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:58:03',1),(34,'PRT-0034','zigma TIKTIK Quiet Portable with 12 Months Warranty Ultra High Speed 300 mm Table Fan (White | Pack of 1)','Zigma-Tiktik-AP-12inch-ivy',0.00,'FANFR8YZTYKG4PHY','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(35,'PRT-0035','zigma Fresh Aire | Dust Protection | Kitchen Use | Bathroom Use | Industrial Use 300 mm Exhaust Fan (Mouse Grey)','Zigma-Fresh-Aire-300MM-Grey',0.00,'EXFHKKKWXZZQGCAT',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-10 11:59:02',3),(36,'PRT-0036','zigma ION with 6 Months Warranty 230 mm Table Fan (White | Pack of 1)','Zigma-PigME-wht',0.00,'FANHKGBDDY6FRBG3','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(37,'PRT-0037','zigma Curve with 1 Year Warranty 400 mm Wall Fan (Pale Beige | Pack of 1)','Zigma-Wall-Curve400MM-MGrey',0.00,'FANHKEVZHCSZDTSR','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(38,'PRT-0038','zigma 1625 ISI with 12 Months Warranty Ultra High Speed 400 mm Pedestal Fan (Black | Pack of 1)','Zigma-Bullet-SS-LgtGrey',0.00,'FANFRH97PZZHWRDM','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(39,'PRT-0039','zigma VentilAir | Kitchen Use | Bathroom Use 150 mm Exhaust Fan (White)','Zigma-VentilAir-150MM-Wht',0.00,'EXFHKTHZVYETYVF6','','Pankaj','2026-06-30 11:18:42','2026-06-30 11:18:42',NULL),(40,'PRT-0040','Syntro Nutrify Air Fryer (3.2 L)','S0008-Nutrify-AFBLK',0.00,'AFRHM57MTDTSHFEU',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:32:16',2),(41,'PRT-0041','Syntro Ultra Pro Heavy Weight 1000 W Dry Iron (Beige, Black)','S0010-UltraPro-Beige',0.00,'IRNHM33FMH9ES8HF',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:54:43',2),(42,'PRT-0042','Syntro Air Max with 12 Months Warranty 300 mm Table Fan (Sand Grey | Pack of 1)','SYN0020-AIRMAX',0.00,'FANHMZC5W7DKFDZG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-01 07:09:55',2),(43,'PRT-0043','Syntro NEO with 12 Months Warranty 400 mm Wall Fan (Grey Black | Pack of 1)','S0005-Neo-400mm',0.00,'FANHHHBYUJKFP6MK',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-02 11:07:33',2),(44,'PRT-0044','Syntro Smart Pro Light Weight 1000 W Dry Iron (White, Black)','S0008-SmartPro-WhtBlk',0.00,'IRNHM33NNQQXNGJG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:54:59',2),(45,'PRT-0045','Syntro Aero Max with 1 Year Warranty 400 mm Pedestal Fan (Maroon, Black | Pack of 1)','S0001-AeroMax',0.00,'FANHH4YHYMQTFEWM',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:55:26',2),(46,'PRT-0046','Syntro AERON with 12 Months Warranty 300 mm Wall Fan (BLACK | Pack of 1)','S0003-Aeron',0.00,'FANHHGY9WVKBNCUN',NULL,'Pankaj','2026-06-30 11:18:42','2026-06-30 11:25:07',2),(47,'PRT-0047','Syntro 10-Litre Oven Toaster Grill OTG Healthify, Black ()','S0011-OTG10L',0.00,'OTNHMAUCQVAN2ABW',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:55:40',2),(48,'PRT-0048','Syntro Turbo Pro Heavy Weight 1000 W Dry Iron (White, SS)','S0009-TurboPro-WhtIrn',0.00,'IRNHM32MNSUGZRTW',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-02 06:15:18',2),(49,'PRT-0049','Syntro 17-Litre Oven Toaster Grill OTG HEALTHIFY 17 LTR, Black, Silver ()','Syntro-0022-OTG17L',0.00,'OTNHNYDAJTRTTFAP',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-01 10:19:24',2),(50,'PRT-0050','Syntro Aero lite with 1 Year Warranty 300 mm Table Fan (Green, Dark Green | Pack of 1)','S0007-Aerolite',0.00,'FANHHU7U6FGYECFQ',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:56:15',2),(51,'PRT-0051','Syntro Steel Pro Light Weight 1000 W Dry Iron (Golden Yellow)','S0008-StellPro-YlwIrn',0.00,'IRNHM32E9TCHCWRG',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:56:32',2),(52,'PRT-0052','Syntro VENTI | Kitchen Use | Bathroom Use 200 mm Exhaust Fan (WHITE)','SYNT-0021-VENTI200',0.00,'EXFHMZJJGQHZHPWY',NULL,'Pankaj','2026-06-30 11:18:42','2026-07-03 08:56:48',2),(53,'PRT-53','Syntro VENTI | Kitchen Use | Bathroom Use 150 mm Exhaust Fan (WHITE)','SYNTRO VENTI 150MM (6INCH)',0.00,NULL,NULL,'Pankaj','2026-07-03 09:11:19','2026-07-03 09:11:19',2),(54,'PRT-54','SYNTRO SPARK LIGHTER','SYNTRO SPARK LIGHTER',0.00,NULL,NULL,'Pankaj','2026-07-03 10:18:30','2026-07-03 10:18:30',2),(55,'PRT-55','SYNTRO FLAME GAS LIGHTER','SYNTRO FLAME GAS LIGHTER',0.00,NULL,NULL,'Pankaj','2026-07-03 10:20:52','2026-07-03 10:20:52',2),(56,'PRT-56','zigma  Electric Kettle ZEK 721       1.5LTR','ZEK 721',0.00,NULL,NULL,'Pankaj','2026-07-10 05:55:37','2026-07-10 05:55:37',3),(57,'PRT-57','ZIGMA GEYSER NEER 10LTR','ZIGMA NEER 10LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:30:40','2026-07-10 12:30:40',3),(58,'PRT-58','ZIGMA GEYSER JIFFY 3 LTR','JIFFY 3 LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:31:44','2026-07-10 12:31:44',3),(59,'PRT-59','ZIGMA GEYSER CLASSIC 6 LTR','ZIGMA GEYSER CLASSIC 6 LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:32:54','2026-07-10 12:32:54',3),(60,'PRT-60','ZIGMA CLASSIC GEYSER 10LTR','ZIGMA CLASSIC GEYSER 10LTR',0.00,NULL,NULL,'Pankaj','2026-07-10 12:33:47','2026-07-10 12:33:47',3),(61,'PRT-62','ZIGMA SPARK LIGHTER','ZIGMA SPARK LIGHTER',0.00,NULL,NULL,'Pankaj','2026-07-11 05:04:54','2026-07-11 05:04:54',3),(62,'PRT-61','ZG-Flame-Lighter','ZG-Flame-Lighter',0.00,NULL,NULL,'Pankaj','2026-07-11 05:06:32','2026-07-11 05:06:32',3),(63,'PRT-63','SYNTRO LPG GAS PIPE','SYNTRO LPG GAS PIPE',0.00,NULL,NULL,'Pankaj','2026-07-11 08:57:36','2026-07-11 08:57:36',2),(64,'PRT-64','ZIGMA LPG GAS PIPE','ZIGMA LPG GAS PIPE',0.00,NULL,NULL,'Pankaj','2026-07-11 08:58:07','2026-07-11 08:58:07',3),(65,'PRT-65','zigma Z-30 Quiet Performance Quiet Performance Fan Room Heater','Zigma-Z30-Wht',0.00,NULL,NULL,'Pankaj','2026-07-16 04:49:47','2026-07-16 04:49:47',3);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -427,13 +418,13 @@ CREATE TABLE `purchases` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `product_id` bigint unsigned NOT NULL,
   `date` date NOT NULL,
-  `vendor_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `vendor_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quantity` int NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Good Inventory',
-  `mark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `updated_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Good Inventory',
+  `mark` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `brand_id` bigint unsigned DEFAULT NULL,
@@ -464,11 +455,11 @@ DROP TABLE IF EXISTS `sales`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sales` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `portal_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `portal_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `product_id` bigint unsigned NOT NULL,
   `order_date` date NOT NULL,
   `quantity` int NOT NULL,
-  `updated_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `updated_by` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -494,11 +485,11 @@ DROP TABLE IF EXISTS `sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sessions` (
-  `id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
-  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `last_activity` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `sessions_user_id_index` (`user_id`),
@@ -525,14 +516,14 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Active',
-  `role` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'operator',
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Active',
+  `role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'operator',
   `permissions` json DEFAULT NULL,
-  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -549,10 +540,6 @@ LOCK TABLES `users` WRITE;
 INSERT INTO `users` VALUES (1,'Pankaj','indivoltappliances@gmail.com',NULL,'$2y$12$J/TuyCCzXfBA4EJ2xiuN/OKSkwm4lFShy6cyII9kNJ1G1qZkX/joe','Active','admin',NULL,NULL,'2026-06-30 11:01:01','2026-06-30 11:06:36'),(3,'Admin User','admin@example.com',NULL,'$2y$12$/ANLY5Hdy1H0vvrM3JVojOweg0KXcVww5sxPcbVjrIWVEzmwRBDl2','Active','admin','[\"products\", \"purchases\", \"inward_item_codes\", \"sales\", \"dispatch_item_codes\", \"barcodes\"]',NULL,'2026-06-30 11:05:58','2026-06-30 11:06:14');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!50112 SET @disable_bulk_load = IF (@is_rocksdb_supported, 'SET SESSION rocksdb_bulk_load = @old_rocksdb_bulk_load', 'SET @dummy_rocksdb_bulk_load = 0') */;
-/*!50112 PREPARE s FROM @disable_bulk_load */;
-/*!50112 EXECUTE s */;
-/*!50112 DEALLOCATE PREPARE s */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -563,4 +550,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-18 13:59:33
+-- Dump completed on 2026-07-18 13:58:13
