@@ -20,9 +20,6 @@ class DispatchItemCodeController extends Controller
         $search = $request->input('search');
 
         $dispatchItemCodes = DispatchItemCode::with(['product', 'portal'])
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
             ->when($search, function ($query, $search) {
                 $query->where(function ($sub) use ($search) {
                     $sub->where('uid', 'like', "%{$search}%")
@@ -91,10 +88,8 @@ class DispatchItemCodeController extends Controller
                     continue;
                 }
 
-                // Check for duplicate dispatch in DB (excluding cancelled records)
-                if (DispatchItemCode::where('uid', $uid)->where(function($q) {
-                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                })->exists()) {
+                // Check for duplicate dispatch in DB
+                if (DispatchItemCode::where('uid', $uid)->exists()) {
                     $errors[] = "Row {$rowNumber}: UID '{$uid}' is already dispatched.";
                     continue;
                 }
@@ -153,9 +148,6 @@ class DispatchItemCodeController extends Controller
         $search = $request->input('search');
 
         $dispatchItemCodes = DispatchItemCode::with(['product', 'portal'])
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
             ->when($search, function ($query, $search) {
                 $query->where(function ($sub) use ($search) {
                     $sub->where('uid', 'like', "%{$search}%")
@@ -180,9 +172,7 @@ class DispatchItemCodeController extends Controller
         $products = Product::all();
         
         // Fetch inward UIDs that have not been actively dispatched yet (ignoring cancelled)
-        $dispatchedUids = DispatchItemCode::where(function ($q) {
-            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-        })->pluck('uid')->toArray();
+        $dispatchedUids = DispatchItemCode::pluck('uid')->toArray();
         $availableInwardItems = InwardItemCode::whereNotIn('uid', $dispatchedUids)->get();
 
         return view('dispatch_item_codes.create', compact('products', 'availableInwardItems'));
@@ -234,10 +224,7 @@ class DispatchItemCodeController extends Controller
         $products = Product::all();
         
         // Fetch inward UIDs that have not been active (excluding this one and ignoring cancelled)
-        $dispatchedUids = DispatchItemCode::where('id', '!=', $dispatchItemCode->id)
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })->pluck('uid')->toArray();
+        $dispatchedUids = DispatchItemCode::where('id', '!=', $dispatchItemCode->id)->pluck('uid')->toArray();
         $availableInwardItems = InwardItemCode::whereNotIn('uid', $dispatchedUids)->get();
 
         return view('dispatch_item_codes.edit', compact('dispatchItemCode', 'products', 'availableInwardItems'));
@@ -298,11 +285,7 @@ class DispatchItemCodeController extends Controller
         $uid = trim($request->input('scan_uid'));
 
         // Find the active Dispatch record
-        $dispatchItem = DispatchItemCode::where('uid', $uid)
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
-            ->first();
+        $dispatchItem = DispatchItemCode::where('uid', $uid)->first();
 
         if (!$dispatchItem) {
             return back()->with('error', "Serial Code '{$uid}' is not currently dispatched.");

@@ -41,12 +41,8 @@ class BarcodeApiController extends Controller
             ], 422);
         }
 
-        // Find if there is an active dispatch for this UID (not cancelled)
-        $activeDispatch = DispatchItemCode::where('uid', $uid)
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
-            ->first();
+        // Find if there is an active dispatch for this UID
+        $activeDispatch = DispatchItemCode::where('uid', $uid)->first();
 
         if ($activeDispatch) {
             return response()->json([
@@ -120,12 +116,7 @@ class BarcodeApiController extends Controller
         $uid = trim($request->input('scan_uid'));
 
         // Find the active Dispatch record
-        $dispatchItem = DispatchItemCode::with('product')
-            ->where('uid', $uid)
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
-            ->first();
+        $dispatchItem = DispatchItemCode::with('product')->where('uid', $uid)->first();
 
         if (!$dispatchItem) {
             return response()->json([

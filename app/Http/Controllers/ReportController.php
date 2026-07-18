@@ -38,13 +38,9 @@ class ReportController extends Controller
         $end = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
 
         // 2. Compute Common KPIs (Filtered by Date Range and Brand/Product if provided)
-        $inwardKpiQuery = InwardItemCode::where(function ($q) {
-            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-        });
+        $inwardKpiQuery = InwardItemCode::query();
         
-        $dispatchKpiQuery = DispatchItemCode::where(function ($q) {
-            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-        });
+        $dispatchKpiQuery = DispatchItemCode::query();
 
         if ($start) {
             $inwardKpiQuery->where('created_at', '>=', $start);
@@ -168,9 +164,6 @@ class ReportController extends Controller
         } elseif ($activeTab === 'dispatch') {
             // Paginated dispatch logs
             $dispatchQuery = DispatchItemCode::with(['product.brand', 'portal'])
-                ->where(function ($q) {
-                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                })
                 ->when($start, fn($q) => $q->where('created_at', '>=', $start))
                 ->when($end, fn($q) => $q->where('created_at', '<=', $end))
                 ->when($productId, fn($q) => $q->where('product_id', $productId))
@@ -346,9 +339,6 @@ class ReportController extends Controller
         $end = $endDate ? Carbon::parse($endDate)->endOfDay() : null;
 
         $dispatchQuery = DispatchItemCode::with(['product.brand', 'portal'])
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
             ->when($start, fn($q) => $q->where('created_at', '>=', $start))
             ->when($end, fn($q) => $q->where('created_at', '<=', $end))
             ->when($productId, fn($q) => $q->where('product_id', $productId))

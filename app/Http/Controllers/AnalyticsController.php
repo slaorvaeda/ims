@@ -131,9 +131,6 @@ class AnalyticsController extends Controller
 
         // D. Dispatches
         $dispatchesQuery = DispatchItemCode::with(['product', 'portal'])
-            ->where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
             ->whereBetween('created_at', [$start, $end])
             ->when($productId, function ($q) use ($productId) {
                 $q->where('product_id', $productId);
@@ -209,9 +206,7 @@ class AnalyticsController extends Controller
         $totalUnitsDamaged = $filteredPurchases->where('status', 'Damaged')->sum('quantity');
         $damagedPurchases = $filteredPurchases->where('status', 'Damaged')->values();
         
-        $totalRTGSold = DispatchItemCode::where(function ($q) {
-                $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-            })
+        $totalRTGSold = DispatchItemCode::query()
             ->whereBetween('created_at', [$start, $end])
             ->when($productId, function ($q) use ($productId) {
                 $q->where('product_id', $productId);
