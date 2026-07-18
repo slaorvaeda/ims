@@ -5,8 +5,18 @@
         ->concat($brands->map(fn($b) => ['value' => (string)$b->id, 'label' => $b->name]))
         ->toArray();
 
-    $productOptions = collect([['value' => '', 'label' => 'All Products']])
-        ->concat($products->map(fn($p) => ['value' => (string)$p->id, 'label' => $p->product_name]))
+    $productOptions = collect([['value' => '', 'label' => 'All Products', 'search_terms' => 'all products']])
+        ->concat($products->map(fn($p) => [
+            'value' => (string)$p->id,
+            'label' => $p->product_name,
+            'search_terms' => implode(' | ', array_filter([
+                $p->product_name,
+                $p->sku,
+                $p->product_id,
+                $p->fsn,
+                $p->asin
+            ]))
+        ]))
         ->toArray();
 @endphp
 

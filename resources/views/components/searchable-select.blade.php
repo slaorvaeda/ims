@@ -22,9 +22,10 @@
         },
         get filteredOptions() {
             if (!this.search) return this.options;
-            return this.options.filter(opt => 
-                opt.label.toLowerCase().includes(this.search.toLowerCase())
-            );
+            return this.options.filter(opt => {
+                const terms = opt.search_terms ? opt.search_terms : opt.label;
+                return terms.toLowerCase().includes(this.search.toLowerCase());
+            });
         },
         select(option) {
             this.value = option.value;
