@@ -161,15 +161,28 @@ class AnalyticsController extends Controller
         // 3. Consolidated KPIs
         $totalPurchasesCost = $filteredPurchases->sum('amount');
         $totalUnitsPurchased = $filteredPurchases->sum('quantity');
-        $totalSalesCount = $filteredSales->count();
-        $totalUnitsSold = $filteredSales->sum('quantity');
         $totalUnitsInwarded = $filteredInwards->sum('quantity');
         $totalUnitsDispatched = abs($filteredDispatches->sum('quantity'));
 
-        // Calculate Total Sales Revenue based on product selling_price
-        $totalSalesValue = $filteredSales->sum(function ($sale) {
-            return $sale->quantity * ($sale->product->selling_price ?? 0);
+        // Fetch latest purchase prices for all products to calculate total value of dispatched stock
+        $latestPurchasePrices = \Illuminate\Support\Facades\DB::table('purchases')
+            ->select('product_id', 'price')
+            ->whereIn('id', function ($query) {
+                $query->select(\Illuminate\Support\Facades\DB::raw('MAX(id)'))
+                    ->from('purchases')
+                    ->groupBy('product_id');
+            })
+            ->pluck('price', 'product_id')
+            ->toArray();
+
+        // Calculate Total Dispatched Stock value based on purchase price (Sales Inflow)
+        $totalSalesValue = $filteredDispatches->sum(function ($d) use ($latestPurchasePrices) {
+            $purchaseRate = floatval($latestPurchasePrices[$d->product_id] ?? 0.00);
+            return abs($d->quantity) * $purchaseRate;
         });
+
+        $totalUnitsSold = abs($filteredDispatches->sum('quantity'));
+        $totalSalesCount = $filteredDispatches->count();
 
         // Calculate real-time Available Stock matching active filters (Inwarded codes not dispatched)
         $dispatchedUidsQuery = DispatchItemCode::query();
