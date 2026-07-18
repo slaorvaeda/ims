@@ -131,17 +131,8 @@ Route::get('/dashboard', function () {
     // Calculate per-product Stock Breakdown (Inward, Outward/Sold, Available) for the dashboard modal
     $stockBreakdown = Product::with(['brand'])->get()
         ->map(function ($product) {
-            $inwardCount = InwardItemCode::where('product_id', $product->id)
-                ->where(function ($q) {
-                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                })
-                ->count();
-            
-            $dispatchCount = DispatchItemCode::where('product_id', $product->id)
-                ->where(function ($q) {
-                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                })
-                ->count();
+            $inwardCount = InwardItemCode::where('product_id', $product->id)->count();
+            $dispatchCount = DispatchItemCode::where('product_id', $product->id)->count();
 
             $availableCount = max(0, $inwardCount - $dispatchCount);
 

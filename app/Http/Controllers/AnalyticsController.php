@@ -175,12 +175,8 @@ class AnalyticsController extends Controller
         });
 
         // Calculate real-time Available Stock matching active filters (Inwarded codes not dispatched)
-        $dispatchedUidsQuery = DispatchItemCode::where(function ($q) {
-            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-        });
-        $inwardsStockQuery = InwardItemCode::where(function ($q) {
-            $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-        });
+        $dispatchedUidsQuery = DispatchItemCode::query();
+        $inwardsStockQuery = InwardItemCode::query();
 
         if ($productId) {
             $dispatchedUidsQuery->where('product_id', $productId);
@@ -260,15 +256,8 @@ class AnalyticsController extends Controller
 
         $stockBreakdown = $productsQuery->get()
             ->map(function ($product) use ($portalId) {
-                $inwardQuery = InwardItemCode::where('product_id', $product->id)
-                    ->where(function ($q) {
-                        $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                    });
-                
-                $dispatchQuery = DispatchItemCode::where('product_id', $product->id)
-                    ->where(function ($q) {
-                        $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                    });
+                $inwardQuery = InwardItemCode::where('product_id', $product->id);
+                $dispatchQuery = DispatchItemCode::where('product_id', $product->id);
 
                 if ($portalId) {
                     $inwardQuery->whereHas('portal', function ($sub) use ($portalId) {

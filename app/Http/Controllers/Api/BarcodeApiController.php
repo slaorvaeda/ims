@@ -136,21 +136,19 @@ class BarcodeApiController extends Controller
 
         try {
             DB::transaction(function () use ($dispatchItem, $uid) {
-                // Update dispatch record mark to 'cancelled' and clear portal
-                $dispatchItem->update([
-                    'mark' => 'cancelled',
-                    'portal_vendor_id' => null,
-                ]);
-
-                // Find matching InwardItemCode and set back to 'Good Inventory' and clear portal and mark as active (null)
+                // Find matching InwardItemCode and set back to appropriate status and mark as cancelled
                 $inwardItem = InwardItemCode::where('uid', $uid)->first();
                 if ($inwardItem) {
+                    $newStatus = ($inwardItem->mark === 'Returned' || $inwardItem->status === 'RTG') ? 'RTG' : 'Good Inventory';
                     $inwardItem->update([
-                        'status' => 'Good Inventory',
+                        'status' => $newStatus,
                         'portal_vendor_id' => null,
-                        'mark' => null,
+                        'mark' => 'cancelled',
                     ]);
                 }
+
+                // Delete the dispatch record completely
+                $dispatchItem->delete();
             });
 
             $operator = Auth::user()->name ?? 'System';

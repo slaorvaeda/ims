@@ -111,19 +111,13 @@ class ReportController extends Controller
 
             $stockData = $productsQuery->get()->map(function ($product) use ($start, $end, $portalId) {
                 // Inward query
-                $inQuery = InwardItemCode::where('product_id', $product->id)
-                    ->where(function ($q) {
-                        $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                    });
+                $inQuery = InwardItemCode::where('product_id', $product->id);
                 if ($start) $inQuery->where('created_at', '>=', $start);
                 if ($end) $inQuery->where('created_at', '<=', $end);
                 if ($portalId) $inQuery->where('portal_vendor_id', $portalId);
 
                 // Dispatch query
-                $outQuery = DispatchItemCode::where('product_id', $product->id)
-                    ->where(function ($q) {
-                        $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                    });
+                $outQuery = DispatchItemCode::where('product_id', $product->id);
                 if ($start) $outQuery->where('created_at', '>=', $start);
                 if ($end) $outQuery->where('created_at', '<=', $end);
                 if ($portalId) $outQuery->where('portal_vendor_id', $portalId);
@@ -248,18 +242,12 @@ class ReportController extends Controller
         $data = [];
 
         foreach ($productsQuery->get() as $product) {
-            $inQuery = InwardItemCode::where('product_id', $product->id)
-                ->where(function ($q) {
-                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                });
+            $inQuery = InwardItemCode::where('product_id', $product->id);
             if ($start) $inQuery->where('created_at', '>=', $start);
             if ($end) $inQuery->where('created_at', '<=', $end);
             if ($portalId) $inQuery->where('portal_vendor_id', $portalId);
 
-            $outQuery = DispatchItemCode::where('product_id', $product->id)
-                ->where(function ($q) {
-                    $q->whereNull('mark')->orWhere('mark', '!=', 'cancelled');
-                });
+            $outQuery = DispatchItemCode::where('product_id', $product->id);
             if ($start) $outQuery->where('created_at', '>=', $start);
             if ($end) $outQuery->where('created_at', '<=', $end);
             if ($portalId) $outQuery->where('portal_vendor_id', $portalId);

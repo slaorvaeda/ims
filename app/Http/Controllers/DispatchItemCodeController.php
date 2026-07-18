@@ -308,23 +308,21 @@ class DispatchItemCodeController extends Controller
             return back()->with('error', "Serial Code '{$uid}' is not currently dispatched.");
         }
 
-        // Run in transaction to update dispatch record mark to 'cancelled' and update Inward status to 'Good Inventory'
+        // Run in transaction to delete dispatch record and update Inward status to 'Good Inventory' or 'RTG' and mark as cancelled
         DB::transaction(function () use ($dispatchItem, $uid) {
-            // Update dispatch record mark to 'cancelled' and clear portal
-            $dispatchItem->update([
-                'mark' => 'cancelled',
-                'portal_vendor_id' => null,
-            ]);
-
-            // Find matching InwardItemCode and set back to 'Good Inventory' and clear portal and mark as active (null)
+            // Find matching InwardItemCode and set back to appropriate status and mark as cancelled
             $inwardItem = InwardItemCode::where('uid', $uid)->first();
             if ($inwardItem) {
+                $newStatus = ($inwardItem->mark === 'Returned' || $inwardItem->status === 'RTG') ? 'RTG' : 'Good Inventory';
                 $inwardItem->update([
-                    'status' => 'Good Inventory',
+                    'status' => $newStatus,
                     'portal_vendor_id' => null,
-                    'mark' => null,
+                    'mark' => 'cancelled',
                 ]);
             }
+
+            // Delete the dispatch record completely
+            $dispatchItem->delete();
         });
 
         return back()->with('success', "Successfully cancelled dispatch for Serial Code '{$uid}'. It has been returned to Good Inventory.");
@@ -338,21 +336,19 @@ class DispatchItemCodeController extends Controller
         $uid = $dispatchItemCode->uid;
 
         DB::transaction(function () use ($dispatchItemCode, $uid) {
-            // Update dispatch record mark to 'cancelled' instead of deleting it and clear portal
-            $dispatchItemCode->update([
-                'mark' => 'cancelled',
-                'portal_vendor_id' => null,
-            ]);
-
-            // Find matching InwardItemCode and set back to 'Good Inventory' and clear portal and mark as active (null)
+            // Find matching InwardItemCode and set back to appropriate status and mark as cancelled
             $inwardItem = InwardItemCode::where('uid', $uid)->first();
             if ($inwardItem) {
+                $newStatus = ($inwardItem->mark === 'Returned' || $inwardItem->status === 'RTG') ? 'RTG' : 'Good Inventory';
                 $inwardItem->update([
-                    'status' => 'Good Inventory',
+                    'status' => $newStatus,
                     'portal_vendor_id' => null,
-                    'mark' => null,
+                    'mark' => 'cancelled',
                 ]);
             }
+
+            // Delete the dispatch record completely
+            $dispatchItemCode->delete();
         });
 
         return redirect()->route('dispatch-item-codes.index')
