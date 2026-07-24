@@ -85,6 +85,10 @@ class GeminiService
                 'body' => $response->body()
             ]);
 
+            if ($response->status() === 429) {
+                return "I apologize, but the Gemini API rate limit or quota was exceeded (Resource Exhausted). Please wait a moment and retry your question.";
+            }
+
             return "I apologize, but I encountered an error communicating with the AI service. Please verify your Gemini API key in the `.env` file.";
 
         } catch (\Exception $e) {
