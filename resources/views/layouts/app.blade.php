@@ -24,13 +24,15 @@
             <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         @endif
         <script>
-            tailwind.config = {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        fontFamily: {
-                            sans: ['Plus Jakarta Sans', 'sans-serif'],
-                            heading: ['Outfit', 'sans-serif'],
+            if (typeof tailwind !== 'undefined') {
+                tailwind.config = {
+                    darkMode: 'class',
+                    theme: {
+                        extend: {
+                            fontFamily: {
+                                sans: ['Plus Jakarta Sans', 'sans-serif'],
+                                heading: ['Outfit', 'sans-serif'],
+                            }
                         }
                     }
                 }
