@@ -5,145 +5,84 @@
         </h2>
     </x-slot>
 
-    <div x-data="{ showStockModal: false }" class="py-6">
-        <!-- Welcome User Banner -->
-    <div class="mb-8 p-6 md:p-8 bg-gradient-to-r from-slate-900 to-indigo-950 dark:from-slate-900/40 dark:to-indigo-950/40 border border-slate-800 dark:border-slate-800/80 rounded-[2rem] text-white relative overflow-hidden shadow-lg shadow-indigo-900/10">
-        <div class="relative z-10 max-w-lg">
-            <h1 class="text-3xl font-extrabold font-heading mb-2 tracking-tight">Hello, {{ Auth::user()->name }}!</h1>
-            <p class="text-slate-300 text-sm leading-relaxed">
-                Welcome back to your dashboard. Monitor your inventory levels, track outward shipments, and manage purchase records dynamically.
-            </p>
-        </div>
-        <!-- Abstract Glassmorphism Shape -->
-        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl"></div>
-    </div>
+    <div x-data="{ showStockModal: false }" class="py-6 animate-fade-in">
+        <!-- Top Row Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mb-8">
+            <!-- Left & Center Columns (Spans 2 columns on md screens) -->
+            <div class="md:col-span-2 flex flex-col justify-between gap-6 w-full">
+                <!-- Welcome greeting -->
+                <x-dashboard.welcome />
 
-    <!-- Statistics Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Active Stock -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md hover:border-indigo-500/50 transition-all duration-200 group cursor-pointer" @click="showStockModal = true" title="Click to view detailed stock breakdown">
-            <div class="space-y-2">
-                <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Active Inventory Stock</p>
-                <h3 id="stat-active-stock" class="text-3xl font-extrabold font-heading text-slate-900 dark:text-white transition-all duration-350">{{ $stats['active_stock'] }}</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Total physical units</p>
+                <!-- Balances cards -->
+                <x-dashboard.balances :stats="$stats" />
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-200">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
+
+            <!-- Right Column (Spans 1 column) -->
+            <div class="w-full">
+                <!-- Sales Overview radial widget -->
+                <x-dashboard.sales-overview :stats="$stats" />
             </div>
         </div>
 
-        <!-- Total Products -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200 group">
-            <div class="space-y-2">
-                <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Product Catalog</p>
-                <h3 class="text-3xl font-extrabold font-heading text-slate-900 dark:text-white">{{ $stats['total_products'] }}</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Different SKUs registered</p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-200">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-            </div>
-        </div>
-
-        <!-- Purchases Expenditure -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200 group">
-            <div class="space-y-2">
-                <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Purchases Cost</p>
-                <h3 class="text-2xl font-extrabold font-heading text-slate-900 dark:text-white">₹{{ number_format($stats['total_purchase_cost'], 2) }}</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">For {{ $stats['total_purchase_qty'] }} total units</p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform duration-200">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </div>
-        </div>
-
-        <!-- Dispatch Orders count -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-3xl p-6 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200 group">
-            <div class="space-y-2">
-                <p class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Portal Orders</p>
-                <h3 class="text-3xl font-extrabold font-heading text-slate-900 dark:text-white">{{ $stats['total_sales'] }}</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400"><span id="stat-total-dispatch" class="transition-all duration-350">{{ $stats['total_dispatch'] }}</span> units dispatched</p>
-            </div>
-            <div class="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform duration-200">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Analytics Section -->
-    <div class="mt-12 space-y-8">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h3 class="text-2xl font-extrabold font-heading text-slate-900 dark:text-white">Warehouse Insights & Analytics</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400">Real-time charts tracking transaction volumes, product levels, and logistics activity.</p>
-            </div>
-            <div class="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 px-4 py-2 rounded-2xl self-start sm:self-center">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wide">Live Feed Active</span>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Chart 1: Sales & Purchases Growth Trend (Area Chart) -->
-            <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h4 class="text-md font-bold text-slate-800 dark:text-white">Sales & Purchases Growth Trend</h4>
-                        <p class="text-xs text-slate-400 dark:text-slate-500">Monthly transactional quantities comparison</p>
-                    </div>
-                    <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
-                        <span class="inline-block w-2.5 h-2.5 rounded bg-indigo-600"></span> Purchases
-                        <span class="inline-block w-2.5 h-2.5 rounded bg-emerald-500 ml-2"></span> Sales
-                    </div>
+        <!-- Product Analytics Section Container (Wraps the entire bottom grid) -->
+        <div class="bg-slate-50/50 p-6 md:p-8 rounded-[2.5rem] border border-slate-100/80 shadow-sm relative overflow-hidden bg-white mt-8">
+            <!-- Header bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <h3 class="font-extrabold text-slate-800 text-lg font-sans">Product Analytics</h3>
                 </div>
-                <div id="chart-monthly-trends" class="min-h-[300px]"></div>
+                
+                <!-- Controls buttons -->
+                <div class="flex flex-wrap items-center gap-2 bg-slate-100/70 p-1 rounded-xl text-xs font-bold text-slate-500 border border-slate-200/40">
+                    <button class="px-3.5 py-1.5 rounded-lg hover:text-slate-800 transition-colors">All</button>
+                    <button class="px-3.5 py-1.5 rounded-lg bg-slate-900 text-white shadow-sm">Store-1</button>
+                    <button class="px-3.5 py-1.5 rounded-lg hover:text-slate-800 transition-colors">Store-2</button>
+                    <button class="px-3.5 py-1.5 rounded-lg hover:text-slate-800 transition-colors">Store-3</button>
+                    <button class="px-3.5 py-1.5 rounded-lg hover:text-slate-800 transition-colors flex items-center gap-1.5">
+                        Month
+                        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <span class="w-px h-4 bg-slate-200"></span>
+                    <button class="p-1.5 hover:text-slate-800 transition-colors" title="Settings">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+                    </button>
+                    <button class="p-1.5 hover:text-slate-800 transition-colors" title="Expand">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>
+                    </button>
+                    <button class="px-3.5 py-1.5 bg-white border border-slate-200 rounded-lg flex items-center gap-1.5 hover:bg-slate-50 transition-all text-slate-700">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        Filter
+                    </button>
+                </div>
             </div>
 
-            <!-- Chart 2: Sales Channel Distribution (Donut Chart) -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
-                <div>
-                    <h4 class="text-md font-bold text-slate-800 dark:text-white">Sales Channels Allocation</h4>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-6">Distribution of order sources</p>
+            <!-- Content Grid split 5-4-3 -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                <!-- Col 1: Heatmap (5 columns) -->
+                <div class="md:col-span-5 w-full">
+                    <x-dashboard.product-analytics />
                 </div>
-                <div class="flex items-center justify-center min-h-[300px]">
-                    <div id="chart-portal-distribution" class="w-full"></div>
+
+                <!-- Col 2: Growth & Engagement (4 columns) -->
+                <div class="md:col-span-4 flex flex-col gap-6 w-full">
+                    <x-dashboard.growth-customer 
+                        :stats="$stats"
+                        :chartMonthlyPurchases="$chartMonthlyPurchases"
+                        :chartMonthlySales="$chartMonthlySales"
+                        :chartMonthlyMonths="$chartMonthlyMonths"
+                    />
+                </div>
+
+                <!-- Col 3: Recent Sales & Review Rating (3 columns) -->
+                <div class="md:col-span-3 flex flex-col gap-6 w-full">
+                    <x-dashboard.recent-sales />
+                    <x-dashboard.review-rating />
                 </div>
             </div>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Chart 3: Physical Product Inventory (Horizontal Bar Chart) -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
-                <div class="mb-6">
-                    <h4 class="text-md font-bold text-slate-800 dark:text-white">Current Physical Stock Levels</h4>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">Inward inventory minus dispatched units</p>
-                </div>
-                <div id="chart-product-stock" class="min-h-[300px]"></div>
-            </div>
-
-            <!-- Chart 4: Logistics Activity Timeline (Column Chart) -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-200">
-                <div class="flex items-center justify-between mb-6">
-                    <div>
-                        <h4 class="text-md font-bold text-slate-800 dark:text-white">Logistics Daily Intake & Dispatch</h4>
-                        <p class="text-xs text-slate-400 dark:text-slate-500 font-sans">7-Day inward receipts vs outward dispatches</p>
-                    </div>
-                    <div class="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
-                        <span class="inline-block w-2.5 h-2.5 rounded bg-indigo-500"></span> Inward
-                        <span class="inline-block w-2.5 h-2.5 rounded bg-amber-500 ml-2"></span> Dispatched
-                    </div>
-                </div>
-                <div id="chart-daily-log" class="min-h-[300px]"></div>
-            </div>
-        </div>
-    </div>
 
     <!-- Chart Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -208,8 +147,11 @@
                 },
                 legend: { show: false }
             };
-            const monthlyTrendsChart = new ApexCharts(document.querySelector("#chart-monthly-trends"), monthlyTrendsOptions);
-            monthlyTrendsChart.render();
+            const elMonthly = document.querySelector("#chart-monthly-trends");
+            if (elMonthly) {
+                const monthlyTrendsChart = new ApexCharts(elMonthly, monthlyTrendsOptions);
+                monthlyTrendsChart.render();
+            }
 
             // 2. Sales Portals donut chart
             const portalDistributionOptions = {
@@ -253,8 +195,11 @@
                     theme: isDarkMode ? 'dark' : 'light'
                 }
             };
-            const portalDistributionChart = new ApexCharts(document.querySelector("#chart-portal-distribution"), portalDistributionOptions);
-            portalDistributionChart.render();
+            const elPortal = document.querySelector("#chart-portal-distribution");
+            if (elPortal) {
+                const portalDistributionChart = new ApexCharts(elPortal, portalDistributionOptions);
+                portalDistributionChart.render();
+            }
 
             // 3. Product Stocks horizontal bar chart
             const productStockOptions = {
@@ -307,8 +252,11 @@
                 },
                 legend: { show: false }
             };
-            const productStockChart = new ApexCharts(document.querySelector("#chart-product-stock"), productStockOptions);
-            productStockChart.render();
+            const elProductStock = document.querySelector("#chart-product-stock");
+            if (elProductStock) {
+                const productStockChart = new ApexCharts(elProductStock, productStockOptions);
+                productStockChart.render();
+            }
 
             // 4. Daily Activity Log (Inward vs Dispatch)
             const dailyActivityOptions = {
@@ -367,8 +315,11 @@
                 },
                 legend: { show: false }
             };
-            const dailyActivityChart = new ApexCharts(document.querySelector("#chart-daily-log"), dailyActivityOptions);
-            dailyActivityChart.render();
+            const elDailyLog = document.querySelector("#chart-daily-log");
+            if (elDailyLog) {
+                const dailyActivityChart = new ApexCharts(elDailyLog, dailyActivityOptions);
+                dailyActivityChart.render();
+            }
         });
     </script>
 
@@ -448,6 +399,15 @@
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-4 pointer-events-none w-full max-w-md"></div>
 
     <style>
+        .bg-stripe-light {
+            background-image: repeating-linear-gradient(45deg, rgba(255, 90, 54, 0.15) 0, rgba(255, 90, 54, 0.15) 2px, transparent 0, transparent 6px);
+        }
+        .bg-stripe-medium {
+            background-image: repeating-linear-gradient(45deg, rgba(255, 90, 54, 0.45) 0, rgba(255, 90, 54, 0.45) 2px, transparent 0, transparent 5px);
+        }
+        .bg-stripe-orange {
+            background-image: repeating-linear-gradient(45deg, rgba(255, 90, 54, 0.8) 0, rgba(255, 90, 54, 0.8) 2px, transparent 0, transparent 4px);
+        }
         .toast-card {
             background: rgba(15, 23, 42, 0.9);
             border: 1px solid rgba(99, 102, 241, 0.3);

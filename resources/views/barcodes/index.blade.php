@@ -8,8 +8,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8" x-data="barcodeApp()" :style="'--print-w: ' + printWidth + 'mm; --print-h: ' + printHeight + 'mm;'">
         <!-- Left Panel: Configuration Form -->
         <div class="lg:col-span-4 space-y-6 no-print">
-            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm relative overflow-hidden group">
+                <!-- Backing graphics -->
+                <div class="absolute -right-6 -bottom-10 w-28 h-28 rounded-full bg-slate-50 dark:bg-slate-800/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-3 group-hover:-translate-y-3"></div>
+                <div class="flex items-center justify-between mb-4 relative z-10">
                     <h3 class="text-base font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Generator Mode</h3>
                     <span 
                         x-show="!isEditing" 
@@ -31,7 +33,7 @@
 
                 
                 <!-- Mode Toggle -->
-                <div class="flex p-1 bg-slate-100 dark:bg-slate-950/60 rounded-2xl mb-6" :class="{'opacity-75 cursor-not-allowed': !isEditing}">
+                <div class="flex p-1 bg-slate-100 dark:bg-slate-950/60 rounded-2xl mb-6 relative z-10" :class="{'opacity-75 cursor-not-allowed': !isEditing}">
                     <button 
                         type="button"
                         @click="if (isEditing) { mode = 'manual'; updateAndRender(); }"
@@ -63,7 +65,7 @@
                             @input.debounce.250ms="updateAndRender()"
                             placeholder="Enter one text per line..."
                             rows="5"
-                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                         ></textarea>
                         <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Type multiple items separated by new lines.</p>
                     </div>
@@ -78,7 +80,7 @@
                                 :disabled="!isEditing"
                                 @input.debounce.250ms="updateAndRender()"
                                 placeholder="e.g., Zig0001"
-                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                         </div>
                         <div>
@@ -90,7 +92,7 @@
                                 @input="updateAndRender()"
                                 min="1"
                                 max="100"
-                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                             <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Generates up to 100 codes at a time.</p>
                         </div>
@@ -99,8 +101,10 @@
             </div>
 
             <!-- Customizations Card -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm space-y-5">
-                <h3 class="text-base font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Styling Options</h3>
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm space-y-5 relative overflow-hidden group">
+                <!-- Backing graphics -->
+                <div class="absolute -right-6 -bottom-10 w-28 h-28 rounded-full bg-slate-50 dark:bg-slate-800/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-3 group-hover:-translate-y-3"></div>
+                <h3 class="text-base font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 relative z-10">Styling Options</h3>
                 
                 <!-- Format -->
                 <div>
@@ -109,7 +113,7 @@
                         x-model="format"
                         :disabled="!isEditing"
                         @change="updateAndRender()"
-                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-sm focus:outline-none focus:border-indigo-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                        class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all disabled:opacity-60 disabled:cursor-not-allowed relative z-10"
                     >
                         <option value="CODE128">Code 128 (Recommended)</option>
                         <option value="CODE39">Code 39</option>
@@ -132,7 +136,7 @@
                         x-model.number="barWidth"
                         :disabled="!isEditing"
                         @input="updateAndRender()"
-                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#FF5A36] disabled:opacity-60 disabled:cursor-not-allowed relative z-10"
                     >
                 </div>
  
@@ -150,7 +154,7 @@
                         x-model.number="barHeight"
                         :disabled="!isEditing"
                         @input="updateAndRender()"
-                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed"
+                        class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#FF5A36] disabled:opacity-60 disabled:cursor-not-allowed relative z-10"
                     >
                 </div>
  
@@ -162,9 +166,9 @@
                         x-model="displayValue"
                         :disabled="!isEditing"
                         @change="updateAndRender()"
-                        class="w-5 h-5 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-lg focus:ring-indigo-500 focus:ring-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                        class="w-5 h-5 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-lg focus:ring-[#FF5A36]/30 focus:ring-2 disabled:opacity-60 disabled:cursor-not-allowed relative z-10 focus:outline-none"
                     >
-                    <label for="displayValue" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 cursor-pointer select-none">Display Text below Barcode</label>
+                    <label for="displayValue" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 cursor-pointer select-none relative z-10">Display Text below Barcode</label>
                 </div>
 
 
@@ -182,7 +186,7 @@
                                 x-model.number="printWidth"
                                 :disabled="!isEditing"
                                 @input="updateAndRender()"
-                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed relative z-10"
                                 placeholder="50"
                             >
                         </div>
@@ -195,7 +199,7 @@
                                 x-model.number="printHeight"
                                 :disabled="!isEditing"
                                 @input="updateAndRender()"
-                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed relative z-10"
                                 placeholder="25"
                             >
                         </div>
@@ -208,7 +212,7 @@
                                 x-model.number="printGap"
                                 :disabled="!isEditing"
                                 @input="updateAndRender()"
-                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-indigo-500 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-[10px] focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all font-mono disabled:opacity-60 disabled:cursor-not-allowed relative z-10"
                                 placeholder="3"
                             >
                         </div>
@@ -216,13 +220,13 @@
                 </div>
 
                 <!-- Lock / Unlock Settings Controls -->
-                <div class="border-t border-slate-100 dark:border-slate-800/50 pt-5 mt-2">
+                <div class="border-t border-slate-100 dark:border-slate-800/50 pt-5 mt-2 relative z-10">
                     <button 
                         type="button" 
                         @click="isEditing = true"
                         x-show="!isEditing"
                         x-cloak
-                        class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-indigo-900/10 flex items-center justify-center gap-2"
+                        class="w-full py-3.5 bg-[#FF5A36] hover:bg-[#e04826] text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-orange-950/10 flex items-center justify-center gap-2"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                         <span>Update Configuration</span>
@@ -250,13 +254,15 @@
 
         <!-- Right Panel: Barcodes Preview & Actions -->
         <div class="lg:col-span-8 space-y-6">
-            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 sm:p-8 shadow-sm flex flex-col min-h-[500px]">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/50 mb-6 shrink-0 no-print">
+            <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 sm:p-8 shadow-sm flex flex-col min-h-[500px] relative overflow-hidden group">
+                <!-- Backing graphics -->
+                <div class="absolute -right-6 -bottom-10 w-28 h-28 rounded-full bg-slate-50 dark:bg-slate-800/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-3 group-hover:-translate-y-3"></div>
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800/50 mb-6 shrink-0 no-print relative z-10">
                     <div>
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white font-heading">Barcodes Sheet Preview</h3>
                         <p class="text-xs text-slate-400 mt-1">Real-time rendered vector labels</p>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 relative z-10">
                         <button 
                             @click="printBarcodes()"
                             :disabled="items.length === 0"
@@ -269,7 +275,7 @@
                 </div>
 
                 <!-- Barcode Grid Container (The Target of printing) -->
-                <div id="print-area" :style="'gap: ' + printGap + 'mm !important;'" class="flex-1 flex flex-wrap gap-5 justify-center items-start overflow-y-auto p-4 max-h-[600px] border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50 dark:bg-slate-950/40">
+                <div id="print-area" :style="'gap: ' + printGap + 'mm !important;'" class="flex-1 flex flex-wrap gap-5 justify-center items-start overflow-y-auto p-4 max-h-[600px] border border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-slate-50 dark:bg-slate-950/40 relative z-10">
                     <template x-for="(item, index) in items" :key="index">
                         <div class="barcode-card p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center shadow-sm relative group shrink-0">
                             <!-- Label top info -->

@@ -6,7 +6,7 @@
             <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white">Dispatch Serial Codes Detail Log</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400">Chronological history of scanned barcode dispatches.</p>
         </div>
-        <a href="{{ route('reports.export.dispatch', request()->query()) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-2xl transition-all shadow-md shadow-indigo-950/10">
+        <a href="{{ route('reports.export.dispatch', request()->query()) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5A36] hover:bg-[#e04826] text-white text-xs font-semibold rounded-2xl transition-all shadow-md shadow-orange-950/10">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
@@ -47,7 +47,7 @@
                         </td>
                         <td class="py-4 px-6">
                             @if($item->portal)
-                                <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400 rounded-xl text-xs font-bold border border-indigo-100/20">
+                                <span class="px-2.5 py-1 bg-[#EAF2FC] text-[#3B82F6] dark:bg-blue-950/30 dark:text-blue-400 rounded-xl text-xs font-bold border border-blue-100/20">
                                     {{ $item->portal->name }}
                                 </span>
                             @else

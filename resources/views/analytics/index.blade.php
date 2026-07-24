@@ -4,7 +4,7 @@
             <h2 class="font-heading font-bold text-2xl text-slate-800 dark:text-white leading-tight">
                 {{ __('Advanced Unified Analytics') }}
             </h2>
-            <span class="text-xs font-semibold px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 rounded-full border border-indigo-100/50 dark:border-indigo-900/50 shadow-sm">
+            <span class="text-xs font-semibold px-3 py-1.5 bg-[#FFF2EE] dark:bg-orange-950/40 text-[#FF5A36] rounded-full border border-orange-100/50 dark:border-orange-900/50 shadow-sm">
                 Real-time Sync
             </span>
         </div>
@@ -17,7 +17,7 @@
         <!-- Advanced Filters & Parameters Section -->
         <div class="p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm">
             <h3 class="font-heading font-bold text-base text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                <svg class="w-5 h-5 text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                 Control & Filtering Panel
             </h3>
             
@@ -27,13 +27,13 @@
                     <!-- Start Date -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-400 uppercase">Start Date</label>
-                        <input type="date" name="start_date" value="{{ $startDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                        <input type="date" name="start_date" value="{{ $startDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm">
                     </div>
 
                     <!-- End Date -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-400 uppercase">End Date</label>
-                        <input type="date" name="end_date" value="{{ $endDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                        <input type="date" name="end_date" value="{{ $endDate }}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm">
                     </div>
 
                     <!-- Brand -->
@@ -43,7 +43,7 @@
                             name="brand_id" 
                             id="brand-filter-select"
                             onchange="filterProducts()"
-                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm"
                         >
                             <option value="">All Brands</option>
                             @foreach($brands as $b)
@@ -58,7 +58,7 @@
                         <select 
                             name="product_id" 
                             id="product-filter-select"
-                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm"
                         >
                             <option value="">All Products</option>
                             @foreach($products as $prod)
@@ -76,7 +76,7 @@
                     <!-- Type filter -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-400 uppercase">Activity Type</label>
-                        <select name="type" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm">
+                        <select name="type" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm">
                             <option value="">All Types</option>
                             <option value="Purchase" {{ $type == 'Purchase' ? 'selected' : '' }}>Purchases</option>
                             <option value="Sale" {{ $type == 'Sale' ? 'selected' : '' }}>Sales</option>
@@ -94,11 +94,11 @@
                             name="search" 
                             value="{{ $search }}" 
                             placeholder="Search keyword (Vendor, Portal, UID, SKU)..." 
-                            class="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                            class="w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm"
                         >
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-indigo-900/10 text-center shrink-0">
+                        <button type="submit" class="px-6 py-3.5 bg-[#FF5A36] hover:bg-[#e04826] text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-orange-900/10 text-center shrink-0">
                             Apply Filters
                         </button>
                         @if($startDate || $endDate || $productId || $brandId || $portalId || $vendorId || $search || $type)
@@ -121,7 +121,7 @@
                             class="sr-only peer"
                             onchange="this.form.submit()"
                         >
-                        <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
+                        <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-[#FF5A36] peer-checked:text-white peer-checked:border-[#FF5A36] hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
                             All Portals
                         </span>
                     </label>
@@ -135,7 +135,7 @@
                                 class="sr-only peer"
                                 onchange="this.form.submit()"
                             >
-                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-[#FF5A36] peer-checked:text-white peer-checked:border-[#FF5A36] hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
                                 {{ $pName }}
                             </span>
                         </label>
@@ -147,91 +147,98 @@
         <!-- KPI Metric Highlight Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             <!-- Total Purchases Cost -->
-            <div class="p-6 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
-                <div class="space-y-1">
+            <div class="p-6 bg-gradient-to-br from-blue-50/60 to-white dark:from-blue-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between transition-all duration-300 relative overflow-hidden group">
+                <div class="space-y-1 relative z-10">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Purchase Outflow</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">₹{{ number_format($totalPurchasesCost, 2) }}</h3>
                     <p class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">{{ $totalUnitsPurchased }} units purchased</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100/60 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-100/60 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center relative z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
+                <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-blue-100/35 dark:bg-blue-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
 
             <!-- Total Sales Value -->
-            <div class="p-6 bg-gradient-to-br from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
-                <div class="space-y-1">
+            <div class="p-6 bg-gradient-to-br from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between transition-all duration-300 relative overflow-hidden group">
+                <div class="space-y-1 relative z-10">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Sales Inflow</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">₹{{ number_format($totalSalesValue, 2) }}</h3>
                     <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{{ number_format($totalUnitsSold) }} units dispatched ({{ $totalSalesCount }} dispatches)</p>
                 </div>
-                <div class="w-12 h-12 bg-emerald-100/60 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-emerald-100/60 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center relative z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
+                <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-emerald-100/35 dark:bg-emerald-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
 
             <!-- Inward Serial Scans -->
-            <div class="p-6 bg-gradient-to-br from-purple-50/60 to-white dark:from-purple-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
-                <div class="space-y-1">
+            <div class="p-6 bg-gradient-to-br from-purple-50/60 to-white dark:from-purple-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between transition-all duration-300 relative overflow-hidden group">
+                <div class="space-y-1 relative z-10">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Serial Units Inwarded</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsInwarded) }} Units</h3>
                     <p class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold">Registered barcoded stock</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100/60 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-purple-100/60 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center relative z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 </div>
+                <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-purple-100/35 dark:bg-purple-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
 
             <!-- Dispatch Unit Serial Codes -->
-            <div class="p-6 bg-gradient-to-br from-rose-50/60 to-white dark:from-rose-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all cursor-pointer hover:border-rose-500/50 group" @click="showDispatchModal = true" title="Click to view detailed dispatches per product">
-                <div class="space-y-1">
+            <div class="p-6 bg-gradient-to-br from-rose-50/60 to-white dark:from-rose-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between transition-all duration-300 relative overflow-hidden group cursor-pointer hover:border-rose-500/50" @click="showDispatchModal = true" title="Click to view detailed dispatches per product">
+                <div class="space-y-1 relative z-10">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Serial Units Dispatched</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsDispatched) }} Units</h3>
                     <p class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">Shipped scanning activity</p>
                 </div>
-                <div class="w-12 h-12 bg-rose-100/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center group-hover:bg-rose-200 dark:group-hover:bg-rose-900/60 transition-colors">
+                <div class="w-12 h-12 bg-rose-100/60 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center relative z-10 group-hover:bg-rose-200 dark:group-hover:bg-rose-900/60 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"/></svg>
                 </div>
+                <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-rose-100/35 dark:bg-rose-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
 
             <!-- Available Stock -->
-            <div class="p-6 bg-gradient-to-br from-teal-50/60 to-white dark:from-teal-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all cursor-pointer hover:border-teal-500/50 group" @click="showStockModal = true" title="Click to view detailed stock per product">
-                <div class="space-y-1">
+            <div class="p-6 bg-gradient-to-br from-teal-50/60 to-white dark:from-teal-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between transition-all duration-300 relative overflow-hidden group cursor-pointer hover:border-teal-500/50" @click="showStockModal = true" title="Click to view detailed stock per product">
+                <div class="space-y-1 relative z-10">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Available Stock</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsAvailable) }} Units</h3>
                     <p class="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">Active stock on hand</p>
                 </div>
-                <div class="w-12 h-12 bg-teal-100/60 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 rounded-2xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-teal-100/60 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 rounded-2xl flex items-center justify-center relative z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
+                <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-teal-100/35 dark:bg-teal-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
         </div>
 
         <!-- KPI Metric Highlight Cards (Second Row: Damaged and Returns) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- Total Damaged Stock -->
-            <div class="p-6 bg-gradient-to-br from-amber-50/60 to-white dark:from-amber-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all cursor-pointer hover:border-amber-500/50 group" @click="showDamagedModal = true" title="Click to view damaged stock details">
-                <div class="space-y-1">
+            <div class="p-6 bg-gradient-to-br from-amber-50/60 to-white dark:from-amber-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between transition-all duration-300 relative overflow-hidden group cursor-pointer hover:border-amber-500/50" @click="showDamagedModal = true" title="Click to view damaged stock details">
+                <div class="space-y-1 relative z-10">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Damaged Stock</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalUnitsDamaged) }} Units</h3>
                     <p class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Logged as damaged purchases</p>
                     <span class="text-[9px] text-slate-400 group-hover:text-amber-500 transition-colors">Click to view details</span>
                 </div>
-                <div class="w-12 h-12 bg-amber-100/60 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-amber-100/60 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center relative z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 </div>
+                <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-amber-100/35 dark:bg-amber-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
 
             <!-- Total Returned Stock -->
-            <div class="p-6 bg-gradient-to-br from-fuchsia-50/60 to-white dark:from-fuchsia-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] transition-all">
-                <div class="space-y-1">
+            <div class="p-6 bg-gradient-to-br from-fuchsia-50/60 to-white dark:from-fuchsia-950/20 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm flex items-center justify-between transition-all duration-300 relative overflow-hidden group">
+                <div class="space-y-1 relative z-10">
                     <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase">Returned Stock</span>
                     <h3 class="text-2xl font-black text-slate-800 dark:text-white">{{ number_format($totalInwardRTG) }} Units</h3>
                     <p class="text-[10px] text-fuchsia-600 dark:text-fuchsia-400 font-semibold">{{ number_format($totalRTGSold) }}  RTG products sold</p>
                 </div>
-                <div class="w-12 h-12 bg-fuchsia-100/60 dark:bg-fuchsia-950/40 text-fuchsia-600 dark:text-fuchsia-400 rounded-2xl flex items-center justify-center">
+                <div class="w-12 h-12 bg-fuchsia-100/60 dark:bg-fuchsia-950/40 text-fuchsia-600 dark:text-fuchsia-400 rounded-2xl flex items-center justify-center relative z-10">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 15v-6m0 0l-3 3m3-3l3 3m-9 0h6m-9-3V9m0 0l-3 3m3-3l3 3m-3 0h6m-3-3v6M4 4h16v16H4V4z"/></svg>
                 </div>
+                <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-fuchsia-100/35 dark:bg-fuchsia-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
         </div>
 

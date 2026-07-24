@@ -25,7 +25,12 @@
         }
     </script>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @endif
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -56,8 +61,12 @@
         <section class="w-full lg:w-[47%] p-8 md:p-12 lg:p-16 flex flex-col justify-between soft-gradient-bg min-h-[600px] lg:min-h-0">
             <!-- Top Bar / Logo -->
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-black rounded-full flex items-center justify-center shadow-md">
-                    <img src="/logo.png" alt="">
+                <div class="w-9 h-9 rounded-xl bg-[#FF5A36] flex items-center justify-center shadow-lg shadow-[#FF5A36]/20">
+                    <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
                 </div>
                 <span class="text-xl font-bold text-slate-900 tracking-tight font-heading">IMS</span>
             </div>

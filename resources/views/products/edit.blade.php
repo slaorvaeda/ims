@@ -121,7 +121,7 @@
                     <a href="{{ route('products.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
                         Cancel
                     </a>
-                    <button type="submit" class="px-6 py-3.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-800 dark:hover:bg-slate-100 shadow-md">
+                    <button type="submit" class="px-6 py-3.5 bg-[#FF5A36] hover:bg-[#E04826] text-white font-semibold rounded-2xl text-sm transition-all shadow-lg shadow-[#FF5A36]/20">
                         Update Product
                     </button>
                 </div>

@@ -6,7 +6,7 @@
             <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white">Product Stock Balance Summary</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400">Total inward, dispatch, and physical items in stock per product.</p>
         </div>
-        <a href="{{ route('reports.export.stock', request()->query()) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-2xl transition-all shadow-md shadow-indigo-950/10">
+        <a href="{{ route('reports.export.stock', request()->query()) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5A36] hover:bg-[#e04826] text-white text-xs font-semibold rounded-2xl transition-all shadow-md shadow-orange-950/10">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
@@ -32,7 +32,7 @@
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 text-sm">
                 @forelse($stockData as $row)
                     <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors duration-150">
-                        <td class="py-4 px-6 font-semibold text-indigo-600 dark:text-indigo-400">{{ $row['product_id'] }}</td>
+                        <td class="py-4 px-6 font-semibold text-[#FF5A36] dark:text-orange-400">{{ $row['product_id'] }}</td>
                         <td class="py-4 px-6 font-mono text-xs">{{ $row['sku'] }}</td>
                         <td class="py-4 px-6 font-semibold text-slate-700 dark:text-slate-300">{{ $row['name'] }}</td>
                         <td class="py-4 px-6 text-slate-500 dark:text-slate-400">
@@ -46,7 +46,7 @@
                             </span>
                         </td>
                         <td class="py-4 px-6 text-right font-semibold text-slate-700 dark:text-slate-300">₹{{ number_format($row['purchase_rate'], 2) }}</td>
-                        <td class="py-4 px-6 text-right font-extrabold text-indigo-600 dark:text-indigo-400">₹{{ number_format($row['stock_value'], 2) }}</td>
+                        <td class="py-4 px-6 text-right font-extrabold text-[#FF5A36] dark:text-orange-400">₹{{ number_format($row['stock_value'], 2) }}</td>
                     </tr>
                 @empty
                     <tr>
