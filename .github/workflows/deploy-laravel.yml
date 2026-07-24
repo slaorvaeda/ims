@@ -25,7 +25,7 @@ jobs:
 
       - name: Package Application Files
         run: |
-          zip -r build.zip . -x "node_modules/*" -x ".git/*" -x ".env" -x "*.sql" -x "*.pdf" -x "*.png" -x "*.xlsx" -x "storage/logs/*"
+          zip -r build.zip . -x "node_modules/*" -x ".git/*" -x ".env" -x "*.sql" -x "*.pdf" -x "*.xlsx" -x "storage/logs/*"
 
       - name: Setup SSH Configuration
         run: |
