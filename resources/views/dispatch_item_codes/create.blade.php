@@ -18,7 +18,7 @@
                         name="uid" 
                         required 
                         onchange="updateProductSelection()"
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all font-mono"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all font-mono"
                     >
                         <option value="">-- Choose a UID from Stock --</option>
                         @foreach ($availableInwardItems as $item)
@@ -71,7 +71,7 @@
                         id="status" 
                         name="status" 
                         required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all"
                     >
                         <option value="Sold" {{ old('status', 'Sold') == 'Sold' ? 'selected' : '' }}>Sold</option>
                         <option value="Dispatched" {{ old('status') == 'Dispatched' ? 'selected' : '' }}>Dispatched</option>
@@ -86,7 +86,7 @@
                     <a href="{{ route('dispatch-item-codes.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
                         Cancel
                     </a>
-                    <button type="submit" class="px-6 py-3.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-800 dark:hover:bg-slate-100 shadow-md">
+                    <button type="submit" class="px-6 py-3.5 bg-[#FF5A36] hover:bg-[#E04826] text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-[#FF5A36]/20">
                         Record Dispatch
                     </button>
                 </div>

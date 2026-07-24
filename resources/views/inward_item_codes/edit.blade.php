@@ -18,7 +18,7 @@
                         id="product_id" 
                         name="product_id" 
                         required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all"
                     >
                         <option value="">-- Choose a Product --</option>
                         @foreach ($products as $product)
@@ -42,7 +42,7 @@
                         value="{{ old('uid', $inwardItemCode->uid) }}" 
                         placeholder="e.g., Zig0001, Zig0002" 
                         required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all font-mono"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all font-mono"
                     >
                     @error('uid')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
@@ -59,7 +59,7 @@
                         value="{{ old('quantity', $inwardItemCode->quantity) }}" 
                         required 
                         min="1"
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all"
                     >
                     @error('quantity')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
@@ -73,7 +73,7 @@
                         id="status" 
                         name="status" 
                         required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all"
                     >
                         <option value="Good Inventory" {{ old('status', $inwardItemCode->status) == 'Good Inventory' ? 'selected' : '' }}>Good Inventory</option>
                         <option value="Damaged" {{ old('status', $inwardItemCode->status) == 'Damaged' ? 'selected' : '' }}>Damaged</option>
@@ -89,7 +89,7 @@
                     <a href="{{ route('inward-item-codes.index') }}" class="px-5 py-3.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
                         Cancel
                     </a>
-                    <button type="submit" class="px-6 py-3.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-semibold rounded-2xl text-sm transition-all hover:bg-slate-800 dark:hover:bg-slate-100 shadow-md">
+                    <button type="submit" class="px-6 py-3.5 bg-[#FF5A36] hover:bg-[#E04826] text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-[#FF5A36]/20">
                         Update Inward
                     </button>
                 </div>

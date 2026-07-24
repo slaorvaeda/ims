@@ -4,6 +4,9 @@
     'selected' => null,
     'placeholder' => 'Select an option...',
     'class' => '',
+    'filterBy' => null,
+    'filterValue' => null,
+    'dropdownClass' => 'w-full',
 ])
 
 <div 
@@ -13,6 +16,7 @@
         value: '{{ $selected }}',
         label: '',
         options: @js($options),
+        filterVal: '{{ $filterValue }}',
         init() {
             const matched = this.options.find(opt => String(opt.value) === String(this.value));
             if (matched) {
@@ -21,8 +25,12 @@
             }
         },
         get filteredOptions() {
-            if (!this.search) return this.options;
-            return this.options.filter(opt => {
+            let opts = this.options;
+            if ('{{ $filterBy }}' && this.filterVal) {
+                opts = opts.filter(opt => opt.value === '' || String(opt['{{ $filterBy }}']) === String(this.filterVal));
+            }
+            if (!this.search) return opts;
+            return opts.filter(opt => {
                 const terms = opt.search_terms ? opt.search_terms : opt.label;
                 return terms.toLowerCase().includes(this.search.toLowerCase());
             });
@@ -32,6 +40,7 @@
             this.label = option.label;
             this.search = option.label;
             this.open = false;
+            this.$dispatch('change-' + '{{ $name }}', { value: this.value });
         },
         toggle() {
             this.open = !this.open;
@@ -48,6 +57,7 @@
     }"
     class="relative w-full {{ $class }}"
     @click.outside="close()"
+    @change-brand_id.window="if ('{{ $filterBy }}' === 'brand_id') { filterVal = $event.detail.value; const selectedOpt = options.find(o => String(o.value) === String(value)); if (selectedOpt && String(selectedOpt.brand_id) !== String(filterVal) && filterVal !== '') { select({value: '', label: 'All Products'}); } }"
 >
     <!-- Hidden input for form submission -->
     <input type="hidden" name="{{ $name }}" x-model="value">
@@ -84,7 +94,7 @@
         x-transition:leave="transition ease-in duration-75"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute z-50 mt-1.5 w-full max-h-60 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-lg focus:outline-none"
+        class="absolute z-50 mt-1.5 {{ $dropdownClass }} max-h-60 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-lg focus:outline-none"
     >
         <ul class="py-1.5 text-xs text-slate-700 dark:text-slate-300">
             <template x-for="option in filteredOptions" :key="option.value">

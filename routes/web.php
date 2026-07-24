@@ -11,6 +11,7 @@ use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\AiCopilotController;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\InwardItemCode;
@@ -24,6 +25,39 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    // Calculate Monthly Sales / Dispatches Growth
+    $currentMonthDispatches = DispatchItemCode::whereMonth('created_at', now()->month)
+        ->whereYear('created_at', now()->year)
+        ->count();
+    $lastMonthDispatches = DispatchItemCode::whereMonth('created_at', now()->subMonth()->month)
+        ->whereYear('created_at', now()->subMonth()->year)
+        ->count();
+
+    if ($lastMonthDispatches > 0) {
+        $growthRate = (($currentMonthDispatches - $lastMonthDispatches) / $lastMonthDispatches) * 100;
+    } else {
+        $growthRate = $currentMonthDispatches > 0 ? 100 : 0;
+    }
+
+    // Calculate Available Stock Value dynamically based on latest purchase price
+    $latestPrices = \Illuminate\Support\Facades\DB::table('purchases')
+        ->select('product_id', 'price')
+        ->whereIn('id', function ($query) {
+            $query->select(\Illuminate\Support\Facades\DB::raw('MAX(id)'))
+                ->from('purchases')
+                ->groupBy('product_id');
+        })
+        ->pluck('price', 'product_id')
+        ->toArray();
+
+    $availableStockValue = 0;
+    $productsStock = Product::withCount(['inwardItemCodes', 'dispatchItemCodes'])->get();
+    foreach ($productsStock as $prod) {
+        $availQty = max(0, $prod->inward_item_codes_count - $prod->dispatch_item_codes_count);
+        $price = floatval($latestPrices[$prod->id] ?? 0.00);
+        $availableStockValue += $availQty * $price;
+    }
+
     $stats = [
         'total_products' => Product::count(),
         'total_purchase_qty' => Purchase::sum('quantity'),
@@ -33,6 +67,8 @@ Route::get('/dashboard', function () {
         'active_stock' => InwardItemCode::count() - DispatchItemCode::count(),
         'total_sales' => Sale::count(),
         'total_users' => User::count(),
+        'growth_rate' => $growthRate,
+        'available_stock_value' => $availableStockValue,
     ];
 
     // 1. Monthly Trends (Sales vs Purchases)
@@ -135,7 +171,6 @@ Route::get('/dashboard', function () {
             $dispatchCount = DispatchItemCode::where('product_id', $product->id)->count();
 
             $availableCount = max(0, $inwardCount - $dispatchCount);
-
             return [
                 'product_name' => $product->product_name,
                 'product_id_code' => $product->product_id,
@@ -231,6 +266,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/export/stock', [ReportController::class, 'exportStock'])->name('reports.export.stock');
     Route::get('/reports/export/inward', [ReportController::class, 'exportInward'])->name('reports.export.inward');
     Route::get('/reports/export/dispatch', [ReportController::class, 'exportDispatch'])->name('reports.export.dispatch');
+
+    // AI Copilot Routes
+    Route::post('/ai/chat', [AiCopilotController::class, 'chat'])->name('ai.chat');
+    Route::post('/ai/analyze-file', [AiCopilotController::class, 'analyzeFile'])->name('ai.analyze-file');
 });
 
 require __DIR__.'/auth.php';

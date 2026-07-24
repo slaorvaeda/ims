@@ -5,10 +5,11 @@
         ->concat($brands->map(fn($b) => ['value' => (string)$b->id, 'label' => $b->name]))
         ->toArray();
 
-    $productOptions = collect([['value' => '', 'label' => 'All Products', 'search_terms' => 'all products']])
+    $productOptions = collect([['value' => '', 'label' => 'All Products', 'search_terms' => 'all products', 'brand_id' => '']])
         ->concat($products->map(fn($p) => [
             'value' => (string)$p->id,
             'label' => $p->product_name,
+            'brand_id' => (string)$p->brand_id,
             'search_terms' => implode(' | ', array_filter([
                 $p->product_name,
                 $p->sku,
@@ -64,6 +65,9 @@
                     :options="$productOptions" 
                     :selected="$productId" 
                     placeholder="All Products"
+                    filter-by="brand_id"
+                    filter-value="{{ $brandId }}"
+                    dropdown-class="w-full md:min-w-[150%] lg:min-w-[220%] right-0"
                 />
             </div>
         </div>

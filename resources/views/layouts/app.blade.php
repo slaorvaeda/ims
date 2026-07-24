@@ -177,5 +177,6 @@
                 </main>
             </div>
         </div>
+        <x-dashboard.ai-copilot />
     </body>
 </html>

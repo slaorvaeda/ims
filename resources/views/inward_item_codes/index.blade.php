@@ -4,7 +4,7 @@
             <h2 class="font-heading font-bold text-2xl text-slate-800 dark:text-white leading-tight">
                 {{ __('Inward Serial Codes') }}
             </h2>
-            <a href="{{ route('inward-item-codes.create') }}" class="px-5 py-2.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 text-sm font-semibold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all duration-150 flex items-center gap-2 shadow-md">
+            <a href="{{ route('inward-item-codes.create') }}" class="px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-sm font-semibold rounded-2xl transition-all duration-150 flex items-center gap-2 shadow-md shadow-[#FF5A36]/15">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.75v14.5M4.75 12h14.5"/></svg>
                 <span>Add Inward Code</span>
             </a>
@@ -15,8 +15,8 @@
         <!-- Barcode Scanner Input Form -->
         <div class="p-6 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-slate-900 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-colors">
             <div class="space-y-1">
-                <h3 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-2">
-                    <svg class="w-5 h-5 animate-pulse text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <h3 class="text-sm font-bold text-[#FF5A36] uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-5 h-5 animate-pulse text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M16 20h2a2 2 0 002-2v-2M6 20H4a2 2 0 01-2-2v-2m16-10V4a2 2 0 00-2-2h-2m-8 2H4a2 2 0 00-2 2v2" />
                     </svg>
                     <span>Barcode Scan Dispatcher</span>
@@ -37,7 +37,7 @@
                             required
                             @focus="inputFocused = true"
                             @blur="inputFocused = false"
-                            class="w-full pl-5 pr-28 py-3.5 bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all font-mono shadow-sm"
+                            class="w-full pl-5 pr-28 py-3.5 bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all font-mono shadow-sm"
                         >
                         <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none select-none">
                             <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 rounded-lg text-[9px] font-bold border border-emerald-100/50 dark:border-emerald-900/50 shadow-sm" x-show="inputFocused" x-cloak>
@@ -72,7 +72,7 @@
                                 class="sr-only peer"
                                 onchange="localStorage.setItem('selected_portal_id', this.value)"
                             >
-                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-[#FF5A36] peer-checked:text-white peer-checked:border-[#FF5A36] hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
                                 {{ $portal->name }}
                             </span>
                         </label>
@@ -96,19 +96,18 @@
                                 name="search" 
                                 value="{{ $search }}" 
                                 placeholder="Search UID or Product..." 
-                                class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all shadow-sm"
+                                class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all shadow-sm"
                             >
                             <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        
                         <div class="flex flex-wrap w-full xl:w-auto items-center gap-2">
-                            <button type="submit" class="flex-1 xl:flex-none px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10 whitespace-nowrap">
+                            <button type="submit" class="flex-1 xl:flex-none px-6 py-3.5 bg-[#FF5A36] hover:bg-[#E04826] text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-[#FF5A36]/20 whitespace-nowrap">
                                 Apply Search
                             </button>
                             
-                            <button type="button" @click="showFilterSort = !showFilterSort" :class="showFilterSort ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border-indigo-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent'" class="px-5 py-3.5 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border shrink-0">
+                            <button type="button" @click="showFilterSort = !showFilterSort" :class="showFilterSort ? 'bg-orange-50 dark:bg-orange-950/40 text-[#FF5A36] border-[#FF5A36]/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent'" class="px-5 py-3.5 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border shrink-0">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                                 <span>Filter & Sort</span>
                             </button>
@@ -159,7 +158,7 @@
                                 <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Status</label>
                                 <select 
                                     name="status" 
-                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] transition-all shadow-sm"
                                 >
                                     <option value="">All Statuses</option>
                                     <option value="Good Inventory" {{ $status == 'Good Inventory' ? 'selected' : '' }}>Good Inventory</option>
@@ -174,7 +173,7 @@
                                 <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Linked Product</label>
                                 <select 
                                     name="product_id" 
-                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] transition-all shadow-sm"
                                 >
                                     <option value="">All Products</option>
                                     @foreach($products as $prod)
@@ -190,7 +189,7 @@
                                 <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dispatched Portal</label>
                                 <select 
                                     name="portal_id" 
-                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] transition-all shadow-sm"
                                 >
                                     <option value="">All Portals</option>
                                     @foreach($portals as $port)
@@ -208,7 +207,7 @@
                                     type="date" 
                                     name="start_date" 
                                     value="{{ $startDate }}" 
-                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] transition-all shadow-sm"
                                 />
                             </div>
 
@@ -219,7 +218,7 @@
                                     type="date" 
                                     name="end_date" 
                                     value="{{ $endDate }}" 
-                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                    class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] transition-all shadow-sm"
                                 />
                             </div>
                         </div>
@@ -232,7 +231,7 @@
                                     <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">Sort By</label>
                                     <select 
                                         name="sort_by" 
-                                        class="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                        class="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] transition-all shadow-sm"
                                     >
                                         <option value="id" {{ $sortBy == 'id' ? 'selected' : '' }}>ID</option>
                                         <option value="uid" {{ $sortBy == 'uid' ? 'selected' : '' }}>UID</option>
@@ -248,7 +247,7 @@
                                     <label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">Order</label>
                                     <select 
                                         name="sort_dir" 
-                                        class="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-indigo-500 transition-all shadow-sm"
+                                        class="px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 rounded-xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] transition-all shadow-sm"
                                     >
                                         <option value="asc" {{ $sortDir == 'asc' ? 'selected' : '' }}>Ascending</option>
                                         <option value="desc" {{ $sortDir == 'desc' ? 'selected' : '' }}>Descending</option>
@@ -263,7 +262,7 @@
                                     </a>
                                 @endif
                                 
-                                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-indigo-900/10 whitespace-nowrap">
+                                <button type="submit" class="px-6 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white font-semibold rounded-2xl text-xs transition-all shadow-md shadow-[#FF5A36]/20 whitespace-nowrap">
                                     Apply Options
                                 </button>
                             </div>
@@ -285,13 +284,13 @@
             <!-- Export Section -->
             <div class="space-y-3">
                 <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <svg class="w-5 h-5 text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     Export Data
                 </h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400">
                     Download all inward serial codes matching the current search & status criteria as an Excel-compatible CSV file.
                 </p>
-                <a href="{{ route('inward-item-codes.export', ['search' => request('search'), 'status' => request('status'), 'portal_id' => request('portal_id'), 'product_id' => request('product_id'), 'sort_by' => request('sort_by'), 'sort_dir' => request('sort_dir'), 'start_date' => request('start_date'), 'end_date' => request('end_date')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-950/10">
+                <a href="{{ route('inward-item-codes.export', ['search' => request('search'), 'status' => request('status'), 'portal_id' => request('portal_id'), 'product_id' => request('product_id'), 'sort_by' => request('sort_by'), 'sort_dir' => request('sort_dir'), 'start_date' => request('start_date'), 'end_date' => request('end_date')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-[#FF5A36]/20">
                     Export Filtered Serial Codes
                 </a>
             </div>
@@ -324,11 +323,11 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 translate-y-0"
             x-transition:leave-end="opacity-0 translate-y-2"
-            class="p-4 bg-indigo-50 dark:bg-slate-900/60 border border-indigo-100/30 dark:border-slate-800 rounded-3xl flex items-center justify-between shadow-sm"
+            class="p-4 bg-orange-50 dark:bg-slate-900/60 border border-orange-100/30 dark:border-slate-800 rounded-3xl flex items-center justify-between shadow-sm"
             style="display: none;"
         >
             <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold" x-text="selectedUids.length"></span>
+                <span class="w-6 h-6 rounded-full bg-[#FF5A36] text-white flex items-center justify-center text-xs font-bold" x-text="selectedUids.length"></span>
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">barcodes selected for download</span>
             </div>
             <div class="flex items-center gap-3">
@@ -340,7 +339,7 @@
                 </button>
                 <button 
                     @click="downloadSelectedBarcodes()" 
-                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2"
+                    class="px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-[#FF5A36]/20 flex items-center gap-2"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Download Selected</span>
@@ -366,7 +365,7 @@
                                     type="checkbox" 
                                     @change="toggleSelectAll($event)"
                                     :checked="isAllSelected()"
-                                    class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
                                 >
                             </th>
                             <th class="py-4 px-6">ID</th>
@@ -388,7 +387,7 @@
                                         type="checkbox" 
                                         :value="{{ json_encode($item->uid) }}" 
                                         x-model="selectedUids"
-                                        class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                        class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
                                     >
                                 </td>
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->id }}</td>
@@ -431,7 +430,7 @@
                                 </td>
                                 <td class="py-4.5 px-6 font-semibold" id="inward-portal-{{ $item->uid }}">
                                     @if ($item->portal)
-                                        <span class="px-2.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-100/30 dark:border-indigo-900/30 text-xs">
+                                        <span class="px-2.5 py-1 bg-orange-50/50 dark:bg-orange-950/20 text-[#FF5A36] rounded-lg border border-[#FF5A36]/30 text-xs">
                                             {{ $item->portal->name }}
                                         </span>
                                     @else
@@ -466,7 +465,7 @@
                                                 </button>
                                             </form>
                                         @endif
-                                        <a href="{{ route('inward-item-codes.edit', $item->id) }}" class="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all" title="Edit">
+                                        <a href="{{ route('inward-item-codes.edit', $item->id) }}" class="p-2 text-slate-400 hover:text-[#FF5A36] hover:bg-orange-50 dark:hover:bg-slate-800 rounded-xl transition-all" title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                             </svg>
@@ -513,7 +512,7 @@
                                     type="checkbox" 
                                     :value="{{ json_encode($item->uid) }}" 
                                     x-model="selectedUids"
-                                    class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
                                 >
                                 <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase font-mono">ID: {{ $item->id }}</span>
                             </div>
@@ -558,7 +557,7 @@
                             </div>
                             @if ($item->portal)
                                 <div class="text-[10px] text-slate-500 font-medium" id="card-portal-{{ $item->uid }}">
-                                    Portal: <span class="text-indigo-600 dark:text-indigo-400 font-semibold">{{ $item->portal->name }}</span>
+                                    Portal: <span class="text-[#FF5A36] font-semibold">{{ $item->portal->name }}</span>
                                 </div>
                             @endif
                         </div>
@@ -579,14 +578,14 @@
                                 @endif
                             <button 
                              @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})"
-                                 class="p-2 bg-white text-slate-900 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
+                                 class="p-2 bg-white text-slate-900 hover:bg-orange-50 hover:text-[#FF5A36] rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
                              >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <span>Zoom</span>
                             </button>
                             <a 
                                 href="{{ route('inward-item-codes.edit', $item->id) }}"
-                                class="p-2 bg-white text-slate-900 hover:bg-indigo-50 hover:text-indigo-600 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
+                                class="p-2 bg-white text-slate-900 hover:bg-orange-50 hover:text-[#FF5A36] rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
                             >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 <span>Edit</span>
@@ -704,7 +703,7 @@
             return {
                 isOpen: false,
                 showExcelTools: false,
-                showFilterSort: {{ ($status || $portalId || $productId || $startDate || $endDate || $sortBy !== 'id' || $sortDir !== 'asc') ? 'true' : 'false' }},
+                showFilterSort: {{ ($status || $portalId || $productId || $startDate || $endDate || $sortBy !== 'updated_at' || $sortDir !== 'desc') ? 'true' : 'false' }},
                 uid: '',
                 productName: '',
                 printWidth: parseInt(getStorage('barcode_printWidth', '50')) || 50,
@@ -1218,7 +1217,7 @@
                         const tablePortal = document.getElementById(`inward-portal-${e.uid}`);
                         if (tablePortal && e.portalName && e.portalName !== 'N/A') {
                             tablePortal.innerHTML = `
-                                <span class="px-2.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-100/30 dark:border-indigo-900/30 text-xs">
+                                <span class="px-2.5 py-1 bg-orange-50/50 dark:bg-orange-950/20 text-[#FF5A36] rounded-lg border border-[#FF5A36]/30 text-xs">
                                     ${e.portalName}
                                 </span>
                             `;
@@ -1228,7 +1227,7 @@
                         const cardPortal = document.getElementById(`card-portal-${e.uid}`);
                         if (cardPortal && e.portalName && e.portalName !== 'N/A') {
                             cardPortal.innerHTML = `
-                                Portal: <span class="text-indigo-600 dark:text-indigo-400 font-semibold">${e.portalName}</span>
+                                Portal: <span class="text-[#FF5A36] font-semibold">${e.portalName}</span>
                             `;
                         } else if (e.portalName && e.portalName !== 'N/A') {
                             const cardUpdater = document.getElementById(`card-updater-${e.uid}`);
@@ -1238,7 +1237,7 @@
                                     const portalDiv = document.createElement('div');
                                     portalDiv.id = `card-portal-${e.uid}`;
                                     portalDiv.className = 'text-[10px] text-slate-500 font-medium';
-                                    portalDiv.innerHTML = `Portal: <span class="text-indigo-600 dark:text-indigo-400 font-semibold">${e.portalName}</span>`;
+                                    portalDiv.innerHTML = `Portal: <span class="text-[#FF5A36] font-semibold">${e.portalName}</span>`;
                                     cardBottom.appendChild(portalDiv);
                                 }
                             }

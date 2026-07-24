@@ -24,8 +24,8 @@ class InwardItemCodeController extends Controller
         $endDate = $request->input('end_date');
 
         $validSortFields = ['id', 'uid', 'status', 'created_at', 'updated_at', 'updated_by'];
-        $sortBy = in_array($request->input('sort_by'), $validSortFields) ? $request->input('sort_by') : 'id';
-        $sortDir = in_array(strtolower($request->input('sort_dir')), ['asc', 'desc']) ? strtolower($request->input('sort_dir')) : 'asc';
+        $sortBy = in_array($request->input('sort_by'), $validSortFields) ? $request->input('sort_by') : 'updated_at';
+        $sortDir = in_array(strtolower($request->input('sort_dir')), ['asc', 'desc']) ? strtolower($request->input('sort_dir')) : 'desc';
 
         $inwardItemCodes = InwardItemCode::with(['product', 'portal'])
             ->when($search, function ($query, $search) {
@@ -194,8 +194,8 @@ class InwardItemCodeController extends Controller
         $endDate = $request->input('end_date');
 
         $validSortFields = ['id', 'uid', 'status', 'created_at', 'updated_at', 'updated_by'];
-        $sortBy = in_array($request->input('sort_by'), $validSortFields) ? $request->input('sort_by') : 'id';
-        $sortDir = in_array(strtolower($request->input('sort_dir')), ['asc', 'desc']) ? strtolower($request->input('sort_dir')) : 'asc';
+        $sortBy = in_array($request->input('sort_by'), $validSortFields) ? $request->input('sort_by') : 'updated_at';
+        $sortDir = in_array(strtolower($request->input('sort_dir')), ['asc', 'desc']) ? strtolower($request->input('sort_dir')) : 'desc';
 
         $inwardItemCodes = InwardItemCode::with(['product', 'portal'])
             ->when($search, function ($query, $search) {

@@ -4,7 +4,7 @@
             <h2 class="font-heading font-bold text-2xl text-slate-800 dark:text-white leading-tight">
                 {{ __('Dispatch Unit Serial Codes') }}
             </h2>
-            <a href="{{ route('dispatch-item-codes.create') }}" class="px-5 py-2.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 text-sm font-semibold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all duration-150 flex items-center gap-2 shadow-md">
+            <a href="{{ route('dispatch-item-codes.create') }}" class="px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-sm font-semibold rounded-2xl transition-all duration-150 flex items-center gap-2 shadow-md shadow-[#FF5A36]/15">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.75v14.5M4.75 12h14.5"/></svg>
                 <span>Dispatch Item</span>
             </a>
@@ -67,13 +67,13 @@
                             name="search" 
                             value="{{ $search }}" 
                             placeholder="Search dispatch by UID or Product..." 
-                            class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                            class="w-full pl-11 pr-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all"
                         >
                         <svg class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <button type="submit" class="px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-indigo-900/10">
+                    <button type="submit" class="px-6 py-3.5 bg-[#FF5A36] hover:bg-[#E04826] text-white font-semibold rounded-2xl text-sm transition-all shadow-md shadow-[#FF5A36]/20">
                         Apply Search
                     </button>
                     @if ($search)
@@ -85,7 +85,7 @@
 
                 <div class="flex items-center gap-2">
                     <button type="button" @click="showExcelTools = !showExcelTools" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border border-slate-200/40 dark:border-slate-700/40 shrink-0">
-                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                        <svg class="w-5 h-5 text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                         <span>Excel Import/Export</span>
                     </button>
                 </div>
@@ -100,18 +100,18 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-4"
-             class="p-6 bg-gradient-to-br from-indigo-50/50 to-slate-50 dark:from-indigo-950/20 dark:to-slate-900 border border-indigo-100/60 dark:border-slate-800/80 rounded-[2rem] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6" 
+             class="p-6 bg-gradient-to-br from-orange-50/50 to-slate-50 dark:from-orange-950/20 dark:to-slate-900 border border-[#FF5A36]/30 dark:border-slate-800/80 rounded-[2rem] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6" 
              x-cloak>
             <!-- Export Section -->
             <div class="space-y-3">
                 <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <svg class="w-5 h-5 text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     Export Data
                 </h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400">
                     Download all dispatch serial codes matching the current search criteria as an Excel-compatible CSV file.
                 </p>
-                <a href="{{ route('dispatch-item-codes.export', ['search' => request('search')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-950/10">
+                <a href="{{ route('dispatch-item-codes.export', ['search' => request('search')]) }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-[#FF5A36]/20">
                     Export Filtered Dispatch Codes
                 </a>
             </div>
@@ -144,11 +144,11 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100 translate-y-0"
             x-transition:leave-end="opacity-0 translate-y-2"
-            class="p-4 bg-indigo-50 dark:bg-slate-900/60 border border-indigo-100/30 dark:border-slate-800 rounded-3xl flex items-center justify-between shadow-sm"
+            class="p-4 bg-orange-50 dark:bg-slate-900/60 border border-orange-100/30 dark:border-slate-800 rounded-3xl flex items-center justify-between shadow-sm"
             style="display: none;"
         >
             <div class="flex items-center gap-3">
-                <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold" x-text="selectedUids.length"></span>
+                <span class="w-6 h-6 rounded-full bg-[#FF5A36] text-white flex items-center justify-center text-xs font-bold" x-text="selectedUids.length"></span>
                 <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">barcodes selected for download</span>
             </div>
             <div class="flex items-center gap-3">
@@ -160,7 +160,7 @@
                 </button>
                 <button 
                     @click="downloadSelectedBarcodes()" 
-                    class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2"
+                    class="px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-[#FF5A36]/20 flex items-center gap-2"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Download Selected</span>
@@ -186,7 +186,7 @@
                                     type="checkbox" 
                                     @change="toggleSelectAll($event)"
                                     :checked="isAllSelected()"
-                                    class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                    class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
                                 >
                             </th>
                             <th class="py-4 px-6">ID</th>
@@ -208,18 +208,18 @@
                                         type="checkbox" 
                                         :value="{{ json_encode($item->uid) }}" 
                                         x-model="selectedUids"
-                                        class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer"
+                                        class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
                                     >
                                 </td>
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->id }}</td>
                                 <td class="py-4.5 px-6">
                                     <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
                                         <div class="flex flex-col gap-1.5 shrink-0">
-                                            <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit group-hover:border-indigo-500/50 dark:group-hover:border-indigo-500/50 transition-colors">
+                                            <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit group-hover:border-[#FF5A36]/50 dark:group-hover:border-[#FF5A36]/50 transition-colors">
                                                 {{ $item->uid }}
                                             </span>
                                             <!-- Inline Rendered Barcode SVG -->
-                                            <svg id="inline-barcode-{{ $item->id }}" class="bg-white p-0.5 rounded border border-slate-100 max-w-[130px] h-[32px] group-hover:border-indigo-500/50 transition-colors"></svg>
+                                            <svg id="inline-barcode-{{ $item->id }}" class="bg-white p-0.5 rounded border border-slate-100 max-w-[130px] h-[32px] group-hover:border-[#FF5A36]/50 transition-colors"></svg>
                                         </div>
                                     </div>
                                 </td>
@@ -237,7 +237,7 @@
                                 </td>
                                 <td class="py-4.5 px-6 font-semibold">
                                     @if ($item->portal)
-                                        <span class="px-2.5 py-1 bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 rounded-lg border border-indigo-100/30 dark:border-indigo-900/30 text-xs font-semibold">
+                                        <span class="px-2.5 py-1 bg-orange-50/50 dark:bg-orange-950/20 text-[#FF5A36] rounded-lg border border-[#FF5A36]/30 text-xs font-semibold">
                                             {{ $item->portal->name }}
                                         </span>
                                     @else
@@ -261,7 +261,7 @@
                                 </td>
                                 <td class="py-4.5 px-6 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        <a href="{{ route('dispatch-item-codes.edit', $item->id) }}" class="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all" title="Edit">
+                                        <a href="{{ route('dispatch-item-codes.edit', $item->id) }}" class="p-2 text-slate-400 hover:text-[#FF5A36] hover:bg-orange-50 dark:hover:bg-slate-800 rounded-xl transition-all" title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                             </svg>
@@ -330,7 +330,7 @@
                             max="300" 
                             x-model.number="printWidth"
                             @input="setStorage('barcode_printWidth', printWidth)"
-                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-[#FF5A36] transition-all font-mono"
                             placeholder="50"
                         >
                     </div>
@@ -342,7 +342,7 @@
                             max="300" 
                             x-model.number="printHeight"
                             @input="setStorage('barcode_printHeight', printHeight)"
-                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                            class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-xl text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-[#FF5A36] transition-all font-mono"
                             placeholder="25"
                         >
                     </div>

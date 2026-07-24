@@ -5,63 +5,71 @@
         </h2>
     </x-slot>
 
+    @php
+        $brandOptions = collect([['value' => '', 'label' => 'Choose a Brand']])
+            ->concat($brands->map(fn($b) => ['value' => (string)$b->id, 'label' => $b->name]))
+            ->toArray();
+
+        $productOptions = collect([['value' => '', 'label' => 'Choose a Product', 'brand_id' => '']])
+            ->concat($products->map(fn($p) => [
+                'value' => (string)$p->id,
+                'label' => $p->product_name . ' (' . $p->product_id . ')',
+                'brand_id' => (string)$p->brand_id,
+                'search_terms' => implode(' | ', array_filter([
+                    $p->product_name,
+                    $p->sku,
+                    $p->product_id
+                ]))
+            ]))
+            ->toArray();
+    @endphp
+
     <div class="max-w-2xl mx-auto">
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 sm:p-8 shadow-sm">
             <form method="POST" action="{{ route('purchases.store') }}" class="space-y-6">
                 @csrf
 
-                <!-- Product Selection -->
+                <!-- Brand Selection -->
                 <div>
-                    <label for="product_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Select Product</label>
-                    <select 
-                        id="product_id" 
-                        name="product_id" 
-                        required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
-                    >
-                        <option value="">-- Choose a Product --</option>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}" data-brand-id="{{ $product->brand_id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
-                                {{ $product->product_name }} ({{ $product->product_id }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('product_id')
+                    <label for="brand_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Select Brand</label>
+                    <x-searchable-select 
+                        name="brand_id" 
+                        :options="$brandOptions" 
+                        :selected="old('brand_id')" 
+                        placeholder="Choose a Brand"
+                    />
+                    @error('brand_id')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <!-- Brand Selection -->
+                <!-- Product Selection -->
                 <div>
-                    <label for="brand_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Select Brand</label>
-                    <select 
-                        id="brand_id" 
-                        name="brand_id" 
-                        required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
-                    >
-                        <option value="">-- Choose a Brand --</option>
-                        @foreach ($brands as $brand)
-                            <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
-                                {{ $brand->name }} ({{ $brand->sub ?: 'No Subtitle' }})
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('brand_id')
+                    <label for="product_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Select Product</label>
+                    <x-searchable-select 
+                        name="product_id" 
+                        :options="$productOptions" 
+                        :selected="old('product_id')" 
+                        placeholder="Choose a Product"
+                        filter-by="brand_id"
+                        filter-value="{{ old('brand_id') }}"
+                        dropdown-class="w-full md:min-w-[120%] right-0"
+                    />
+                    @error('product_id')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Date -->
                 <div>
-                    <label for="date" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Purchase Date</label>
+                    <label for="date" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 mb-2">Purchase Date</label>
                     <input 
                         type="date" 
                         id="date" 
                         name="date" 
                         value="{{ old('date', date('Y-m-d')) }}" 
                         required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all shadow-sm"
                     >
                     @error('date')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
@@ -70,7 +78,7 @@
 
                 <!-- Vendor ID -->
                 <div>
-                    <label for="vendor_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Vendor ID</label>
+                    <label for="vendor_id" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 mb-2">Vendor ID</label>
                     <input 
                         type="text" 
                         id="vendor_id" 
@@ -78,7 +86,7 @@
                         value="{{ old('vendor_id') }}" 
                         placeholder="e.g., a1, v-901" 
                         required 
-                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                        class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all shadow-sm"
                     >
                     @error('vendor_id')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
@@ -89,7 +97,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- Quantity -->
                     <div>
-                        <label for="quantity" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Quantity</label>
+                        <label for="quantity" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 mb-2">Quantity</label>
                         <input 
                             type="number" 
                             id="quantity" 
@@ -98,7 +106,7 @@
                             placeholder="e.g., 10" 
                             required 
                             min="1"
-                            class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                            class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all shadow-sm"
                         >
                         @error('quantity')
                             <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
@@ -107,7 +115,7 @@
 
                     <!-- Price -->
                     <div>
-                        <label for="price" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Unit Price (₹)</label>
+                        <label for="price" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 mb-2">Unit Price (₹)</label>
                         <input 
                             type="number" 
                             step="0.01"
@@ -117,7 +125,7 @@
                             placeholder="e.g., 20.00" 
                             required 
                             min="0"
-                            class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                            class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 placeholder-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all shadow-sm"
                         >
                         @error('price')
                             <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
@@ -128,17 +136,17 @@
                 <!-- Starting UID & Autocomplete control -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                        <label for="start_uid" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Starting UID / Serial Code</label>
+                        <label for="start_uid" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 mb-2">Starting UID / Serial Code</label>
                         <input 
                             type="text" 
                             id="start_uid" 
                             name="start_uid" 
                             value="{{ old('start_uid') }}" 
-                            placeholder="Select a product to auto-fill" 
+                            placeholder="Select a brand to auto-fill" 
                             required 
                             readonly
                             oninput="generateSequencePreview()"
-                            class="w-full px-5 py-4 bg-slate-100 dark:bg-slate-950/20 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-500 dark:text-slate-400 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all font-mono"
+                            class="w-full px-5 py-4 bg-slate-100 dark:bg-slate-950/20 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-500 dark:text-slate-400 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all font-mono shadow-sm"
                         >
                         @error('start_uid')
                             <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>
@@ -150,7 +158,7 @@
                                 type="checkbox" 
                                 id="manual_uid_check" 
                                 onchange="toggleManualUid()"
-                                class="w-4 h-4 text-indigo-600 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-indigo-500 focus:ring-2"
+                                class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
                             >
                             <label for="manual_uid_check" class="text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer">
                                 Edit starting UID manually
@@ -160,12 +168,12 @@
 
                     <!-- Inward Inventory Status -->
                     <div>
-                        <label for="status" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Inward Inventory Status</label>
+                        <label for="status" class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-555 mb-2">Inward Inventory Status</label>
                         <select 
                             id="status" 
                             name="status" 
                             required 
-                            class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/30 transition-all"
+                            class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/20 transition-all shadow-sm"
                         >
                             <option value="Good Inventory" {{ old('status', 'Good Inventory') == 'Good Inventory' ? 'selected' : '' }}>Good Inventory</option>
                             <option value="Damaged" {{ old('status') == 'Damaged' ? 'selected' : '' }}>Damaged</option>
@@ -181,7 +189,7 @@
                 <div class="p-5 bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/60 rounded-3xl space-y-3">
                     <p class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Live Serial Codes Preview</p>
                     <div id="uids-preview-container" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                        <span class="text-xs text-slate-400 italic">Select a product and enter quantity to preview list...</span>
+                        <span class="text-xs text-slate-400 italic">Select a brand and enter quantity to preview list...</span>
                     </div>
                 </div>
 
@@ -214,12 +222,14 @@
                 uidInput.classList.add('bg-slate-100', 'dark:bg-slate-950/20', 'text-slate-500', 'dark:text-slate-400');
                 uidInput.classList.remove('bg-slate-50', 'dark:bg-slate-950/60', 'text-slate-800', 'dark:text-slate-200');
                 
-                fetchNextUid();
+                const brandInput = document.querySelector('input[name="brand_id"]');
+                if (brandInput) {
+                    fetchNextUid(brandInput.value);
+                }
             }
         }
 
-        function fetchNextUid() {
-            const brandSelect = document.getElementById('brand_id');
+        function fetchNextUid(brandId) {
             const uidInput = document.getElementById('start_uid');
             const checkBox = document.getElementById('manual_uid_check');
 
@@ -227,7 +237,6 @@
                 return;
             }
 
-            const brandId = brandSelect.value;
             if (!brandId) {
                 uidInput.value = '';
                 generateSequencePreview();
@@ -292,32 +301,25 @@
             previewContainer.innerHTML = html;
         }
 
-        function handleProductChange() {
-            const productSelect = document.getElementById('product_id');
-            const brandSelect = document.getElementById('brand_id');
-            
-            if (productSelect.selectedIndex > 0) {
-                const selectedOption = productSelect.options[productSelect.selectedIndex];
-                const brandId = selectedOption.getAttribute('data-brand-id');
-                if (brandId) {
-                    brandSelect.value = brandId;
-                    fetchNextUid();
-                }
-            }
-        }
-
         // Attach listeners and setup page load
         window.addEventListener('DOMContentLoaded', () => {
-            const productSelect = document.getElementById('product_id');
-            const brandSelect = document.getElementById('brand_id');
             const qtyInput = document.getElementById('quantity');
-            
-            productSelect.addEventListener('change', handleProductChange);
-            brandSelect.addEventListener('change', fetchNextUid);
             qtyInput.addEventListener('input', generateSequencePreview);
             
-            // Run initially if fields are already filled (e.g. from validation error/old input)
-            fetchNextUid();
+            // Listen to dynamic change events from searchable select components
+            window.addEventListener('change-brand_id', (e) => {
+                fetchNextUid(e.detail.value);
+            });
+
+            window.addEventListener('change-product_id', (e) => {
+                generateSequencePreview();
+            });
+
+            // Run initially if fields are already filled
+            const brandInput = document.querySelector('input[name="brand_id"]');
+            if (brandInput && brandInput.value) {
+                fetchNextUid(brandInput.value);
+            }
             generateSequencePreview();
         });
     </script>

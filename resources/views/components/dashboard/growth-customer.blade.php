@@ -13,20 +13,27 @@
             </div>
     
             <div class="flex-1 flex items-center justify-center w-full py-1">
+                @php
+                    $growthVal = $stats['growth_rate'] ?? 0;
+                    $pct = min(100, max(0, abs($growthVal)));
+                    $offset = 88 - (88 * ($pct / 100));
+                @endphp
                 <div class="relative w-22 h-22 flex items-center justify-center">
-                    <!-- Circular gauge with orange and black segments -->
+                    <!-- Circular gauge with dynamic progress -->
                     <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                         <!-- Background light pink/coral circle -->
                         <circle cx="18" cy="18" r="14" stroke="#FFF0ED" stroke-width="3.5" fill="transparent"/>
                         <!-- Orange Sweeping progress arc -->
                         <circle cx="18" cy="18" r="14" stroke="#FF5A36" stroke-width="3.5" fill="transparent"
-                                stroke-dasharray="88" stroke-dashoffset="26" stroke-linecap="round"/>
+                                stroke-dasharray="88" stroke-dashoffset="{{ $offset }}" stroke-linecap="round"/>
                         <!-- Black Sweeping indicator arc -->
                         <circle cx="18" cy="18" r="14" stroke="#0F172A" stroke-width="3.5" fill="transparent"
                                 stroke-dasharray="88" stroke-dashoffset="76" stroke-linecap="round"/>
                     </svg>
                     <div class="absolute flex flex-col items-center justify-center">
-                        <span class="text-lg font-extrabold text-slate-800 font-sans tracking-tight">+32%</span>
+                        <span class="text-lg font-extrabold text-slate-800 font-sans tracking-tight">
+                            {{ ($growthVal >= 0 ? '+' : '') . round($growthVal) }}%
+                        </span>
                         <span class="text-[7.5px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Growth rate</span>
                     </div>
                 </div>

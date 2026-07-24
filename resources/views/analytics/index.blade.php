@@ -10,6 +10,27 @@
         </div>
     </x-slot>
 
+    @php
+        $brandOptions = collect([['value' => '', 'label' => 'All Brands']])
+            ->concat($brands->map(fn($b) => ['value' => (string)$b->id, 'label' => $b->name]))
+            ->toArray();
+
+        $productOptions = collect([['value' => '', 'label' => 'All Products', 'search_terms' => 'all products', 'brand_id' => '']])
+            ->concat($products->map(fn($p) => [
+                'value' => (string)$p->id,
+                'label' => $p->product_name,
+                'brand_id' => (string)$p->brand_id,
+                'search_terms' => implode(' | ', array_filter([
+                    $p->product_name,
+                    $p->sku,
+                    $p->product_id,
+                    $p->fsn,
+                    $p->asin
+                ]))
+            ]))
+            ->toArray();
+    @endphp
+
     <!-- Include Chart.js via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -39,38 +60,26 @@
                     <!-- Brand -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-400 uppercase">Brand</label>
-                        <select 
+                        <x-searchable-select 
                             name="brand_id" 
-                            id="brand-filter-select"
-                            onchange="filterProducts()"
-                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm"
-                        >
-                            <option value="">All Brands</option>
-                            @foreach($brands as $b)
-                                <option value="{{ $b->id }}" {{ $brandId == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
-                            @endforeach
-                        </select>
+                            :options="$brandOptions" 
+                            :selected="$brandId" 
+                            placeholder="All Brands"
+                        />
                     </div>
 
                     <!-- Product -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold text-slate-400 uppercase">Product</label>
-                        <select 
+                        <x-searchable-select 
                             name="product_id" 
-                            id="product-filter-select"
-                            class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800/80 rounded-2xl text-slate-700 dark:text-slate-300 text-xs focus:outline-none focus:border-[#FF5A36] focus:ring-2 focus:ring-[#FF5A36]/15 transition-all shadow-sm"
-                        >
-                            <option value="">All Products</option>
-                            @foreach($products as $prod)
-                                <option 
-                                    value="{{ $prod->id }}" 
-                                    data-brand-id="{{ $prod->brand_id }}" 
-                                    {{ $productId == $prod->id ? 'selected' : '' }}
-                                >
-                                    {{ $prod->product_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                            :options="$productOptions" 
+                            :selected="$productId" 
+                            placeholder="All Products"
+                            filter-by="brand_id"
+                            filter-value="{{ $brandId }}"
+                            dropdown-class="w-full md:min-w-[150%] lg:min-w-[220%] right-0"
+                        />
                     </div>
 
                     <!-- Type filter -->
@@ -154,7 +163,7 @@
                     <p class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">{{ $totalUnitsPurchased }} units purchased</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-100/60 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center relative z-10">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3a4 4 0 0 0 0-8"/></svg>
                 </div>
                 <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-blue-100/35 dark:bg-blue-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
@@ -167,7 +176,7 @@
                     <p class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">{{ number_format($totalUnitsSold) }} units dispatched ({{ $totalSalesCount }} dispatches)</p>
                 </div>
                 <div class="w-12 h-12 bg-emerald-100/60 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center relative z-10">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3a4 4 0 0 0 0-8"/></svg>
                 </div>
                 <div class="absolute -right-6 -bottom-10 w-24 h-24 rounded-full bg-emerald-100/35 dark:bg-emerald-900/10 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-2 group-hover:-translate-y-2"></div>
             </div>
@@ -696,47 +705,6 @@
                     }
                 }
             });
-
-            // 3. Dynamic Brand to Product options filter
-            const brandSelect = document.getElementById('brand-filter-select');
-            const productSelect = document.getElementById('product-filter-select');
-            
-            if (brandSelect && productSelect) {
-                const originalOptions = Array.from(productSelect.options);
-                
-                window.filterProducts = function() {
-                    const selectedBrandId = brandSelect.value;
-                    const currentSelectedProductValue = productSelect.value;
-                    
-                    productSelect.innerHTML = '';
-                    
-                    let isCurrentProductStillValid = false;
-                    originalOptions.forEach(option => {
-                        const optionBrandId = option.getAttribute('data-brand-id');
-                        
-                        // Check if the product has a valid brand associated
-                        const hasBrand = optionBrandId !== null && optionBrandId !== '';
-                        
-                        // Show option if no brand is filtered, or if the product has a brand that matches the selection
-                        const isMatch = !selectedBrandId || (hasBrand && optionBrandId == selectedBrandId);
-                        
-                        if (option.value === '' || isMatch) {
-                            productSelect.appendChild(option.cloneNode(true));
-                            if (option.value === currentSelectedProductValue) {
-                                isCurrentProductStillValid = true;
-                            }
-                        }
-                    });
-                    
-                    if (isCurrentProductStillValid) {
-                        productSelect.value = currentSelectedProductValue;
-                    } else {
-                        productSelect.value = '';
-                    }
-                };
-                
-                window.filterProducts();
-            }
         });
     </script>
 </x-app-layout>

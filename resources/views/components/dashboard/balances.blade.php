@@ -67,7 +67,7 @@
             <!-- Icon -->
             <div class="w-11 h-11 rounded-full bg-[#E6F4EA] dark:bg-slate-800 flex items-center justify-center">
                 <svg class="w-5.5 h-5.5 text-[#137333]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3a4 4 0 0 0 0-8" />
                 </svg>
             </div>
             <!-- Badge -->
@@ -87,7 +87,7 @@
         <div class="absolute -right-6 -bottom-10 w-28 h-28 rounded-full bg-slate-100/70 dark:bg-slate-800/20 pointer-events-none transition-all duration-500 ease-out group-hover:scale-125 group-hover:-translate-x-3 group-hover:-translate-y-3"></div>
     </div>
 
-    <!-- Card 4: Portal Orders (Light) -->
+    <!-- Card 4: Available Stock Value (Light) -->
     <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 p-6 rounded-[2rem] flex flex-col justify-between shadow-sm relative overflow-hidden group min-h-[148px]">
         
         <!-- Top Row -->
@@ -95,20 +95,20 @@
             <!-- Icon -->
             <div class="w-11 h-11 rounded-full bg-[#FFF2EE] dark:bg-slate-800 flex items-center justify-center">
                 <svg class="w-5.5 h-5.5 text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3a4 4 0 0 0 0-8" />
                 </svg>
             </div>
             <!-- Badge -->
-            <span class="bg-[#FFF2EE] dark:bg-orange-950/40 text-[#FF5A36] text-[11px] font-bold px-3 py-1 rounded-full">Orders</span>
+            <span class="bg-[#FFF2EE] dark:bg-orange-950/40 text-[#FF5A36] text-[11px] font-bold px-3 py-1 rounded-full">Available</span>
         </div>
 
         <!-- Bottom Section -->
         <div class="mt-5 text-left relative z-10">
-            <p class="text-slate-400 dark:text-slate-500 text-xs font-semibold tracking-wide uppercase">Portal Orders</p>
-            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white font-sans mt-0.5">
-                {{ number_format($stats['total_sales']) }}
+            <p class="text-slate-400 dark:text-slate-500 text-xs font-semibold tracking-wide uppercase">Available Stock Value</p>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-800 dark:text-white font-sans mt-0.5">
+                ₹{{ number_format($stats['available_stock_value'], 2) }}
             </h3>
-            <p class="text-slate-400 dark:text-slate-550 text-[11px] mt-0.5">{{ number_format($stats['total_dispatch']) }} units dispatched</p>
+            <p class="text-slate-400 dark:text-slate-550 text-[11px] mt-0.5">For {{ number_format($stats['active_stock']) }} available units</p>
         </div>
 
         <!-- Backing graphics (Hover scale & move animation) -->
