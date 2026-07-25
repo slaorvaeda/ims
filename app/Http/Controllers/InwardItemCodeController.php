@@ -360,6 +360,7 @@ class InwardItemCodeController extends Controller
             $inwardItem->update([
                 'status' => 'Sold',
                 'portal_vendor_id' => $portalVendorId,
+                'updated_by' => Auth::user()->name ?? 'System',
             ]);
 
             // Create Dispatch record

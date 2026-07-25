@@ -59,6 +59,7 @@ class BarcodeApiController extends Controller
                     'status' => 'Sold',
                     'mark' => null,
                     'portal_vendor_id' => $portalVendorId,
+                    'updated_by' => Auth::user()->name ?? 'System',
                 ]);
 
                 // Create Dispatch record
@@ -135,6 +136,7 @@ class BarcodeApiController extends Controller
                         'status' => $newStatus,
                         'portal_vendor_id' => null,
                         'mark' => 'cancelled',
+                        'updated_by' => Auth::user()->name ?? 'System',
                     ]);
                 }
 

@@ -200,6 +200,7 @@ class DispatchItemCodeController extends Controller
             if ($inwardItem) {
                 $inwardItem->update([
                     'status' => $validated['status'],
+                    'updated_by' => Auth::user()->name ?? 'System',
                 ]);
             }
         });
@@ -256,6 +257,7 @@ class DispatchItemCodeController extends Controller
                 if ($oldInward) {
                     $oldInward->update([
                         'status' => 'Good Inventory',
+                        'updated_by' => Auth::user()->name ?? 'System',
                     ]);
                 }
             }
@@ -265,6 +267,7 @@ class DispatchItemCodeController extends Controller
             if ($newInward) {
                 $newInward->update([
                     'status' => $validated['status'],
+                    'updated_by' => Auth::user()->name ?? 'System',
                 ]);
             }
         });
@@ -301,6 +304,7 @@ class DispatchItemCodeController extends Controller
                     'status' => $newStatus,
                     'portal_vendor_id' => null,
                     'mark' => 'cancelled',
+                    'updated_by' => Auth::user()->name ?? 'System',
                 ]);
             }
 
@@ -327,6 +331,7 @@ class DispatchItemCodeController extends Controller
                     'status' => $newStatus,
                     'portal_vendor_id' => null,
                     'mark' => 'cancelled',
+                    'updated_by' => Auth::user()->name ?? 'System',
                 ]);
             }
 
