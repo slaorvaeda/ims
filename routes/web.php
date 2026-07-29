@@ -12,6 +12,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AiCopilotController;
+use App\Http\Controllers\StoreController;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\InwardItemCode;
@@ -270,6 +271,8 @@ Route::middleware('auth')->group(function () {
     // AI Copilot Routes
     Route::post('/ai/chat', [AiCopilotController::class, 'chat'])->name('ai.chat');
     Route::post('/ai/analyze-file', [AiCopilotController::class, 'analyzeFile'])->name('ai.analyze-file');
+    // Store Config Routes
+    Route::resource('stores', StoreController::class);
 });
 
 require __DIR__.'/auth.php';

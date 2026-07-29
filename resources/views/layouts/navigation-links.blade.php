@@ -42,6 +42,17 @@
     <span x-show="!sidebarMinimized">Operators</span>
 </a>
 
+<!-- Stores Link -->
+<a href="{{ route('stores.index') }}" 
+   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('stores.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
+   :class="sidebarMinimized ? 'justify-center px-2' : ''"
+   x-bind:title="sidebarMinimized ? 'Stores' : ''">
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    </svg>
+    <span x-show="!sidebarMinimized">Stores</span>
+</a>
+
 @if(auth()->user()->hasPermission('products'))
 <!-- Product Master Link -->
 <a href="{{ route('products.index') }}" 
