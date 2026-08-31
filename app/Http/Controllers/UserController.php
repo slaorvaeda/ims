@@ -48,7 +48,7 @@ class UserController extends Controller
             'status' => ['required', 'string', 'in:Active,Inactive'],
             'role' => ['required', 'string', 'in:admin,operator'],
             'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', 'in:products,purchases,inward_item_codes,sales,dispatch_item_codes,barcodes'],
+            'permissions.*' => ['string', 'in:products,products.view,products.create,products.import,products.export,purchases,purchases.view,purchases.create,purchases.import,purchases.export,inward_item_codes,inward_item_codes.view,inward_item_codes.scan,inward_item_codes.import,inward_item_codes.export,sales,sales.view,sales.create,sales.import,sales.export,dispatch_item_codes,dispatch_item_codes.view,dispatch_item_codes.scan,dispatch_item_codes.import,dispatch_item_codes.export,barcodes,barcodes.view'],
         ]);
 
         User::create([
@@ -91,7 +91,7 @@ class UserController extends Controller
             'status' => ['required', 'string', 'in:Active,Inactive'],
             'role' => ['required', 'string', 'in:admin,operator'],
             'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', 'in:products,purchases,inward_item_codes,sales,dispatch_item_codes,barcodes'],
+            'permissions.*' => ['string', 'in:products,products.view,products.create,products.import,products.export,purchases,purchases.view,purchases.create,purchases.import,purchases.export,inward_item_codes,inward_item_codes.view,inward_item_codes.scan,inward_item_codes.import,inward_item_codes.export,sales,sales.view,sales.create,sales.import,sales.export,dispatch_item_codes,dispatch_item_codes.view,dispatch_item_codes.scan,dispatch_item_codes.import,dispatch_item_codes.export,barcodes,barcodes.view'],
         ]);
 
         $user->name = $request->name;

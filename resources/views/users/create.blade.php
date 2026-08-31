@@ -110,26 +110,105 @@
 
                 <!-- Operator Permissions Checklist -->
                 <div x-show="role === 'operator'" x-transition class="space-y-4 p-5 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-150 dark:border-slate-800/50 rounded-2xl">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Operator Permissions</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Operator Permissions Matrix</label>
+                    
+                    <div class="space-y-4">
                         @php
-                            $availablePermissions = [
-                                'products' => 'Products Master',
-                                'purchases' => 'Purchase History',
-                                'inward_item_codes' => 'Inward Serial Codes',
-                                'sales' => 'Sales History',
-                                'dispatch_item_codes' => 'Dispatch Serial Codes',
-                                'barcodes' => 'Barcode Generator',
+                            $modules = [
+                                'products' => [
+                                    'title' => 'Products Master',
+                                    'actions' => [
+                                        'view' => 'View List',
+                                        'create' => 'Create/Edit',
+                                        'import' => 'Import (Excel/CSV)',
+                                        'export' => 'Export (Excel/CSV)',
+                                    ]
+                                ],
+                                'purchases' => [
+                                    'title' => 'Purchase History',
+                                    'actions' => [
+                                        'view' => 'View List',
+                                        'create' => 'Create/Edit',
+                                        'import' => 'Import (Excel/CSV)',
+                                        'export' => 'Export (Excel/CSV)',
+                                    ]
+                                ],
+                                'inward_item_codes' => [
+                                    'title' => 'Inward Serial Codes',
+                                    'actions' => [
+                                        'view' => 'View List',
+                                        'scan' => 'Scan (Dispatch)',
+                                        'import' => 'Import (Excel/CSV)',
+                                        'export' => 'Export (Excel/CSV)',
+                                    ]
+                                ],
+                                'sales' => [
+                                    'title' => 'Sales Registry',
+                                    'actions' => [
+                                        'view' => 'View List',
+                                        'create' => 'Create/Edit',
+                                        'import' => 'Import (Excel/CSV)',
+                                        'export' => 'Export (Excel/CSV)',
+                                    ]
+                                ],
+                                'dispatch_item_codes' => [
+                                    'title' => 'Dispatch Serial Codes',
+                                    'actions' => [
+                                        'view' => 'View List',
+                                        'scan' => 'Scan (Cancel)',
+                                        'import' => 'Import (Excel/CSV)',
+                                        'export' => 'Export (Excel/CSV)',
+                                    ]
+                                ],
                             ];
                         @endphp
-                        @foreach($availablePermissions as $value => $label)
-                            <label class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/50 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all">
-                                <input type="checkbox" name="permissions[]" value="{{ $value }}" 
-                                       {{ in_array($value, old('permissions', ['products', 'purchases', 'inward_item_codes', 'sales', 'dispatch_item_codes', 'barcodes'])) ? 'checked' : '' }}
-                                       class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950">
-                                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ $label }}</span>
-                            </label>
+
+                        @foreach($modules as $moduleKey => $moduleData)
+                            <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/60 rounded-xl p-4 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-850 pb-2">
+                                    <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ $moduleData['title'] }}</span>
+                                    <div class="flex items-center gap-3 text-[10px] text-slate-400 font-semibold select-none">
+                                        <button type="button" @click="
+                                            document.querySelectorAll('[data-module={{ $moduleKey }}]').forEach(el => el.checked = true);
+                                        " class="hover:text-[#FF5A36] transition-all">Select All</button>
+                                        <span>|</span>
+                                        <button type="button" @click="
+                                            document.querySelectorAll('[data-module={{ $moduleKey }}]').forEach(el => el.checked = false);
+                                        " class="hover:text-rose-500 transition-all">Clear</button>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 text-xs">
+                                    @foreach($moduleData['actions'] as $actionKey => $actionLabel)
+                                        @php
+                                            $permissionValue = "{$moduleKey}.{$actionKey}";
+                                            $oldPermissions = old('permissions', []);
+                                            // By default, check all for new users
+                                            $isChecked = empty($oldPermissions) || in_array($permissionValue, $oldPermissions);
+                                        @endphp
+                                        <label class="flex items-center gap-2 cursor-pointer py-1">
+                                            <input type="checkbox" name="permissions[]" value="{{ $permissionValue }}" data-module="{{ $moduleKey }}"
+                                                   {{ $isChecked ? 'checked' : '' }}
+                                                   class="w-4 h-4 rounded text-[#FF5A36] focus:ring-[#FF5A36] border-slate-350 dark:border-slate-700 dark:bg-slate-950">
+                                            <span class="font-semibold text-slate-650 dark:text-slate-350 text-[11px]">{{ $actionLabel }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
                         @endforeach
+
+                        <!-- Barcode Generator -->
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/60 rounded-xl p-4 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Barcode Generator</span>
+                            @php
+                                $barcodeChecked = empty($oldPermissions) || in_array('barcodes.view', $oldPermissions);
+                            @endphp
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="permissions[]" value="barcodes.view" data-module="barcodes"
+                                       {{ $barcodeChecked ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-[#FF5A36] focus:ring-[#FF5A36] border-slate-350 dark:border-slate-700 dark:bg-slate-950">
+                                <span class="font-semibold text-slate-650 dark:text-slate-300 text-[11px]">Enable Access</span>
+                            </label>
+                        </div>
                     </div>
                     @error('permissions')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>

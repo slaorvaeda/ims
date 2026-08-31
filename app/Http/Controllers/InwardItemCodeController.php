@@ -9,8 +9,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class InwardItemCodeController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class InwardItemCodeController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:inward_item_codes.view', only: ['index', 'show']),
+            new Middleware('permission:inward_item_codes.scan', only: ['create', 'store', 'edit', 'update', 'destroy']),
+        ];
+    }
+
     /**
      * Export inward item codes to Excel/CSV.
      */

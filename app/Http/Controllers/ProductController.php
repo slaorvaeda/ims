@@ -8,8 +8,19 @@ use App\Services\CsvExcelService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ProductController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class ProductController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:products.view', only: ['index', 'show']),
+            new Middleware('permission:products.create', only: ['create', 'store', 'edit', 'update', 'destroy']),
+        ];
+    }
+
     /**
      * Export products to Excel/CSV.
      */

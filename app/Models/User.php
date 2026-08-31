@@ -42,6 +42,23 @@ class User extends Authenticatable
             return true;
         }
 
-        return is_array($this->permissions) && in_array($permission, $this->permissions);
+        if (!is_array($this->permissions)) {
+            return false;
+        }
+
+        if (in_array($permission, $this->permissions)) {
+            return true;
+        }
+
+        // Support parent permission fallback (e.g. 'products' grants 'products.view')
+        $parts = explode('.', $permission);
+        if (count($parts) > 1) {
+            $parentPermission = $parts[0];
+            if (in_array($parentPermission, $this->permissions)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

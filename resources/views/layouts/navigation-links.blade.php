@@ -53,7 +53,7 @@
     <span x-show="!sidebarMinimized">Stores</span>
 </a>
 
-@if(auth()->user()->hasPermission('products'))
+@if(auth()->user()->hasPermission('products.view'))
 <!-- Product Master Link -->
 <a href="{{ route('products.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('products.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -66,7 +66,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('purchases'))
+@if(auth()->user()->hasPermission('purchases.view'))
 <!-- Purchase Master Link -->
 <a href="{{ route('purchases.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('purchases.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -79,7 +79,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('inward_item_codes'))
+@if(auth()->user()->hasPermission('inward_item_codes.view'))
 <!-- Inward ItemCode Master Link -->
 <a href="{{ route('inward-item-codes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('inward-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -92,7 +92,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('sales'))
+@if(auth()->user()->hasPermission('sales.view'))
 <!-- Sale Master Link -->
 <a href="{{ route('sales.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('sales.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -105,7 +105,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('dispatch_item_codes'))
+@if(auth()->user()->hasPermission('dispatch_item_codes.view'))
 <!-- Dispatch ItemCode Master Link -->
 <a href="{{ route('dispatch-item-codes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('dispatch-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -131,7 +131,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('barcodes'))
+@if(auth()->user()->hasPermission('barcodes.view'))
 <!-- Barcode Generator Link -->
 <a href="{{ route('barcodes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('barcodes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"

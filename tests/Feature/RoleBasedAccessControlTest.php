@@ -173,4 +173,33 @@ class RoleBasedAccessControlTest extends TestCase
             ->get('/products');
         $responseProducts->assertOk();
     }
+
+    public function test_granular_operator_permissions_are_enforced_individually(): void
+    {
+        $operator = User::factory()->create([
+            'role' => 'operator',
+            'permissions' => ['products.view', 'products.export']
+        ]);
+
+        $this->assertTrue($operator->hasPermission('products.view'));
+        $this->assertTrue($operator->hasPermission('products.export'));
+        $this->assertFalse($operator->hasPermission('products.create'));
+        $this->assertFalse($operator->hasPermission('products.import'));
+
+        // Authorized: GET /products (view)
+        $responseView = $this->actingAs($operator)->get('/products');
+        $responseView->assertOk();
+
+        // Authorized: GET /products/export (export)
+        $responseExport = $this->actingAs($operator)->get('/products/export');
+        $responseExport->assertOk();
+
+        // Unauthorized: GET /products/create (create)
+        $responseCreate = $this->actingAs($operator)->get('/products/create');
+        $responseCreate->assertStatus(403);
+
+        // Unauthorized: POST /products/import (import)
+        $responseImport = $this->actingAs($operator)->post('/products/import');
+        $responseImport->assertStatus(403);
+    }
 }

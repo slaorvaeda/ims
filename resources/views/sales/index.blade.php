@@ -4,10 +4,12 @@
             <h2 class="font-heading font-bold text-2xl text-slate-800 dark:text-white leading-tight">
                 {{ __('Sales Order History') }}
             </h2>
+            @if(auth()->user()->hasPermission('sales.create'))
             <a href="{{ route('sales.create') }}" class="px-5 py-2.5 bg-slate-950 dark:bg-white text-white dark:text-slate-950 text-sm font-semibold rounded-2xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-all duration-150 flex items-center gap-2 shadow-md">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.75v14.5M4.75 12h14.5"/></svg>
                 <span>Add Sale Order</span>
             </a>
+            @endif
         </div>
     </x-slot>
 
@@ -38,12 +40,14 @@
                     @endif
                 </form>
 
+                @if(auth()->user()->hasPermission('sales.import') || auth()->user()->hasPermission('sales.export'))
                 <div class="flex items-center gap-2">
                     <button @click="showExcelTools = !showExcelTools" class="px-5 py-3.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border border-slate-200/40 dark:border-slate-700/40">
                         <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                         <span>Excel Import/Export</span>
                     </button>
                 </div>
+                @endif
             </div>
         </div>
 
@@ -58,6 +62,7 @@
              class="p-6 bg-gradient-to-br from-indigo-50/50 to-slate-50 dark:from-indigo-950/20 dark:to-slate-900 border border-indigo-100/60 dark:border-slate-800/80 rounded-[2rem] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6" 
              x-cloak>
             <!-- Export Section -->
+            @if(auth()->user()->hasPermission('sales.export'))
             <div class="space-y-3">
                 <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
                     <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -70,9 +75,11 @@
                     Export Filtered Sales
                 </a>
             </div>
+            @endif
 
             <!-- Import Section -->
-            <div class="space-y-3">
+            @if(auth()->user()->hasPermission('sales.import'))
+            <div class="space-y-3 col-start-auto">
                 <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
                     <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     Import Sales
@@ -88,6 +95,7 @@
                     </button>
                 </form>
             </div>
+            @endif
         </div>
 
         <!-- Table Panel -->
@@ -130,6 +138,7 @@
                                 </td>
                                 <td class="py-4.5 px-6 text-right">
                                     <div class="flex items-center justify-end gap-2">
+                                        @if(auth()->user()->hasPermission('sales.create'))
                                         <a href="{{ route('sales.edit', $sale->id) }}" class="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all" title="Edit">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -144,6 +153,9 @@
                                                 </svg>
                                             </button>
                                         </form>
+                                        @else
+                                        <span class="text-xs text-slate-400 font-semibold italic">Locked</span>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

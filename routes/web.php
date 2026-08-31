@@ -220,47 +220,35 @@ Route::middleware('auth')->group(function () {
     Route::delete('/operators/portal-vendors/{portalVendor}', [OperatorController::class, 'destroyPortalVendor'])->name('operators.destroy-portal-vendor');
 
     // IMS Resource CRUD routes with permission checks
-    Route::middleware('permission:products')->group(function () {
-        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
-        Route::post('/products/import', [ProductController::class, 'import'])->name('products.import');
-        Route::resource('products', ProductController::class);
-    });
+    Route::get('/products/export', [ProductController::class, 'export'])->middleware('permission:products.export')->name('products.export');
+    Route::post('/products/import', [ProductController::class, 'import'])->middleware('permission:products.import')->name('products.import');
+    Route::resource('products', ProductController::class);
 
-    Route::middleware('permission:purchases')->group(function () {
-        Route::get('/purchases/export', [PurchaseController::class, 'export'])->name('purchases.export');
-        Route::post('/purchases/import', [PurchaseController::class, 'import'])->name('purchases.import');
-        Route::get('/purchases/next-uid', [PurchaseController::class, 'getNextUid'])->name('purchases.next-uid');
-        Route::resource('purchases', PurchaseController::class);
-    });
+    Route::get('/purchases/export', [PurchaseController::class, 'export'])->middleware('permission:purchases.export')->name('purchases.export');
+    Route::post('/purchases/import', [PurchaseController::class, 'import'])->middleware('permission:purchases.import')->name('purchases.import');
+    Route::get('/purchases/next-uid', [PurchaseController::class, 'getNextUid'])->middleware('permission:purchases.create')->name('purchases.next-uid');
+    Route::resource('purchases', PurchaseController::class);
 
-    Route::middleware('permission:inward_item_codes')->group(function () {
-        Route::get('/inward-item-codes/export', [InwardItemCodeController::class, 'export'])->name('inward-item-codes.export');
-        Route::post('/inward-item-codes/import', [InwardItemCodeController::class, 'import'])->name('inward-item-codes.import');
-        Route::post('/inward-item-codes/scan-dispatch', [InwardItemCodeController::class, 'scanDispatch'])->name('inward-item-codes.scan-dispatch');
-        Route::resource('inward-item-codes', InwardItemCodeController::class);
-    });
+    Route::get('/inward-item-codes/export', [InwardItemCodeController::class, 'export'])->middleware('permission:inward_item_codes.export')->name('inward-item-codes.export');
+    Route::post('/inward-item-codes/import', [InwardItemCodeController::class, 'import'])->middleware('permission:inward_item_codes.import')->name('inward-item-codes.import');
+    Route::post('/inward-item-codes/scan-dispatch', [InwardItemCodeController::class, 'scanDispatch'])->middleware('permission:inward_item_codes.scan')->name('inward-item-codes.scan-dispatch');
+    Route::resource('inward-item-codes', InwardItemCodeController::class);
 
-    Route::middleware('permission:sales')->group(function () {
-        Route::get('/sales/export', [SaleController::class, 'export'])->name('sales.export');
-        Route::post('/sales/import', [SaleController::class, 'import'])->name('sales.import');
-        Route::resource('sales', SaleController::class);
-    });
+    Route::get('/sales/export', [SaleController::class, 'export'])->middleware('permission:sales.export')->name('sales.export');
+    Route::post('/sales/import', [SaleController::class, 'import'])->middleware('permission:sales.import')->name('sales.import');
+    Route::resource('sales', SaleController::class);
 
-    Route::middleware('permission:dispatch_item_codes')->group(function () {
-        Route::get('/dispatch-item-codes/export', [DispatchItemCodeController::class, 'export'])->name('dispatch-item-codes.export');
-        Route::post('/dispatch-item-codes/import', [DispatchItemCodeController::class, 'import'])->name('dispatch-item-codes.import');
-        Route::post('/dispatch-item-codes/scan-cancel', [DispatchItemCodeController::class, 'scanCancel'])->name('dispatch-item-codes.scan-cancel');
-        Route::resource('dispatch-item-codes', DispatchItemCodeController::class);
-    });
+    Route::get('/dispatch-item-codes/export', [DispatchItemCodeController::class, 'export'])->middleware('permission:dispatch_item_codes.export')->name('dispatch-item-codes.export');
+    Route::post('/dispatch-item-codes/import', [DispatchItemCodeController::class, 'import'])->middleware('permission:dispatch_item_codes.import')->name('dispatch-item-codes.import');
+    Route::post('/dispatch-item-codes/scan-cancel', [DispatchItemCodeController::class, 'scanCancel'])->middleware('permission:dispatch_item_codes.scan')->name('dispatch-item-codes.scan-cancel');
+    Route::resource('dispatch-item-codes', DispatchItemCodeController::class);
     
     Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
     });
     
     // Barcode Generator route with permission check
-    Route::middleware('permission:barcodes')->group(function () {
-        Route::get('/barcodes', [BarcodeController::class, 'index'])->name('barcodes.index');
-    });
+    Route::get('/barcodes', [BarcodeController::class, 'index'])->middleware('permission:barcodes.view')->name('barcodes.index');
 
     // Unified Reports Routes
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

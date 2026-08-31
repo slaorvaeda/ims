@@ -4,14 +4,17 @@
             <h2 class="font-heading font-bold text-2xl text-slate-800 dark:text-white leading-tight">
                 {{ __('Inward Serial Codes') }}
             </h2>
+            @if(auth()->user()->hasPermission('inward_item_codes.scan'))
             <a href="{{ route('inward-item-codes.create') }}" class="px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-sm font-semibold rounded-2xl transition-all duration-150 flex items-center gap-2 shadow-md shadow-[#FF5A36]/15">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.75v14.5M4.75 12h14.5"/></svg>
                 <span>Add Inward Code</span>
             </a>
+            @endif
         </div>
     </x-slot>
 
     <div class="space-y-6" x-data="barcodeModalApp()">
+        @if(auth()->user()->hasPermission('inward_item_codes.scan'))
         <!-- Barcode Scanner Input Form -->
         <div class="p-6 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-slate-900 dark:to-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-colors">
             <div class="space-y-1">
@@ -72,7 +75,7 @@
                                 class="sr-only peer"
                                 onchange="localStorage.setItem('selected_portal_id', this.value)"
                             >
-                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-[#FF5A36] peer-checked:text-white peer-checked:border-[#FF5A36] hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
+                            <span class="text-xs font-semibold text-slate-650 dark:text-slate-400 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800/80 px-3.5 py-2 rounded-2xl peer-checked:bg-[#FF5A36] peer-checked:text-white peer-checked:border-[#FF5A36] hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all shadow-sm">
                                 {{ $portal->name }}
                             </span>
                         </label>
@@ -82,6 +85,7 @@
                 </div>
             </form>
         </div>
+        @endif
 
         <!-- Search Toolbar and Filter Options Wrapper -->
         <div class="w-full">
@@ -112,10 +116,12 @@
                                 <span>Filter & Sort</span>
                             </button>
 
-                            <button type="button" @click="showExcelTools = !showExcelTools" :class="showExcelTools ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent'" class="px-5 py-3.5 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border shrink-0">
+                            @if(auth()->user()->hasPermission('inward_item_codes.import') || auth()->user()->hasPermission('inward_item_codes.export'))
+                            <button type="button" @click="showExcelTools = !showExcelTools" :class="showExcelTools ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent'\" class="px-5 py-3.5 font-semibold rounded-2xl text-sm transition-all flex items-center gap-2 border shrink-0">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                                 <span>Excel Tools</span>
                             </button>
+                            @endif
 
                             <div class="flex p-1 bg-slate-100 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-sm shrink-0">
                                 <button 
@@ -282,6 +288,7 @@
              class="p-6 bg-gradient-to-br from-indigo-50/50 to-slate-50 dark:from-indigo-950/20 dark:to-slate-900 border border-indigo-100/60 dark:border-slate-800/80 rounded-[2rem] shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6" 
              x-cloak>
             <!-- Export Section -->
+            @if(auth()->user()->hasPermission('inward_item_codes.export'))
             <div class="space-y-3">
                 <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
                     <svg class="w-5 h-5 text-[#FF5A36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -294,9 +301,11 @@
                     Export Filtered Serial Codes
                 </a>
             </div>
+            @endif
 
             <!-- Import Section -->
-            <div class="space-y-3">
+            @if(auth()->user()->hasPermission('inward_item_codes.import'))
+            <div class="space-y-3 col-start-auto">
                 <h3 class="font-heading font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
                     <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     Import Serial Codes
@@ -312,6 +321,7 @@
                     </button>
                 </form>
             </div>
+            @endif
         </div>
 
         <!-- Bulk Action Bar -->
@@ -454,31 +464,35 @@
                                 </td>
                                 <td class="py-4.5 px-6 text-right" id="inward-actions-{{ $item->uid }}">
                                     <div class="flex items-center justify-end gap-2" id="inward-action-wrapper-{{ $item->uid }}">
-                                        @if ($item->status !== 'Sold')
-                                            <form method="POST" action="{{ route('inward-item-codes.scan-dispatch') }}" class="inline">
+                                        @if(auth()->user()->hasPermission('inward_item_codes.scan'))
+                                            @if ($item->status !== 'Sold')
+                                                <form method="POST" action="{{ route('inward-item-codes.scan-dispatch') }}" class="inline">
+                                                    @csrf
+                                                    <input type="hidden" name="scan_uid" value="{{ $item->uid }}">
+                                                    <button type="submit" class="p-2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all" title="Dispatch / Sell Item">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <a href="{{ route('inward-item-codes.edit', $item->id) }}" class="p-2 text-slate-400 hover:text-[#FF5A36] hover:bg-orange-50 dark:hover:bg-slate-800 rounded-xl transition-all" title="Edit">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                            </a>
+                                            <form method="POST" action="{{ route('inward-item-codes.destroy', $item->id) }}" onsubmit="return confirm('Are you sure you want to delete this serial code?');" class="inline">
                                                 @csrf
-                                                <input type="hidden" name="scan_uid" value="{{ $item->uid }}">
-                                                <button type="submit" class="p-2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all" title="Dispatch / Sell Item">
+                                                @method('DELETE')
+                                                <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all" title="Delete">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
                                                 </button>
                                             </form>
+                                        @else
+                                            <span class="text-xs text-slate-400 font-semibold italic">Locked</span>
                                         @endif
-                                        <a href="{{ route('inward-item-codes.edit', $item->id) }}" class="p-2 text-slate-400 hover:text-[#FF5A36] hover:bg-orange-50 dark:hover:bg-slate-800 rounded-xl transition-all" title="Edit">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
-                                        </a>
-                                        <form method="POST" action="{{ route('inward-item-codes.destroy', $item->id) }}" onsubmit="return confirm('Are you sure you want to delete this serial code?');" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all" title="Delete">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -564,17 +578,19 @@
 
                         <!-- Actions Overlay -->
                         <div id="card-actions-{{ $item->uid }}" class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 rounded-[2.5rem] flex items-center justify-center gap-2 transition-all duration-200 backdrop-blur-[1px] z-10 p-4 flex-wrap">
-                                @if ($item->status !== 'Sold')
-                                    <form method="POST" action="{{ route('inward-item-codes.scan-dispatch') }}" class="inline-block">
-                                        @csrf
-                                        <input type="hidden" name="scan_uid" value="{{ $item->uid }}">
-                                        <button type="submit" class="p-2 bg-emerald-600 text-white hover:bg-emerald-500 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all" title="Dispatch / Sell Item">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                            </svg>
-                                            <span>Dispatch</span>
-                                        </button>
-                                    </form>
+                                @if(auth()->user()->hasPermission('inward_item_codes.scan'))
+                                    @if ($item->status !== 'Sold')
+                                        <form method="POST" action="{{ route('inward-item-codes.scan-dispatch') }}" class="inline-block">
+                                            @csrf
+                                            <input type="hidden" name="scan_uid" value="{{ $item->uid }}">
+                                            <button type="submit" class="p-2 bg-emerald-600 text-white hover:bg-emerald-500 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all" title="Dispatch / Sell Item">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                </svg>
+                                                <span>Dispatch</span>
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
                             <button 
                              @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})"
@@ -583,6 +599,7 @@
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <span>Zoom</span>
                             </button>
+                            @if(auth()->user()->hasPermission('inward_item_codes.scan'))
                             <a 
                                 href="{{ route('inward-item-codes.edit', $item->id) }}"
                                 class="p-2 bg-white text-slate-900 hover:bg-orange-50 hover:text-[#FF5A36] rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
@@ -598,6 +615,7 @@
                                     <span>Delete</span>
                                 </button>
                             </form>
+                            @endif
                         </div>
                     </div>
                 @empty
