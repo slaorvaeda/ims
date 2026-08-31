@@ -17,7 +17,8 @@ class SaleController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:sales.view', only: ['index', 'show']),
+            new Middleware('permission:sales.view|sales.create|sales.import|sales.export', only: ['index']),
+            new Middleware('permission:sales.view', only: ['show']),
             new Middleware('permission:sales.create', only: ['create', 'store', 'edit', 'update', 'destroy']),
         ];
     }

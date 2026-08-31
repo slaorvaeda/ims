@@ -17,7 +17,8 @@ class InwardItemCodeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:inward_item_codes.view', only: ['index', 'show']),
+            new Middleware('permission:inward_item_codes.view|inward_item_codes.scan|inward_item_codes.import|inward_item_codes.export', only: ['index']),
+            new Middleware('permission:inward_item_codes.view', only: ['show']),
             new Middleware('permission:inward_item_codes.scan', only: ['create', 'store', 'edit', 'update', 'destroy']),
         ];
     }

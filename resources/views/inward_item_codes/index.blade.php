@@ -325,6 +325,7 @@
         </div>
 
         <!-- Bulk Action Bar -->
+        @if(auth()->user()->hasPermission('inward_item_codes.view'))
         <div 
             x-show="selectedUids.length > 0" 
             x-transition:enter="transition ease-out duration-300"
@@ -338,20 +339,15 @@
         >
             <div class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[#FF5A36] text-white flex items-center justify-center text-xs font-bold" x-text="selectedUids.length"></span>
-                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">barcodes selected for download</span>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-350">Items Selected</span>
             </div>
-            <div class="flex items-center gap-3">
-                <button 
-                    @click="selectedUids = []" 
-                    class="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 px-3 py-2 transition-all"
-                >
-                    Clear Selection
-                </button>
+            
+            <div class="flex items-center gap-2">
                 <button 
                     @click="downloadSelectedBarcodes()" 
-                    class="px-5 py-2.5 bg-[#FF5A36] hover:bg-[#E04826] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-[#FF5A36]/20 flex items-center gap-2"
+                    class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-750 text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center gap-2"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     <span>Download Selected</span>
                 </button>
                 <button 
@@ -401,36 +397,26 @@
                                     >
                                 </td>
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->id }}</td>
-                                <td class="py-4.5 px-6">
-                                    <div class="flex items-center gap-3 cursor-pointer group" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
-                                        <div class="flex flex-col gap-1.5 shrink-0">
-                                            <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit group-hover:border-indigo-500/50 dark:group-hover:border-indigo-500/50 transition-colors">
-                                                {{ $item->uid }}
-                                            </span>
-                                            <!-- Inline Rendered Barcode SVG -->
-                                            <svg id="inline-barcode-{{ $item->id }}" class="bg-white p-0.5 rounded border border-slate-100 max-w-[130px] h-[32px] group-hover:border-indigo-500/50 transition-colors"></svg>
-                                        </div>
-                                    </div>
-                                </td>
+                                <td class="py-4.5 px-6 font-bold tracking-wider font-mono text-xs text-slate-900 dark:text-white">{{ $item->uid }}</td>
                                 <td class="py-4.5 px-6">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-slate-900 dark:text-white">{{ $item->product->product_name ?? 'Deleted Product' }}</span>
-                                        <span class="text-xs text-slate-400 font-mono">ID: {{ $item->product->product_id ?? '-' }}</span>
+                                        <span class="text-xs text-slate-400 font-mono">SKU: {{ $item->product->sku ?? '-' }}</span>
                                     </div>
                                 </td>
                                 <td class="py-4.5 px-6 font-semibold">{{ $item->quantity }}</td>
-                                <td class="py-4.5 px-6" id="inward-status-{{ $item->uid }}">
+                                <td class="py-4.5 px-6" id="status-badge-{{ $item->uid }}">
                                     @if ($item->status == 'Good Inventory')
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
                                             Good Inventory
                                         </span>
-                                    @elseif ($item->status == 'Sold')
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
-                                            Sold
+                                    @elseif ($item->status == 'Damaged')
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-900/50">
+                                            Damaged
                                         </span>
-                                    @elseif ($item->status == 'RTG')
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/50">
-                                            RTG
+                                    @elseif ($item->status == 'Sold')
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/50">
+                                            Sold
                                         </span>
                                     @else
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
@@ -438,25 +424,25 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="py-4.5 px-6 font-semibold" id="inward-portal-{{ $item->uid }}">
-                                    @if ($item->portal)
-                                        <span class="px-2.5 py-1 bg-orange-50/50 dark:bg-orange-950/20 text-[#FF5A36] rounded-lg border border-[#FF5A36]/30 text-xs">
+                                <td class="py-4.5 px-6">
+                                    @if($item->portal)
+                                        <span class="px-2.5 py-1 bg-[#FF5A36]/10 text-[#FF5A36] rounded-xl font-bold text-xs">
                                             {{ $item->portal->name }}
                                         </span>
                                     @else
                                         <span class="text-slate-400 dark:text-slate-500 font-normal">-</span>
                                     @endif
                                 </td>
-                                <td class="py-4.5 px-6 font-mono text-xs font-semibold">
-                                    @if ($item->mark)
-                                        <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                                <td class="py-4.5 px-6">
+                                    @if($item->mark)
+                                        <span class="px-2.5 py-1 bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 rounded-xl font-bold text-xs border border-purple-100 dark:border-purple-900/50">
                                             {{ $item->mark }}
                                         </span>
                                     @else
                                         <span class="text-slate-400 dark:text-slate-500 font-normal">-</span>
                                     @endif
                                 </td>
-                                <td class="py-4.5 px-6" id="inward-updater-{{ $item->uid }}">
+                                <td class="py-4.5 px-6">
                                     <div class="flex flex-col">
                                         <span class="font-bold text-xs">{{ $item->updated_by ?? 'System' }}</span>
                                         <span class="text-[10px] text-slate-400">{{ $item->updated_at->diffForHumans() }}</span>
@@ -498,7 +484,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
+                                <td colspan="10" class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">
                                     No inward serial items registered.
                                 </td>
                             </tr>
@@ -520,60 +506,63 @@
                 @forelse ($inwardItemCodes as $item)
                     <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2.5rem] p-6 shadow-sm hover:shadow-md transition-all relative group flex flex-col justify-between min-h-[260px]">
                         <!-- Card Top -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <input 
-                                    type="checkbox" 
-                                    :value="{{ json_encode($item->uid) }}" 
-                                    x-model="selectedUids"
-                                    class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
-                                >
-                                <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase font-mono">ID: {{ $item->id }}</span>
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-2">
+                                    <input 
+                                        type="checkbox" 
+                                        :value="{{ json_encode($item->uid) }}" 
+                                        x-model="selectedUids"
+                                        class="w-4 h-4 text-[#FF5A36] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded focus:ring-[#FF5A36] focus:ring-2 cursor-pointer"
+                                    >
+                                    <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase font-mono">ID: {{ $item->id }}</span>
+                                </div>
+                                <div id="card-status-{{ $item->uid }}">
+                                    @if ($item->status == 'Good Inventory')
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
+                                            Good Inventory
+                                        </span>
+                                    @elseif ($item->status == 'Damaged')
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-900/50">
+                                            Damaged
+                                        </span>
+                                    @elseif ($item->status == 'Sold')
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/50">
+                                            Sold
+                                        </span>
+                                    @else
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
+                                            {{ $item->status }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
-                            <div id="card-status-{{ $item->uid }}">
-                                @if ($item->status == 'Good Inventory')
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/50">
-                                        Good Inventory
-                                    </span>
-                                @elseif ($item->status == 'Sold')
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50">
-                                        Sold
-                                    </span>
-                                @elseif ($item->status == 'RTG')
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/50">
-                                        RTG
-                                    </span>
-                                @else
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-900/50">
-                                        {{ $item->status }}
-                                    </span>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">UID</h4>
+                                    <p class="text-sm font-bold tracking-wider font-mono text-slate-800 dark:text-slate-200">{{ $item->uid }}</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Product</h4>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-350 truncate">{{ $item->product->product_name ?? 'Deleted Product' }}</p>
+                                </div>
+                                @if($item->portal)
+                                    <div>
+                                        <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Portal</h4>
+                                        <p class="text-xs font-bold text-[#FF5A36]">{{ $item->portal->name }}</p>
+                                    </div>
                                 @endif
                             </div>
                         </div>
 
-                        <!-- Card Center -->
-                        <div class="flex flex-col items-center justify-center py-4 cursor-pointer" @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})" title="Click to view/print barcode label">
-                            <span class="px-3 py-1 bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-800 rounded-xl font-mono text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm w-fit mb-2 group-hover:border-indigo-500/50 transition-colors">
-                                {{ $item->uid }}
-                            </span>
-                            <svg id="inline-barcode-card-{{ $item->id }}" class="bg-white p-1 rounded border border-slate-100 max-w-full h-[45px] group-hover:border-indigo-500/50 transition-colors"></svg>
-                        </div>
-
-                        <!-- Card Bottom -->
-                        <div class="border-t border-slate-50 dark:border-slate-800/60 pt-4 flex flex-col gap-1.5">
+                        <!-- Card Bottom Info -->
+                        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
                             <div class="flex flex-col">
-                                <span class="font-bold text-slate-900 dark:text-white text-sm truncate">{{ $item->product->product_name ?? 'Deleted Product' }}</span>
-                                <span class="text-[10px] text-slate-400 font-mono">Code: {{ $item->product->product_id ?? '-' }}</span>
+                                <span class="text-[10px] text-slate-450 dark:text-slate-500 font-bold uppercase">Updated By</span>
+                                <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300">{{ $item->updated_by ?? 'System' }}</span>
                             </div>
-                            <div class="flex justify-between items-center text-[10px] text-slate-400">
-                                <span>Qty: {{ $item->quantity }}@if($item->mark) | Mark: {{ $item->mark }}@endif</span>
-                                <span id="card-updater-{{ $item->uid }}">By: {{ $item->updated_by ?? 'System' }}</span>
-                            </div>
-                            @if ($item->portal)
-                                <div class="text-[10px] text-slate-500 font-medium" id="card-portal-{{ $item->uid }}">
-                                    Portal: <span class="text-[#FF5A36] font-semibold">{{ $item->portal->name }}</span>
-                                </div>
-                            @endif
+                            <span class="text-[10px] text-slate-400">{{ $item->updated_at->diffForHumans() }}</span>
                         </div>
 
                         <!-- Actions Overlay -->
@@ -592,30 +581,30 @@
                                         </form>
                                     @endif
                                 @endif
-                            <button 
-                             @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})"
-                                 class="p-2 bg-white text-slate-900 hover:bg-orange-50 hover:text-[#FF5A36] rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
-                             >
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <span>Zoom</span>
-                            </button>
-                            @if(auth()->user()->hasPermission('inward_item_codes.scan'))
-                            <a 
-                                href="{{ route('inward-item-codes.edit', $item->id) }}"
-                                class="p-2 bg-white text-slate-900 hover:bg-orange-50 hover:text-[#FF5A36] rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
-                            >
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                <span>Edit</span>
-                            </a>
-                            <form method="POST" action="{{ route('inward-item-codes.destroy', $item->id) }}" onsubmit="return confirm('Are you sure you want to delete this serial code?');" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="p-2 bg-white text-rose-600 hover:bg-rose-50 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    <span>Delete</span>
+                                <button 
+                                 @click="openBarcodeModal({{ json_encode($item->uid) }}, {{ json_encode($item->product->sku ?? $item->product->product_name ?? 'Product') }})"
+                                     class="p-2 bg-white text-slate-900 hover:bg-orange-50 hover:text-[#FF5A36] rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
+                                 >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <span>Zoom</span>
                                 </button>
-                            </form>
-                            @endif
+                                @if(auth()->user()->hasPermission('inward_item_codes.scan'))
+                                <a 
+                                    href="{{ route('inward-item-codes.edit', $item->id) }}"
+                                    class="p-2 bg-white text-slate-900 hover:bg-orange-50 hover:text-[#FF5A36] rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    <span>Edit</span>
+                                </a>
+                                <form method="POST" action="{{ route('inward-item-codes.destroy', $item->id) }}" onsubmit="return confirm('Are you sure you want to delete this serial code?');" class="inline-block">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-2 bg-white text-rose-600 hover:bg-rose-50 rounded-xl shadow font-semibold text-[11px] flex items-center gap-1.5 transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        <span>Delete</span>
+                                    </button>
+                                </form>
+                                @endif
                         </div>
                     </div>
                 @empty
@@ -632,6 +621,12 @@
                 </div>
             @endif
         </div>
+        @else
+        <div class="p-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] text-center shadow-sm">
+            <svg class="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Viewing registered serial code history is restricted.</p>
+        </div>
+        @endif
     <!-- Note: Closing div moved to bottom of file -->
 
     <!-- Barcode View Modal -->

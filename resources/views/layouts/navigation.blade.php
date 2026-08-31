@@ -159,7 +159,7 @@
         <!-- Middle Capsule (Inventory & Masters Operations) -->
         <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur border border-slate-100 dark:border-slate-800/80 shadow-sm py-4 px-2 flex flex-col items-center gap-3.5 pointer-events-auto shrink-0 transition-all duration-300 rounded-[28px]"
              :class="isHovered ? 'w-52 px-3' : 'w-14 px-2'">
-            @if(auth()->user()->hasPermission('products.view'))
+            @if(auth()->user()->hasPermission('products.view') || auth()->user()->hasPermission('products.create') || auth()->user()->hasPermission('products.import') || auth()->user()->hasPermission('products.export'))
             <!-- Product Master -->
             <a href="{{ route('products.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('products.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
@@ -172,7 +172,7 @@
             </a>
             @endif
 
-            @if(auth()->user()->hasPermission('purchases.view'))
+            @if(auth()->user()->hasPermission('purchases.view') || auth()->user()->hasPermission('purchases.create') || auth()->user()->hasPermission('purchases.import') || auth()->user()->hasPermission('purchases.export'))
             <!-- Purchase Master -->
             <a href="{{ route('purchases.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('purchases.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
@@ -185,7 +185,7 @@
             </a>
             @endif
 
-            @if(auth()->user()->hasPermission('sales.view'))
+            @if(auth()->user()->hasPermission('sales.view') || auth()->user()->hasPermission('sales.create') || auth()->user()->hasPermission('sales.import') || auth()->user()->hasPermission('sales.export'))
             <!-- Sale Master -->
             <a href="{{ route('sales.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('sales.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
@@ -198,7 +198,7 @@
             </a>
             @endif
 
-            @if(auth()->user()->hasPermission('inward_item_codes.view'))
+            @if(auth()->user()->hasPermission('inward_item_codes.view') || auth()->user()->hasPermission('inward_item_codes.scan') || auth()->user()->hasPermission('inward_item_codes.import') || auth()->user()->hasPermission('inward_item_codes.export'))
             <!-- Inward Serial Codes -->
             <a href="{{ route('inward-item-codes.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('inward-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
@@ -211,7 +211,7 @@
             </a>
             @endif
 
-            @if(auth()->user()->hasPermission('dispatch_item_codes.view'))
+            @if(auth()->user()->hasPermission('dispatch_item_codes.view') || auth()->user()->hasPermission('dispatch_item_codes.scan') || auth()->user()->hasPermission('dispatch_item_codes.import') || auth()->user()->hasPermission('dispatch_item_codes.export'))
             <!-- Dispatch Serial Codes -->
             <a href="{{ route('dispatch-item-codes.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('dispatch-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 

@@ -18,7 +18,8 @@ class DispatchItemCodeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:dispatch_item_codes.view', only: ['index', 'show']),
+            new Middleware('permission:dispatch_item_codes.view|dispatch_item_codes.scan|dispatch_item_codes.import|dispatch_item_codes.export', only: ['index']),
+            new Middleware('permission:dispatch_item_codes.view', only: ['show']),
             new Middleware('permission:dispatch_item_codes.scan', only: ['create', 'store', 'edit', 'update', 'destroy']),
         ];
     }

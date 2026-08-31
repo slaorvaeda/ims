@@ -99,6 +99,7 @@
         </div>
 
         <!-- Table Panel -->
+        @if(auth()->user()->hasPermission('purchases.view'))
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -205,6 +206,13 @@
                 </div>
             @endif
         </div>
+        @else
+        <div class="p-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] text-center shadow-sm">
+            <svg class="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Viewing the purchase history list is restricted.</p>
+        </div>
+        @endif
+    </div>
     </div>
 
     @if (session('new_purchase_uids'))

@@ -16,7 +16,8 @@ class ProductController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:products.view', only: ['index', 'show']),
+            new Middleware('permission:products.view|products.create|products.import|products.export', only: ['index']),
+            new Middleware('permission:products.view', only: ['show']),
             new Middleware('permission:products.create', only: ['create', 'store', 'edit', 'update', 'destroy']),
         ];
     }

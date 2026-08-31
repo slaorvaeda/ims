@@ -18,8 +18,13 @@ class CheckPermissionMiddleware
      */
     public function handle(Request $request, Closure $next, string $permission): Response
     {
-        if (auth()->check() && auth()->user()->hasPermission($permission)) {
-            return $next($request);
+        if (auth()->check()) {
+            $permissions = explode('|', $permission);
+            foreach ($permissions as $perm) {
+                if (auth()->user()->hasPermission($perm)) {
+                    return $next($request);
+                }
+            }
         }
 
         abort(403, 'Unauthorized action.');

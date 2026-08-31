@@ -53,7 +53,7 @@
     <span x-show="!sidebarMinimized">Stores</span>
 </a>
 
-@if(auth()->user()->hasPermission('products.view'))
+@if(auth()->user()->hasPermission('products.view') || auth()->user()->hasPermission('products.create') || auth()->user()->hasPermission('products.import') || auth()->user()->hasPermission('products.export'))
 <!-- Product Master Link -->
 <a href="{{ route('products.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('products.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -66,7 +66,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('purchases.view'))
+@if(auth()->user()->hasPermission('purchases.view') || auth()->user()->hasPermission('purchases.create') || auth()->user()->hasPermission('purchases.import') || auth()->user()->hasPermission('purchases.export'))
 <!-- Purchase Master Link -->
 <a href="{{ route('purchases.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('purchases.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -79,7 +79,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('inward_item_codes.view'))
+@if(auth()->user()->hasPermission('inward_item_codes.view') || auth()->user()->hasPermission('inward_item_codes.scan') || auth()->user()->hasPermission('inward_item_codes.import') || auth()->user()->hasPermission('inward_item_codes.export'))
 <!-- Inward ItemCode Master Link -->
 <a href="{{ route('inward-item-codes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('inward-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -92,7 +92,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('sales.view'))
+@if(auth()->user()->hasPermission('sales.view') || auth()->user()->hasPermission('sales.create') || auth()->user()->hasPermission('sales.import') || auth()->user()->hasPermission('sales.export'))
 <!-- Sale Master Link -->
 <a href="{{ route('sales.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('sales.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
@@ -105,7 +105,7 @@
 </a>
 @endif
 
-@if(auth()->user()->hasPermission('dispatch_item_codes.view'))
+@if(auth()->user()->hasPermission('dispatch_item_codes.view') || auth()->user()->hasPermission('dispatch_item_codes.scan') || auth()->user()->hasPermission('dispatch_item_codes.import') || auth()->user()->hasPermission('dispatch_item_codes.export'))
 <!-- Dispatch ItemCode Master Link -->
 <a href="{{ route('dispatch-item-codes.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('dispatch-item-codes.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"

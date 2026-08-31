@@ -202,4 +202,21 @@ class RoleBasedAccessControlTest extends TestCase
         $responseImport = $this->actingAs($operator)->post('/products/import');
         $responseImport->assertStatus(403);
     }
+
+    public function test_operator_can_access_index_without_view_permission_if_they_have_other_granular_permissions(): void
+    {
+        $operator = User::factory()->create([
+            'role' => 'operator',
+            'permissions' => ['products.create']
+        ]);
+
+        $this->assertFalse($operator->hasPermission('products.view'));
+        $this->assertTrue($operator->hasPermission('products.create'));
+
+        // Authorized because of products.create permission: GET /products
+        $response = $this->actingAs($operator)->get('/products');
+        $response->assertOk();
+        // Warning placeholder is rendered because products.view is missing
+        $response->assertSee('Viewing the product catalog list is restricted.');
+    }
 }
