@@ -10,6 +10,7 @@
 </a>
 
 <!-- Analytics Link -->
+@if(auth()->user()->hasPermission('analytics.view'))
 <a href="{{ route('analytics.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('analytics.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
    :class="sidebarMinimized ? 'justify-center px-2' : ''"
@@ -19,8 +20,10 @@
     </svg>
     <span x-show="!sidebarMinimized">Analytics</span>
 </a>
+@endif
 
 <!-- Reports Link -->
+@if(auth()->user()->hasPermission('reports.view'))
 <a href="{{ route('reports.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('reports.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
    :class="sidebarMinimized ? 'justify-center px-2' : ''"
@@ -30,8 +33,10 @@
     </svg>
     <span x-show="!sidebarMinimized">Reports</span>
 </a>
+@endif
 
 <!-- Operator Link -->
+@if(auth()->user()->hasPermission('operators.view'))
 <a href="{{ route('operators.index') }}" 
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 {{ request()->routeIs('operators.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}"
    :class="sidebarMinimized ? 'justify-center px-2' : ''"
@@ -41,6 +46,7 @@
     </svg>
     <span x-show="!sidebarMinimized">Operators</span>
 </a>
+@endif
 
 <!-- Stores Link -->
 <a href="{{ route('stores.index') }}" 
@@ -104,6 +110,38 @@
     <span x-show="!sidebarMinimized">Sale Master</span>
 </a>
 @endif
+
+<!-- Bills & Invoices Link (with Sales & Purchases subsections) -->
+<div x-data="{ billsOpen: {{ request()->routeIs('bills.*') ? 'true' : 'false' }} }" class="space-y-1">
+    <div class="flex items-center justify-between rounded-xl transition-all duration-150 {{ request()->routeIs('bills.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md shadow-slate-900/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/40' }}">
+        <a href="{{ route('bills.index') }}" 
+           class="flex items-center gap-3 px-4 py-3 text-sm font-semibold flex-1"
+           :class="sidebarMinimized ? 'justify-center px-2' : ''"
+           x-bind:title="sidebarMinimized ? 'Bills & Invoices' : ''">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span x-show="!sidebarMinimized">Bills</span>
+        </a>
+        <button type="button" @click="billsOpen = !billsOpen" x-show="!sidebarMinimized" class="p-3 hover:opacity-80 focus:outline-none">
+            <svg class="w-4 h-4 transition-transform duration-200" :class="billsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+    </div>
+    
+    <!-- Sub-links for Sales and Purchases -->
+    <div x-show="billsOpen && !sidebarMinimized" class="pl-8 pr-2 py-1 space-y-1 text-xs" x-cloak>
+        <a href="{{ route('bills.index', ['type' => 'purchase']) }}" 
+           class="flex items-center gap-2 py-2 px-3 rounded-xl transition-colors {{ request('type') === 'purchase' ? 'font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40' }}">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            <span>Purchase Bills</span>
+        </a>
+        <a href="{{ route('bills.index', ['type' => 'sale']) }}" 
+           class="flex items-center gap-2 py-2 px-3 rounded-xl transition-colors {{ request('type') === 'sale' ? 'font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40' : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/40' }}">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Sales Bills</span>
+        </a>
+    </div>
+</div>
 
 @if(auth()->user()->hasPermission('dispatch_item_codes.view') || auth()->user()->hasPermission('dispatch_item_codes.scan') || auth()->user()->hasPermission('dispatch_item_codes.import') || auth()->user()->hasPermission('dispatch_item_codes.export'))
 <!-- Dispatch ItemCode Master Link -->

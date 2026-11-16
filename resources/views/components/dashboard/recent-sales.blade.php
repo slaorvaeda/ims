@@ -23,7 +23,7 @@
                     <span class="text-[10px] text-slate-400 font-semibold">01 Day Ago</span>
                 </div>
             </div>
-            <span class="text-green-600 font-black text-xs bg-green-50 px-2.5 py-1 rounded-full">+ $60.00</span>
+            <span class="text-green-600 font-black text-xs bg-green-50 px-2.5 py-1 rounded-full">+ ₹60.00</span>
         </div>
 
         <!-- Adil Is -->
@@ -38,7 +38,7 @@
                     <span class="text-[10px] text-slate-400 font-semibold">02 Day Ago</span>
                 </div>
             </div>
-            <span class="text-green-600 font-black text-xs bg-green-50 px-2.5 py-1 rounded-full">+ $90.00</span>
+            <span class="text-green-600 font-black text-xs bg-green-50 px-2.5 py-1 rounded-full">+ ₹90.00</span>
         </div>
     </div>
 </div>

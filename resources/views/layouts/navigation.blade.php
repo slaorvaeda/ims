@@ -10,12 +10,21 @@
             <span class="text-base font-bold text-slate-900 dark:text-white tracking-tight font-heading">IMS</span>
         </a>
         
-        <!-- Hamburger Button -->
-        <button @click="open = true" class="p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:outline-none transition-all">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
+        <div class="flex items-center gap-1.5">
+            <!-- Mobile Search Link -->
+            <a href="{{ route('search.index') }}" class="p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:outline-none transition-all" title="Search">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </a>
+
+            <!-- Hamburger Button -->
+            <button @click="open = true" class="p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 focus:outline-none transition-all">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
     </header>
 
     <!-- Mobile Drawer Overlay & Content -->
@@ -86,6 +95,7 @@
             </a>
 
             <!-- Analytics -->
+            @if(auth()->user()->hasPermission('analytics.view'))
             <a href="{{ route('analytics.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('analytics.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
                :class="isHovered ? 'w-full px-3.5 gap-3' : 'w-10 justify-center'"
@@ -95,8 +105,10 @@
                 </svg>
                 <span x-show="isHovered" x-cloak class="text-xs font-bold whitespace-nowrap overflow-hidden transition-opacity duration-300 {{ request()->routeIs('analytics.*') ? 'text-white dark:text-slate-950' : 'text-slate-700 dark:text-slate-200' }}">Analytics</span>
             </a>
+            @endif
 
             <!-- Reports -->
+            @if(auth()->user()->hasPermission('reports.view'))
             <a href="{{ route('reports.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('reports.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
                :class="isHovered ? 'w-full px-3.5 gap-3' : 'w-10 justify-center'"
@@ -106,8 +118,10 @@
                 </svg>
                 <span x-show="isHovered" x-cloak class="text-xs font-bold whitespace-nowrap overflow-hidden transition-opacity duration-300 {{ request()->routeIs('reports.*') ? 'text-white dark:text-slate-950' : 'text-slate-700 dark:text-slate-200' }}">Reports</span>
             </a>
+            @endif
 
             <!-- Operators -->
+            @if(auth()->user()->hasPermission('operators.view'))
             <a href="{{ route('operators.index') }}" 
                class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('operators.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
                :class="isHovered ? 'w-full px-3.5 gap-3' : 'w-10 justify-center'"
@@ -117,6 +131,7 @@
                 </svg>
                 <span x-show="isHovered" x-cloak class="text-xs font-bold whitespace-nowrap overflow-hidden transition-opacity duration-300 {{ request()->routeIs('operators.*') ? 'text-white dark:text-slate-950' : 'text-slate-700 dark:text-slate-200' }}">Operators</span>
             </a>
+            @endif
 
             <!-- Stores -->
             <a href="{{ route('stores.index') }}" 
@@ -197,6 +212,17 @@
                 <span x-show="isHovered" x-cloak class="text-xs font-bold whitespace-nowrap overflow-hidden transition-opacity duration-300 {{ request()->routeIs('sales.*') ? 'text-white dark:text-slate-950' : 'text-slate-700 dark:text-slate-200' }}">Sales</span>
             </a>
             @endif
+
+            <!-- Bills Master (Sales & Purchases Invoices) -->
+            <a href="{{ route('bills.index') }}" 
+               class="h-10 rounded-full flex items-center transition-all duration-200 {{ request()->routeIs('bills.*') ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-md' : 'bg-slate-50 hover:bg-slate-100 text-[#FF5A36] dark:bg-slate-800 dark:hover:bg-slate-700/60' }}" 
+               :class="isHovered ? 'w-full px-3.5 gap-3' : 'w-10 justify-center'"
+               title="Bills & Invoices">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span x-show="isHovered" x-cloak class="text-xs font-bold whitespace-nowrap overflow-hidden transition-opacity duration-300 {{ request()->routeIs('bills.*') ? 'text-white dark:text-slate-950' : 'text-slate-700 dark:text-slate-200' }}">Bills</span>
+            </a>
 
             @if(auth()->user()->hasPermission('inward_item_codes.view') || auth()->user()->hasPermission('inward_item_codes.scan') || auth()->user()->hasPermission('inward_item_codes.import') || auth()->user()->hasPermission('inward_item_codes.export'))
             <!-- Inward Serial Codes -->

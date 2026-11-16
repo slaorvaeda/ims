@@ -13,12 +13,14 @@ use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AiCopilotController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\BillController;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\InwardItemCode;
 use App\Models\DispatchItemCode;
 use App\Models\Sale;
 use App\Models\User;
+use App\Models\Bill;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -208,16 +210,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->middleware('permission:analytics.view')->name('analytics.index');
 
     // Operator Routes
-    Route::get('/operators', [OperatorController::class, 'index'])->name('operators.index');
-    Route::post('/operators/brands', [OperatorController::class, 'storeBrand'])->name('operators.store-brand');
-    Route::put('/operators/brands/{brand}', [OperatorController::class, 'updateBrand'])->name('operators.update-brand');
-    Route::delete('/operators/brands/{brand}', [OperatorController::class, 'destroyBrand'])->name('operators.destroy-brand');
-    Route::post('/operators/portal-vendors', [OperatorController::class, 'storePortalVendor'])->name('operators.store-portal-vendor');
-    Route::put('/operators/portal-vendors/{portalVendor}', [OperatorController::class, 'updatePortalVendor'])->name('operators.update-portal-vendor');
-    Route::delete('/operators/portal-vendors/{portalVendor}', [OperatorController::class, 'destroyPortalVendor'])->name('operators.destroy-portal-vendor');
+    Route::get('/operators', [OperatorController::class, 'index'])->middleware('permission:operators.view')->name('operators.index');
+    Route::post('/operators/brands', [OperatorController::class, 'storeBrand'])->middleware('permission:operators.view')->name('operators.store-brand');
+    Route::put('/operators/brands/{brand}', [OperatorController::class, 'updateBrand'])->middleware('permission:operators.view')->name('operators.update-brand');
+    Route::delete('/operators/brands/{brand}', [OperatorController::class, 'destroyBrand'])->middleware('permission:operators.view')->name('operators.destroy-brand');
+    Route::post('/operators/portal-vendors', [OperatorController::class, 'storePortalVendor'])->middleware('permission:operators.view')->name('operators.store-portal-vendor');
+    Route::put('/operators/portal-vendors/{portalVendor}', [OperatorController::class, 'updatePortalVendor'])->middleware('permission:operators.view')->name('operators.update-portal-vendor');
+    Route::delete('/operators/portal-vendors/{portalVendor}', [OperatorController::class, 'destroyPortalVendor'])->middleware('permission:operators.view')->name('operators.destroy-portal-vendor');
 
     // IMS Resource CRUD routes with permission checks
     Route::get('/products/export', [ProductController::class, 'export'])->middleware('permission:products.export')->name('products.export');
@@ -251,16 +253,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/barcodes', [BarcodeController::class, 'index'])->middleware('permission:barcodes.view')->name('barcodes.index');
 
     // Unified Reports Routes
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/export/stock', [ReportController::class, 'exportStock'])->name('reports.export.stock');
-    Route::get('/reports/export/inward', [ReportController::class, 'exportInward'])->name('reports.export.inward');
-    Route::get('/reports/export/dispatch', [ReportController::class, 'exportDispatch'])->name('reports.export.dispatch');
+    Route::get('/reports', [ReportController::class, 'index'])->middleware('permission:reports.view')->name('reports.index');
+    Route::get('/reports/export/stock', [ReportController::class, 'exportStock'])->middleware('permission:reports.view')->name('reports.export.stock');
+    Route::get('/reports/export/inward', [ReportController::class, 'exportInward'])->middleware('permission:reports.view')->name('reports.export.inward');
+    Route::get('/reports/export/dispatch', [ReportController::class, 'exportDispatch'])->middleware('permission:reports.view')->name('reports.export.dispatch');
 
     // AI Copilot Routes
     Route::post('/ai/chat', [AiCopilotController::class, 'chat'])->name('ai.chat');
     Route::post('/ai/analyze-file', [AiCopilotController::class, 'analyzeFile'])->name('ai.analyze-file');
     // Store Config Routes
     Route::resource('stores', StoreController::class);
+
+    // Bills & Scanned Invoices Routes
+    Route::post('/bills/scan-ai', [BillController::class, 'scanAi'])->name('bills.scan-ai');
+    Route::get('/bills/{bill}/download', [BillController::class, 'download'])->name('bills.download');
+    Route::resource('bills', BillController::class);
+
+    // Global Omnisearch Routes
+    Route::get('/search', [\App\Http\Controllers\SearchController::class, 'index'])->name('search.index');
+    Route::get('/api/search/live', [\App\Http\Controllers\SearchController::class, 'live'])->name('search.live');
 });
 
 require __DIR__.'/auth.php';

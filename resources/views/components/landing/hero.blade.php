@@ -83,8 +83,8 @@
                     <!-- Top row: Greeting & Stats Row -->
                     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                         <div>
-                            <h2 class="text-2xl font-extrabold text-slate-900 font-sans tracking-tight">Hi Ahnaf Ibn Habib</h2>
-                            <p class="text-slate-400 text-xs mt-0.5">Hi Richard, How is Your Day? Below We Show Your Sales Report For this Month</p>
+                            <h2 class="text-2xl font-extrabold text-slate-900 font-sans tracking-tight">Hi Durga Madhab</h2>
+                            <p class="text-slate-400 text-xs mt-0.5">Hi Durga Madhab, How is Your Day? Below We Show Your Sales Report For this Month</p>
                         </div>
                     </div>
 
@@ -107,7 +107,7 @@
                                     <div class="relative z-10 flex-1">
                                         <p class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-0.5">Available Balance</p>
                                         <div class="flex items-center justify-between">
-                                            <p class="text-xl font-black text-slate-800">$27,980.24</p>
+                                            <p class="text-xl font-black text-slate-800">₹27,980.24</p>
                                             <span class="bg-[#0F172A] text-white font-bold text-[9px] px-2 py-0.5 rounded-full">+30%</span>
                                         </div>
                                     </div>
@@ -126,7 +126,7 @@
                                     <div class="relative z-10 flex-1">
                                         <p class="text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-0.5">Pending Balance</p>
                                         <div class="flex items-center justify-between">
-                                            <p class="text-xl font-black text-slate-800">$27,980.24</p>
+                                            <p class="text-xl font-black text-slate-800">₹27,980.24</p>
                                             <span class="bg-[#1E293B] text-white font-bold text-[9px] px-2 py-0.5 rounded-full">-1%</span>
                                         </div>
                                     </div>
@@ -167,7 +167,7 @@
                                                 <span class="text-[10px] text-slate-400 font-bold uppercase">Total Sales</span>
                                                 <span class="bg-[#1E293B] text-white text-[8px] font-black px-1.5 py-0.5 rounded-full">4.5% ↗</span>
                                             </div>
-                                            <p class="text-xl font-black text-slate-800">$25.1K</p>
+                                            <p class="text-xl font-black text-slate-800">₹25.1K</p>
                                         </div>
                                     </div>
 
@@ -417,7 +417,7 @@
                                                 <p class="text-[8px] text-slate-400 font-semibold mt-0.5">01 Day Ago</p>
                                             </div>
                                         </div>
-                                        <span class="text-emerald-600 font-black text-[10px] bg-emerald-50 px-2 py-0.5 rounded-full">+ $60.00</span>
+                                        <span class="text-emerald-600 font-black text-[10px] bg-emerald-50 px-2 py-0.5 rounded-full">+ ₹60.00</span>
                                     </div>
                                     <!-- Sale 2 -->
                                     <div class="mockup-transaction-item opacity-0 flex justify-between items-center p-2.5 bg-slate-50/50 rounded-2xl border border-slate-100/50">
@@ -428,7 +428,7 @@
                                                 <p class="text-[8px] text-slate-400 font-semibold mt-0.5">02 Day Ago</p>
                                             </div>
                                         </div>
-                                        <span class="text-emerald-600 font-black text-[10px] bg-emerald-50 px-2 py-0.5 rounded-full">+ $90.00</span>
+                                        <span class="text-emerald-600 font-black text-[10px] bg-emerald-50 px-2 py-0.5 rounded-full">+ ₹90.00</span>
                                     </div>
                                 </div>
                             </div>

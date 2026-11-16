@@ -48,7 +48,7 @@ class UserController extends Controller
             'status' => ['required', 'string', 'in:Active,Inactive'],
             'role' => ['required', 'string', 'in:admin,operator'],
             'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', 'in:products,products.view,products.create,products.import,products.export,purchases,purchases.view,purchases.create,purchases.import,purchases.export,inward_item_codes,inward_item_codes.view,inward_item_codes.scan,inward_item_codes.import,inward_item_codes.export,sales,sales.view,sales.create,sales.import,sales.export,dispatch_item_codes,dispatch_item_codes.view,dispatch_item_codes.scan,dispatch_item_codes.import,dispatch_item_codes.export,barcodes,barcodes.view'],
+            'permissions.*' => ['string', 'in:products,products.view,products.create,products.import,products.export,purchases,purchases.view,purchases.create,purchases.import,purchases.export,inward_item_codes,inward_item_codes.view,inward_item_codes.scan,inward_item_codes.import,inward_item_codes.export,sales,sales.view,sales.create,sales.import,sales.export,dispatch_item_codes,dispatch_item_codes.view,dispatch_item_codes.scan,dispatch_item_codes.import,dispatch_item_codes.export,barcodes,barcodes.view,analytics,analytics.view,reports,reports.view,operators,operators.view,bills,bills.view,bills.create,bills.delete'],
         ]);
 
         User::create([
@@ -91,7 +91,7 @@ class UserController extends Controller
             'status' => ['required', 'string', 'in:Active,Inactive'],
             'role' => ['required', 'string', 'in:admin,operator'],
             'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', 'in:products,products.view,products.create,products.import,products.export,purchases,purchases.view,purchases.create,purchases.import,purchases.export,inward_item_codes,inward_item_codes.view,inward_item_codes.scan,inward_item_codes.import,inward_item_codes.export,sales,sales.view,sales.create,sales.import,sales.export,dispatch_item_codes,dispatch_item_codes.view,dispatch_item_codes.scan,dispatch_item_codes.import,dispatch_item_codes.export,barcodes,barcodes.view'],
+            'permissions.*' => ['string', 'in:products,products.view,products.create,products.import,products.export,purchases,purchases.view,purchases.create,purchases.import,purchases.export,inward_item_codes,inward_item_codes.view,inward_item_codes.scan,inward_item_codes.import,inward_item_codes.export,sales,sales.view,sales.create,sales.import,sales.export,dispatch_item_codes,dispatch_item_codes.view,dispatch_item_codes.scan,dispatch_item_codes.import,dispatch_item_codes.export,barcodes,barcodes.view,analytics,analytics.view,reports,reports.view,operators,operators.view,bills,bills.view,bills.create,bills.delete'],
         ]);
 
         $user->name = $request->name;

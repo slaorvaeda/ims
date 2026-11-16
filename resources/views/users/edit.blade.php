@@ -208,6 +208,62 @@
                                 <span class="font-semibold text-slate-650 dark:text-slate-350 text-[11px]">Enable Access</span>
                             </label>
                         </div>
+
+                        <!-- Analytics Page -->
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/60 rounded-xl p-4 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Analytics Page</span>
+                            @php
+                                $analyticsChecked = in_array('analytics.view', $oldPermissions) || in_array('analytics', $oldPermissions);
+                            @endphp
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="permissions[]" value="analytics.view" data-module="analytics"
+                                       {{ $analyticsChecked ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-[#FF5A36] focus:ring-[#FF5A36] border-slate-350 dark:border-slate-700 dark:bg-slate-950">
+                                <span class="font-semibold text-slate-650 dark:text-slate-350 text-[11px]">Enable Access</span>
+                            </label>
+                        </div>
+
+                        <!-- Unified Reports Page -->
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/60 rounded-xl p-4 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Reports Page</span>
+                            @php
+                                $reportsChecked = in_array('reports.view', $oldPermissions) || in_array('reports', $oldPermissions);
+                            @endphp
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="permissions[]" value="reports.view" data-module="reports"
+                                       {{ $reportsChecked ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-[#FF5A36] focus:ring-[#FF5A36] border-slate-350 dark:border-slate-700 dark:bg-slate-950">
+                                <span class="font-semibold text-slate-650 dark:text-slate-350 text-[11px]">Enable Access</span>
+                            </label>
+                        </div>
+
+                        <!-- Operators Settings Page -->
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/60 rounded-xl p-4 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Operators Settings</span>
+                            @php
+                                $operatorsChecked = in_array('operators.view', $oldPermissions) || in_array('operators', $oldPermissions);
+                            @endphp
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="permissions[]" value="operators.view" data-module="operators"
+                                       {{ $operatorsChecked ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-[#FF5A36] focus:ring-[#FF5A36] border-slate-350 dark:border-slate-700 dark:bg-slate-950">
+                                <span class="font-semibold text-slate-650 dark:text-slate-350 text-[11px]">Enable Access</span>
+                            </label>
+                        </div>
+
+                        <!-- Bills & Scanned Invoices -->
+                        <div class="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800/60 rounded-xl p-4 flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Bills & Invoices</span>
+                            @php
+                                $billsChecked = in_array('bills.view', $oldPermissions) || in_array('bills', $oldPermissions);
+                            @endphp
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="permissions[]" value="bills.view" data-module="bills"
+                                       {{ $billsChecked ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-[#FF5A36] focus:ring-[#FF5A36] border-slate-350 dark:border-slate-700 dark:bg-slate-950">
+                                <span class="font-semibold text-slate-650 dark:text-slate-350 text-[11px]">Enable Access</span>
+                            </label>
+                        </div>
                     </div>
                     @error('permissions')
                         <p class="text-rose-500 text-xs mt-2 ml-1">{{ $message }}</p>

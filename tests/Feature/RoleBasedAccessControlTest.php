@@ -219,4 +219,28 @@ class RoleBasedAccessControlTest extends TestCase
         // Warning placeholder is rendered because products.view is missing
         $response->assertSee('Viewing the product catalog list is restricted.');
     }
+
+    public function test_operator_cannot_access_analytics_reports_or_operators_without_permissions(): void
+    {
+        $operator = User::factory()->create([
+            'role' => 'operator',
+            'permissions' => [] // No permissions
+        ]);
+
+        $this->actingAs($operator)->get('/analytics')->assertStatus(403);
+        $this->actingAs($operator)->get('/reports')->assertStatus(403);
+        $this->actingAs($operator)->get('/operators')->assertStatus(403);
+    }
+
+    public function test_operator_can_access_analytics_reports_and_operators_with_permissions(): void
+    {
+        $operator = User::factory()->create([
+            'role' => 'operator',
+            'permissions' => ['analytics.view', 'reports.view', 'operators.view']
+        ]);
+
+        $this->actingAs($operator)->get('/analytics')->assertOk();
+        $this->actingAs($operator)->get('/reports')->assertOk();
+        $this->actingAs($operator)->get('/operators')->assertOk();
+    }
 }

@@ -112,14 +112,9 @@
                                 </div>
                             </div>
 
-                            <!-- Center/Search bar -->
-                            <div class="hidden md:block relative max-w-xs xl:max-w-md w-full mx-auto">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </div>
-                                <input type="text" placeholder="Start searching here..." class="w-full bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 shadow-sm rounded-full py-2.5 pl-10 pr-4 text-xs focus:ring-1 focus:ring-[#FF5A36]/30 text-slate-600 dark:text-slate-200 font-medium placeholder-slate-400 transition-all focus:outline-none" />
+                            <!-- Center/Search bar (Omnisearch) -->
+                            <div class="hidden md:block flex-1 max-w-sm lg:max-w-md xl:max-w-lg mx-auto px-4">
+                                <x-top-search />
                             </div>
 
                             <!-- Right Section (Actions) -->
