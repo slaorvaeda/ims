@@ -179,6 +179,39 @@ class BillManagementTest extends TestCase
         Storage::disk('public')->assertMissing($storedPath);
     }
 
+    public function test_user_can_update_bill_details_and_updated_by_is_recorded(): void
+    {
+        $bill = Bill::create([
+            'bill_type' => 'sale',
+            'invoice_number' => 'INV-UP-001',
+            'invoice_date' => '2026-10-21',
+            'party_name' => 'Original Customer',
+            'total_amount' => 5000.00,
+            'status' => 'Pending',
+            'file_path' => 'bills/test.pdf',
+            'file_name' => 'test.pdf',
+        ]);
+
+        $updateData = [
+            'bill_type' => 'sale',
+            'invoice_number' => 'INV-UP-001',
+            'invoice_date' => '2026-10-22',
+            'party_name' => 'Updated Customer Name',
+            'total_amount' => 7500.00,
+            'status' => 'Paid',
+            'payment_mode' => 'UPI',
+        ];
+
+        $response = $this->actingAs($this->admin)->put(route('bills.update', $bill), $updateData);
+        $response->assertRedirect(route('bills.show', $bill));
+
+        $bill->refresh();
+        $this->assertEquals('Updated Customer Name', $bill->party_name);
+        $this->assertEquals(7500.00, (float) $bill->total_amount);
+        $this->assertEquals('Paid', $bill->status);
+        $this->assertEquals($this->admin->name, $bill->updated_by);
+    }
+
     public function test_gemini_service_accurately_recognises_vendor_on_purchase_bill(): void
     {
         $gemini = app(\App\Services\GeminiService::class);

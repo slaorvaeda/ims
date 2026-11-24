@@ -39,6 +39,7 @@ class Bill extends Model
         'raw_extracted_data',
         'notes',
         'uploaded_by',
+        'updated_by',
     ];
 
     protected function casts(): array
