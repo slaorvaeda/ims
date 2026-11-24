@@ -113,4 +113,13 @@ class GlobalSearchTest extends TestCase
         $response->assertSee('BILL-SEARCH-101');
         $response->assertSee('Mega Vendor');
     }
+
+    public function test_search_query_with_arbitrary_string_does_not_throw_sql_error(): void
+    {
+        $responseLive = $this->actingAs($this->admin)->getJson(route('search.live', ['q' => 'zigma']));
+        $responseLive->assertStatus(200);
+
+        $responseIndex = $this->actingAs($this->admin)->get(route('search.index', ['q' => 'zigma']));
+        $responseIndex->assertStatus(200);
+    }
 }

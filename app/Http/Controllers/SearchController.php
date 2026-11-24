@@ -126,7 +126,6 @@ class SearchController extends Controller
             $sales = Sale::with(['product'])
                 ->where(function ($query) use ($q) {
                     $query->where('portal_id', 'like', "%{$q}%")
-                          ->orWhere('sales_partner', 'like', "%{$q}%")
                           ->orWhereHas('product', function ($sub) use ($q) {
                               $sub->where('product_name', 'like', "%{$q}%")
                                   ->orWhere('sku', 'like', "%{$q}%");
@@ -294,7 +293,6 @@ class SearchController extends Controller
                 ->where(function ($query) use ($q) {
                     if (!empty($q)) {
                         $query->where('portal_id', 'like', "%{$q}%")
-                              ->orWhere('sales_partner', 'like', "%{$q}%")
                               ->orWhereHas('product', function ($sub) use ($q) {
                                   $sub->where('product_name', 'like', "%{$q}%")
                                       ->orWhere('sku', 'like', "%{$q}%");
