@@ -375,7 +375,7 @@
                                             @endif
                                         </td>
                                         <td class="py-2.5 px-3 text-center font-mono text-slate-700 dark:text-slate-300">
-                                            {{ $item['quantity'] ?? 1 }}
+                                            {{ is_numeric($item['quantity'] ?? null) ? (float) $item['quantity'] : ($item['quantity'] ?? 1) }}
                                         </td>
                                         <td class="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
                                             ₹{{ number_format((float)($item['rate'] ?? 0), 2) }}

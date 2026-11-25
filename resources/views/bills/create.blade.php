@@ -395,7 +395,7 @@
                                         <input type="text" x-model="item.hsn" placeholder="HSN" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs font-mono">
                                     </td>
                                     <td class="p-2">
-                                        <input type="number" x-model.number="item.quantity" @input="recalcRow(item)" min="1" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-center font-mono">
+                                        <input type="number" step="any" min="0" x-model.number="item.quantity" @input="recalcRow(item)" placeholder="Qty" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-center font-mono">
                                     </td>
                                     <td class="p-2">
                                         <input type="number" step="0.01" x-model.number="item.rate" @input="recalcRow(item)" min="0" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-right font-mono">
@@ -609,9 +609,9 @@
                                 this.lineItems = d.items.map(it => ({
                                     item_name: it.item_name || '',
                                     hsn: it.hsn || '',
-                                    quantity: it.quantity || 1,
+                                    quantity: (it.quantity !== undefined && it.quantity !== null && !isNaN(parseFloat(it.quantity))) ? parseFloat(it.quantity) : 1,
                                     rate: parseFloat(it.rate) || 0,
-                                    amount: parseFloat(it.amount) || ((it.quantity || 1) * (parseFloat(it.rate) || 0))
+                                    amount: parseFloat(it.amount) || ((parseFloat(it.quantity) || 1) * (parseFloat(it.rate) || 0))
                                 }));
                             }
                         }

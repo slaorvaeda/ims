@@ -212,6 +212,51 @@ class BillManagementTest extends TestCase
         $this->assertEquals($this->admin->name, $bill->updated_by);
     }
 
+    public function test_bill_accepts_decimal_quantities_in_line_items(): void
+    {
+        $file = UploadedFile::fake()->create('decimal_sample.pdf', 300, 'application/pdf');
+
+        $payload = [
+            'bill_type' => 'purchase',
+            'invoice_number' => 'DEC-2026-001',
+            'invoice_date' => '2026-10-25',
+            'party_name' => 'Copper Wire Suppliers Ltd',
+            'total_amount' => 15750.50,
+            'status' => 'Paid',
+            'file' => $file,
+            'line_items' => json_encode([
+                [
+                    'item_name' => '0.5mm Copper Winding Wire Coil',
+                    'hsn' => '8544',
+                    'quantity' => 12.75, // Decimal quantity
+                    'rate' => 1200.00,
+                    'amount' => 15300.00,
+                ],
+                [
+                    'item_name' => 'Insulation Sleeving (Meters)',
+                    'hsn' => '8546',
+                    'quantity' => 0.5, // Sub-unit decimal quantity
+                    'rate' => 901.00,
+                    'amount' => 450.50,
+                ]
+            ]),
+        ];
+
+        $response = $this->actingAs($this->admin)->post(route('bills.store'), $payload);
+        $response->assertSessionHasNoErrors();
+
+        $bill = Bill::where('invoice_number', 'DEC-2026-001')->first();
+        $this->assertNotNull($bill);
+        $this->assertEquals(12.75, $bill->line_items[0]['quantity']);
+        $this->assertEquals(0.5, $bill->line_items[1]['quantity']);
+
+        // Check show page displays decimal quantities
+        $showResponse = $this->actingAs($this->admin)->get(route('bills.show', $bill));
+        $showResponse->assertStatus(200);
+        $showResponse->assertSee('12.75');
+        $showResponse->assertSee('0.5');
+    }
+
     public function test_gemini_service_accurately_recognises_vendor_on_purchase_bill(): void
     {
         $gemini = app(\App\Services\GeminiService::class);
