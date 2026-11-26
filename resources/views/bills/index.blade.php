@@ -418,16 +418,18 @@
 
                         @foreach ($secondaryCompanies as $sComp)
                             @php
-                                $isSellerActive = ($seller === $sComp->seller_name);
+                                $vendorName = $sComp->seller_name ?? $sComp->name;
+                                $vendorGstin = $sComp->seller_gstin ?? $sComp->gstin;
+                                $isSellerActive = ($seller === $vendorName);
                             @endphp
-                            <a href="{{ route('bills.index', array_merge(request()->except('seller', 'page'), ['type' => 'purchase', 'buyer' => $buyer, 'seller' => $sComp->seller_name])) }}" 
+                            <a href="{{ route('bills.index', array_merge(request()->except('seller', 'page'), ['type' => 'purchase', 'buyer' => $buyer, 'seller' => $vendorName])) }}" 
                                class="p-3 rounded-xl border text-xs transition-all flex items-center justify-between group {{ $isSellerActive ? 'bg-amber-500 text-white border-amber-600 shadow-md shadow-amber-500/25 ring-2 ring-amber-500/20' : 'bg-slate-50 dark:bg-slate-950/40 border-slate-200/60 dark:border-slate-800 hover:border-amber-400 text-slate-700 dark:text-slate-300' }}">
                                 <div class="truncate mr-2">
-                                    <div class="font-semibold truncate {{ $isSellerActive ? 'text-white' : 'text-slate-900 dark:text-white' }}" title="{{ $sComp->seller_name }}">
-                                        {{ $sComp->seller_name }}
+                                    <div class="font-semibold truncate {{ $isSellerActive ? 'text-white' : 'text-slate-900 dark:text-white' }}" title="{{ $vendorName }}">
+                                        {{ $vendorName }}
                                     </div>
                                     <div class="text-[10px] font-mono mt-0.5 truncate {{ $isSellerActive ? 'text-amber-100' : 'text-slate-400' }}">
-                                        {{ $sComp->seller_gstin ?: 'Vendor' }}
+                                        {{ $vendorGstin ? 'GSTIN: ' . $vendorGstin : 'Vendor' }}
                                     </div>
                                 </div>
                                 <div class="text-right shrink-0">

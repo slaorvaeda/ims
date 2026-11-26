@@ -56,7 +56,10 @@ class BillController extends Controller implements HasMiddleware
         }
 
         if (!empty($seller)) {
-            $query->where('seller_name', $seller);
+            $query->where(function ($q) use ($seller) {
+                $q->where('seller_name', $seller)
+                  ->orWhere('party_name', $seller);
+            });
         }
 
         if (!empty($search)) {
@@ -99,7 +102,9 @@ class BillController extends Controller implements HasMiddleware
                 ->whereNotNull('seller_name')
                 ->where('seller_name', '!=', '')
                 ->select(
+                    'seller_name',
                     'seller_name as name',
+                    'seller_gstin',
                     'seller_gstin as gstin',
                     \Illuminate\Support\Facades\DB::raw('count(*) as count'),
                     \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
@@ -112,11 +117,16 @@ class BillController extends Controller implements HasMiddleware
             $secondaryCompanies = collect();
             if (!empty($seller)) {
                 $secondaryCompanies = Bill::where('bill_type', 'sale')
-                    ->where('seller_name', $seller)
+                    ->where(function ($q) use ($seller) {
+                        $q->where('seller_name', $seller)
+                          ->orWhere('party_name', $seller);
+                    })
                     ->whereNotNull('buyer_name')
                     ->where('buyer_name', '!=', '')
                     ->select(
+                        'buyer_name',
                         'buyer_name as name',
+                        'buyer_gstin',
                         'buyer_gstin as gstin',
                         \Illuminate\Support\Facades\DB::raw('count(*) as count'),
                         \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
@@ -131,7 +141,9 @@ class BillController extends Controller implements HasMiddleware
                 ->whereNotNull('buyer_name')
                 ->where('buyer_name', '!=', '')
                 ->select(
+                    'buyer_name',
                     'buyer_name as name',
+                    'buyer_gstin',
                     'buyer_gstin as gstin',
                     \Illuminate\Support\Facades\DB::raw('count(*) as count'),
                     \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
@@ -148,7 +160,9 @@ class BillController extends Controller implements HasMiddleware
                     ->whereNotNull('seller_name')
                     ->where('seller_name', '!=', '')
                     ->select(
+                        'seller_name',
                         'seller_name as name',
+                        'seller_gstin',
                         'seller_gstin as gstin',
                         \Illuminate\Support\Facades\DB::raw('count(*) as count'),
                         \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
