@@ -27,4 +27,5 @@ Homestead.yaml
 Thumbs.db
 .npm-cache
 .npm-cache/
+/scripts/
 

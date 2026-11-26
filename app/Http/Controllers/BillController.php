@@ -42,11 +42,21 @@ class BillController extends Controller implements HasMiddleware
         $status = $request->query('status');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
+        $buyer = $request->query('buyer');
+        $seller = $request->query('seller');
 
         $query = Bill::query();
 
         if (!empty($type) && in_array($type, ['sale', 'purchase'])) {
             $query->where('bill_type', $type);
+        }
+
+        if (!empty($buyer)) {
+            $query->where('buyer_name', $buyer);
+        }
+
+        if (!empty($seller)) {
+            $query->where('seller_name', $seller);
         }
 
         if (!empty($search)) {
@@ -78,12 +88,56 @@ class BillController extends Controller implements HasMiddleware
             $query->whereDate('invoice_date', '<=', $endDate);
         }
 
+        // Buyer Companies (Purchased TO) aggregation for drill-down
+        $baseBuyerQuery = Bill::query();
+        if (!empty($type) && in_array($type, ['sale', 'purchase'])) {
+            $baseBuyerQuery->where('bill_type', $type);
+        } else {
+            // Default to purchase bills for company explorer unless sales is explicitly selected
+            $baseBuyerQuery->where('bill_type', 'purchase');
+        }
+
+        $buyerCompanies = (clone $baseBuyerQuery)
+            ->whereNotNull('buyer_name')
+            ->where('buyer_name', '!=', '')
+            ->select(
+                'buyer_name',
+                'buyer_gstin',
+                \Illuminate\Support\Facades\DB::raw('count(*) as count'),
+                \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
+            )
+            ->groupBy('buyer_name', 'buyer_gstin')
+            ->orderByDesc('total')
+            ->get();
+
+        // If a buyer is selected, get the suppliers that sold to this buyer
+        $sellerCompanies = collect();
+        if (!empty($buyer)) {
+            $sellerCompanies = (clone $baseBuyerQuery)
+                ->where('buyer_name', $buyer)
+                ->whereNotNull('seller_name')
+                ->where('seller_name', '!=', '')
+                ->select(
+                    'seller_name',
+                    'seller_gstin',
+                    \Illuminate\Support\Facades\DB::raw('count(*) as count'),
+                    \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
+                )
+                ->groupBy('seller_name', 'seller_gstin')
+                ->orderByDesc('total')
+                ->get();
+        }
+
         // Summary Statistics (calculated across all bills regardless of current pagination)
         $totalCount = Bill::count();
         $purchaseCount = Bill::where('bill_type', 'purchase')->count();
         $purchaseTotal = (float) Bill::where('bill_type', 'purchase')->sum('total_amount');
         $salesCount = Bill::where('bill_type', 'sale')->count();
         $salesTotal = (float) Bill::where('bill_type', 'sale')->sum('total_amount');
+
+        // Current filtered totals
+        $filteredCount = (clone $query)->count();
+        $filteredTotal = (float) (clone $query)->sum('total_amount');
 
         $bills = $query->orderBy('invoice_date', 'desc')
             ->orderBy('id', 'desc')
@@ -97,6 +151,12 @@ class BillController extends Controller implements HasMiddleware
             'status',
             'startDate',
             'endDate',
+            'buyer',
+            'seller',
+            'buyerCompanies',
+            'sellerCompanies',
+            'filteredCount',
+            'filteredTotal',
             'totalCount',
             'purchaseCount',
             'purchaseTotal',

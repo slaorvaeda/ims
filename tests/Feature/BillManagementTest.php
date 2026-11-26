@@ -397,5 +397,76 @@ class BillManagementTest extends TestCase
         $showResponse->assertSee('TO: BILLED TO / BUYER');
         $showResponse->assertSee('INDIVOLT APPLIANCES & ELECTRICALS');
     }
+
+    public function test_bills_can_be_filtered_by_buyer_company_and_supplier_vendor(): void
+    {
+        Bill::create([
+            'bill_type' => 'purchase',
+            'invoice_number' => 'TEST-BUY-01',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'S.A.E. Global',
+            'seller_name' => 'S.A.E. Global',
+            'buyer_name' => 'Syntro Global Marketing',
+            'total_amount' => 10000.00,
+            'file_path' => 'bills/purchase/test1.pdf',
+            'file_name' => 'test1.pdf',
+        ]);
+
+        Bill::create([
+            'bill_type' => 'purchase',
+            'invoice_number' => 'TEST-BUY-02',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'Mahadev Techno',
+            'seller_name' => 'Mahadev Techno',
+            'buyer_name' => 'Syntro Global Marketing',
+            'total_amount' => 20000.00,
+            'file_path' => 'bills/purchase/test2.pdf',
+            'file_name' => 'test2.pdf',
+        ]);
+
+        Bill::create([
+            'bill_type' => 'purchase',
+            'invoice_number' => 'TEST-BUY-03',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'NXTLAB Appliances',
+            'seller_name' => 'NXTLAB Appliances',
+            'buyer_name' => 'Indivolt Appliances',
+            'total_amount' => 30000.00,
+            'file_path' => 'bills/purchase/test3.pdf',
+            'file_name' => 'test3.pdf',
+        ]);
+
+        // 1. Unfiltered purchases: Buyer cards should be shown, all 3 invoices visible
+        $response = $this->actingAs($this->admin)->get(route('bills.index', ['type' => 'purchase']));
+        $response->assertStatus(200);
+        $response->assertSee('Syntro Global Marketing');
+        $response->assertSee('Indivolt Appliances');
+        $response->assertSee('TEST-BUY-01');
+        $response->assertSee('TEST-BUY-02');
+        $response->assertSee('TEST-BUY-03');
+
+        // 2. Filter by Buyer (Syntro Global Marketing): Supplier cards shown, only TEST-BUY-01 and 02 visible
+        $buyerResponse = $this->actingAs($this->admin)->get(route('bills.index', [
+            'type' => 'purchase',
+            'buyer' => 'Syntro Global Marketing',
+        ]));
+        $buyerResponse->assertStatus(200);
+        $buyerResponse->assertSee('S.A.E. Global');
+        $buyerResponse->assertSee('Mahadev Techno');
+        $buyerResponse->assertSee('TEST-BUY-01');
+        $buyerResponse->assertSee('TEST-BUY-02');
+        $buyerResponse->assertDontSee('TEST-BUY-03');
+
+        // 3. Drill down by both Buyer and Supplier (S.A.E. Global): only TEST-BUY-01 visible
+        $drilldownResponse = $this->actingAs($this->admin)->get(route('bills.index', [
+            'type' => 'purchase',
+            'buyer' => 'Syntro Global Marketing',
+            'seller' => 'S.A.E. Global',
+        ]));
+        $drilldownResponse->assertStatus(200);
+        $drilldownResponse->assertSee('TEST-BUY-01');
+        $drilldownResponse->assertDontSee('TEST-BUY-02');
+        $drilldownResponse->assertDontSee('TEST-BUY-03');
+    }
 }
 

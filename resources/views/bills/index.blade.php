@@ -51,7 +51,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <!-- Total Invoices Card -->
             <a href="{{ route('bills.index') }}" 
-               class="p-5 bg-white dark:bg-slate-900 border {{ empty($type) ? 'border-[#FF5A36] ring-2 ring-[#FF5A36]/10' : 'border-slate-100 dark:border-slate-800/80' }} rounded-[2rem] shadow-sm hover:shadow-md transition-all group">
+               class="p-5 bg-white dark:bg-slate-900 border {{ empty($type) && empty($buyer) && empty($seller) ? 'border-[#FF5A36] ring-2 ring-[#FF5A36]/10' : 'border-slate-100 dark:border-slate-800/80' }} rounded-[2rem] shadow-sm hover:shadow-md transition-all group">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">All Scanned Bills</span>
                     <span class="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 group-hover:scale-110 transition-transform">
@@ -68,7 +68,7 @@
 
             <!-- Purchase Bills Card -->
             <a href="{{ route('bills.index', ['type' => 'purchase']) }}" 
-               class="p-5 bg-white dark:bg-slate-900 border {{ $type === 'purchase' ? 'border-amber-500 ring-2 ring-amber-500/10' : 'border-slate-100 dark:border-slate-800/80' }} rounded-[2rem] shadow-sm hover:shadow-md transition-all group">
+               class="p-5 bg-white dark:bg-slate-900 border {{ $type === 'purchase' && empty($buyer) && empty($seller) ? 'border-amber-500 ring-2 ring-amber-500/10' : 'border-slate-100 dark:border-slate-800/80' }} rounded-[2rem] shadow-sm hover:shadow-md transition-all group">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-amber-500"></span>
@@ -107,6 +107,192 @@
             </a>
         </div>
 
+        <!-- ========================================================================= -->
+        <!-- Buyer & Supplier Company Drilldown Explorer                               -->
+        <!-- ========================================================================= -->
+        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm space-y-5">
+            <!-- Header & Active Drilldown Breadcrumbs -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-xl bg-[#FF5A36]/10 text-[#FF5A36] flex items-center justify-center">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </span>
+                        <h3 class="font-heading font-bold text-base text-slate-900 dark:text-white">
+                            Company Drilldown Explorer
+                        </h3>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Click on a <strong class="text-slate-700 dark:text-slate-300">Buyer Company (Purchased TO)</strong> to see its vendors, then click a <strong class="text-slate-700 dark:text-slate-300">Supplier</strong> to view its bills.
+                    </p>
+                </div>
+
+                <!-- Breadcrumb Path & Clear Button -->
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    @if ($buyer || $seller)
+                        <div class="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-600 dark:text-slate-300">
+                            <!-- All Link -->
+                            <a href="{{ route('bills.index', array_merge(request()->except('buyer', 'seller', 'page'), ['type' => 'purchase'])) }}" 
+                               class="px-2.5 py-1 hover:text-slate-900 dark:hover:text-white font-medium">
+                                All Purchases
+                            </a>
+
+                            @if ($buyer)
+                                <span class="text-slate-400">&gt;</span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200/60 dark:border-indigo-800/50">
+                                    <span>TO: {{ \Illuminate\Support\Str::limit($buyer, 22) }}</span>
+                                    <a href="{{ route('bills.index', array_merge(request()->except('buyer', 'seller', 'page'), ['type' => $type ?: 'purchase'])) }}" 
+                                       class="text-indigo-500 hover:text-rose-600 ml-0.5" title="Clear Buyer Filter">✕</a>
+                                </span>
+                            @endif
+
+                            @if ($seller)
+                                <span class="text-slate-400">&gt;</span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-semibold border border-amber-200/60 dark:border-amber-800/50">
+                                    <span>Vendor: {{ \Illuminate\Support\Str::limit($seller, 22) }}</span>
+                                    <a href="{{ route('bills.index', array_merge(request()->except('seller', 'page'), ['type' => $type ?: 'purchase', 'buyer' => $buyer])) }}" 
+                                       class="text-amber-500 hover:text-rose-600 ml-0.5" title="Clear Vendor Filter">✕</a>
+                                </span>
+                            @endif
+                        </div>
+
+                        <!-- Reset All Filters -->
+                        <a href="{{ route('bills.index', array_merge(request()->except('buyer', 'seller', 'search', 'page'), ['type' => 'purchase'])) }}" 
+                           class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-semibold rounded-xl text-xs transition-colors flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span>Reset Drilldown</span>
+                        </a>
+                    @else
+                        <span class="text-xs text-slate-400 italic">No company filter active</span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- LEVEL 1: Buyer Companies (Purchased TO) -->
+            <div>
+                <div class="flex items-center justify-between mb-2.5">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <span>Step 1: Select Buyer Company (Purchased TO)</span>
+                    </label>
+                    <span class="text-[11px] text-slate-400">
+                        {{ $buyerCompanies->count() }} Companies Recorded
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- All Buyers Card -->
+                    <a href="{{ route('bills.index', array_merge(request()->except('buyer', 'seller', 'page'), ['type' => 'purchase'])) }}" 
+                       class="p-4 rounded-2xl border transition-all text-left flex items-center justify-between {{ empty($buyer) ? 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-500 ring-2 ring-indigo-500/20 text-indigo-950 dark:text-indigo-200' : 'bg-slate-50 dark:bg-slate-950/40 border-slate-200/60 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300' }}">
+                        <div class="flex items-center gap-3">
+                            <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 {{ empty($buyer) ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-500' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                </svg>
+                            </span>
+                            <div>
+                                <div class="font-bold text-xs">All Buyer Companies</div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">View all vendor purchases combined</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold {{ empty($buyer) ? 'bg-indigo-200 dark:bg-indigo-800 text-indigo-900 dark:text-indigo-100' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                {{ $purchaseCount }} bills
+                            </span>
+                        </div>
+                    </a>
+
+                    @foreach ($buyerCompanies as $bComp)
+                        @php
+                            $isBuyerActive = ($buyer === $bComp->buyer_name);
+                        @endphp
+                        <a href="{{ route('bills.index', array_merge(request()->except('buyer', 'seller', 'page'), ['type' => 'purchase', 'buyer' => $bComp->buyer_name])) }}" 
+                           class="p-4 rounded-2xl border transition-all text-left flex items-center justify-between group {{ $isBuyerActive ? 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-500 ring-2 ring-indigo-500/20 text-indigo-950 dark:text-indigo-200' : 'bg-slate-50 dark:bg-slate-950/40 border-slate-200/60 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-800 text-slate-700 dark:text-slate-300' }}">
+                            <div class="flex items-center gap-3 truncate">
+                                <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 {{ $isBuyerActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 group-hover:bg-indigo-100 group-hover:text-indigo-600' }}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                </span>
+                                <div class="truncate">
+                                    <div class="font-bold text-xs truncate" title="{{ $bComp->buyer_name }}">
+                                        {{ $bComp->buyer_name }}
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 font-mono mt-0.5 truncate">
+                                        {{ $bComp->buyer_gstin ? 'GSTIN: ' . $bComp->buyer_gstin : 'Buyer Entity' }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0 ml-2">
+                                <div class="font-mono font-bold text-xs {{ $isBuyerActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-900 dark:text-white' }}">
+                                    ₹{{ number_format($bComp->total, 2) }}
+                                </div>
+                                <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold {{ $isBuyerActive ? 'bg-indigo-200 dark:bg-indigo-800 text-indigo-900 dark:text-indigo-100' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                    {{ $bComp->count }} bills &rarr;
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- LEVEL 2: Supplier / Vendor Companies (Appears when Buyer is selected) -->
+            @if (!empty($buyer))
+                <div class="pt-4 border-t border-dashed border-slate-200 dark:border-slate-800/80">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            <span>Step 2: Suppliers / Vendors selling to <strong class="underline decoration-amber-500/50">{{ $buyer }}</strong> ({{ $sellerCompanies->count() }} Vendors)</span>
+                        </label>
+                        <span class="text-[11px] text-slate-400">Click a vendor to filter its bills</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
+                        <!-- All Suppliers for this Buyer -->
+                        <a href="{{ route('bills.index', array_merge(request()->except('seller', 'page'), ['type' => 'purchase', 'buyer' => $buyer])) }}" 
+                           class="p-3 rounded-xl border text-xs transition-all flex items-center justify-between {{ empty($seller) ? 'bg-amber-500 text-white border-amber-600 shadow-md shadow-amber-500/20' : 'bg-slate-50 dark:bg-slate-950/40 border-slate-200/60 dark:border-slate-800 hover:border-slate-300 text-slate-700 dark:text-slate-300' }}">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg flex items-center justify-center {{ empty($seller) ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-500' }}">
+                                    ✓
+                                </span>
+                                <span class="font-bold">All {{ $sellerCompanies->count() }} Vendors</span>
+                            </div>
+                            <span class="font-mono text-[11px] {{ empty($seller) ? 'text-white' : 'text-slate-500' }}">
+                                Show All
+                            </span>
+                        </a>
+
+                        @foreach ($sellerCompanies as $sComp)
+                            @php
+                                $isSellerActive = ($seller === $sComp->seller_name);
+                            @endphp
+                            <a href="{{ route('bills.index', array_merge(request()->except('seller', 'page'), ['type' => 'purchase', 'buyer' => $buyer, 'seller' => $sComp->seller_name])) }}" 
+                               class="p-3 rounded-xl border text-xs transition-all flex items-center justify-between group {{ $isSellerActive ? 'bg-amber-500 text-white border-amber-600 shadow-md shadow-amber-500/25 ring-2 ring-amber-500/20' : 'bg-slate-50 dark:bg-slate-950/40 border-slate-200/60 dark:border-slate-800 hover:border-amber-400 text-slate-700 dark:text-slate-300' }}">
+                                <div class="truncate mr-2">
+                                    <div class="font-semibold truncate {{ $isSellerActive ? 'text-white' : 'text-slate-900 dark:text-white' }}" title="{{ $sComp->seller_name }}">
+                                        {{ $sComp->seller_name }}
+                                    </div>
+                                    <div class="text-[10px] font-mono mt-0.5 truncate {{ $isSellerActive ? 'text-amber-100' : 'text-slate-400' }}">
+                                        {{ $sComp->seller_gstin ?: 'Vendor' }}
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <div class="font-mono font-bold text-xs {{ $isSellerActive ? 'text-white' : 'text-slate-900 dark:text-white' }}">
+                                        ₹{{ number_format($sComp->total, 2) }}
+                                    </div>
+                                    <span class="inline-block px-1.5 py-0.2 rounded text-[10px] font-semibold {{ $isSellerActive ? 'bg-white/25 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                        {{ $sComp->count }} {{ $sComp->count == 1 ? 'bill' : 'bills' }}
+                                    </span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+
         <!-- Section Navigation Tabs & Search Filter Panel -->
         <div class="p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm space-y-4">
             <!-- Tabs Row -->
@@ -139,6 +325,12 @@
             <form method="GET" action="{{ route('bills.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
                 @if ($type)
                     <input type="hidden" name="type" value="{{ $type }}">
+                @endif
+                @if ($buyer)
+                    <input type="hidden" name="buyer" value="{{ $buyer }}">
+                @endif
+                @if ($seller)
+                    <input type="hidden" name="seller" value="{{ $seller }}">
                 @endif
 
                 <!-- Search Input -->
@@ -198,7 +390,7 @@
                     <button type="submit" class="flex-1 py-2.5 px-4 bg-[#FF5A36] hover:bg-[#E04826] text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-[#FF5A36]/20 text-center">
                         Filter
                     </button>
-                    @if ($search || $status || $startDate || $endDate)
+                    @if ($search || $status || $startDate || $endDate || $buyer || $seller)
                         <a href="{{ route('bills.index', $type ? ['type' => $type] : []) }}" class="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold rounded-xl text-xs transition-all text-center">
                             Clear
                         </a>
@@ -209,6 +401,32 @@
 
         <!-- Bills Data Table -->
         <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800/80 rounded-[2rem] shadow-sm overflow-hidden">
+            @if ($buyer || $seller)
+                <!-- Active Drilldown Filter Indicator Banner -->
+                <div class="px-6 py-3.5 bg-gradient-to-r from-indigo-50/80 via-amber-50/40 to-transparent dark:from-indigo-950/40 dark:via-amber-950/20 dark:to-transparent border-b border-indigo-100 dark:border-indigo-900/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse shrink-0"></span>
+                        <span class="text-slate-600 dark:text-slate-300 font-medium">
+                            Drilldown Active:
+                            @if ($buyer)
+                                Billed TO <strong class="text-indigo-600 dark:text-indigo-400 font-bold">{{ $buyer }}</strong>
+                            @endif
+                            @if ($seller)
+                                &bull; Supplier <strong class="text-amber-600 dark:text-amber-400 font-bold">{{ $seller }}</strong>
+                            @endif
+                        </span>
+                        <span class="text-slate-300 dark:text-slate-700">|</span>
+                        <span class="font-bold font-mono text-slate-900 dark:text-white">
+                            {{ $filteredCount }} {{ $filteredCount == 1 ? 'bill' : 'bills' }} &bull; ₹{{ number_format($filteredTotal, 2) }}
+                        </span>
+                    </div>
+                    <a href="{{ route('bills.index', array_merge(request()->except('buyer', 'seller', 'page'), ['type' => $type ?: 'purchase'])) }}" 
+                       class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200 flex items-center gap-1 transition-colors">
+                        <span>Clear company drilldown</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </a>
+                </div>
+            @endif
             @if ($bills->count() > 0)
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
@@ -269,9 +487,17 @@
                                         </div>
                                         @if ($bill->seller_name && $bill->buyer_name)
                                             <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1 truncate max-w-xs">
-                                                <span class="text-amber-600 dark:text-amber-400 font-medium truncate" title="From: {{ $bill->seller_name }}">{{ \Illuminate\Support\Str::limit($bill->seller_name, 18) }}</span>
+                                                <a href="{{ route('bills.index', array_merge(request()->except('seller', 'page'), ['type' => $bill->bill_type, 'buyer' => $bill->buyer_name, 'seller' => $bill->seller_name])) }}" 
+                                                   class="text-amber-600 dark:text-amber-400 font-medium hover:underline truncate" 
+                                                   title="Filter by Supplier: {{ $bill->seller_name }}">
+                                                    {{ \Illuminate\Support\Str::limit($bill->seller_name, 18) }}
+                                                </a>
                                                 <span>&rarr;</span>
-                                                <span class="text-emerald-600 dark:text-emerald-400 font-medium truncate" title="To: {{ $bill->buyer_name }}">{{ \Illuminate\Support\Str::limit($bill->buyer_name, 18) }}</span>
+                                                <a href="{{ route('bills.index', array_merge(request()->except('buyer', 'seller', 'page'), ['type' => $bill->bill_type, 'buyer' => $bill->buyer_name])) }}" 
+                                                   class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline truncate" 
+                                                   title="Filter by Buyer: {{ $bill->buyer_name }}">
+                                                    {{ \Illuminate\Support\Str::limit($bill->buyer_name, 18) }}
+                                                </a>
                                             </div>
                                         @endif
                                         @if ($bill->party_gstin)
