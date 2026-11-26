@@ -361,6 +361,7 @@
                                     <th class="py-2.5 px-3">Item Description</th>
                                     <th class="py-2.5 px-3 text-center">Qty</th>
                                     <th class="py-2.5 px-3 text-right">Rate</th>
+                                    <th class="py-2.5 px-3 text-center">Disc %</th>
                                     <th class="py-2.5 px-3 text-right">Amount</th>
                                 </tr>
                             </thead>
@@ -379,6 +380,15 @@
                                         </td>
                                         <td class="py-2.5 px-3 text-right font-mono text-slate-700 dark:text-slate-300">
                                             ₹{{ number_format((float)($item['rate'] ?? 0), 2) }}
+                                        </td>
+                                        <td class="py-2.5 px-3 text-center font-mono text-slate-700 dark:text-slate-300">
+                                            @if(!empty($item['discount_percent']) && (float)$item['discount_percent'] > 0)
+                                                <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50">
+                                                    {{ (float)$item['discount_percent'] }}%
+                                                </span>
+                                            @else
+                                                <span class="text-slate-400">-</span>
+                                            @endif
                                         </td>
                                         <td class="py-2.5 px-3 text-right font-mono font-semibold text-slate-900 dark:text-white">
                                             ₹{{ number_format((float)($item['amount'] ?? 0), 2) }}

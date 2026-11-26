@@ -257,9 +257,10 @@
                             <tr class="bg-slate-50 dark:bg-slate-950/60 text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800">
                                 <th class="py-2.5 px-3">Item Description</th>
                                 <th class="py-2.5 px-3 w-28">HSN / SAC</th>
-                                <th class="py-2.5 px-3 w-24 text-center">Qty</th>
-                                <th class="py-2.5 px-3 w-32 text-right">Unit Rate (₹)</th>
-                                <th class="py-2.5 px-3 w-36 text-right">Amount (₹)</th>
+                                <th class="py-2.5 px-3 w-20 text-center">Qty</th>
+                                <th class="py-2.5 px-3 w-28 text-right">Unit Rate (₹)</th>
+                                <th class="py-2.5 px-2 w-20 text-center">Disc %</th>
+                                <th class="py-2.5 px-3 w-32 text-right">Amount (₹)</th>
                                 <th class="py-2.5 px-2 w-10 text-center"></th>
                             </tr>
                         </thead>
@@ -276,10 +277,16 @@
                                         <input type="number" step="any" min="0" x-model.number="item.quantity" @input="recalcRow(item)" placeholder="Qty" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-center font-mono">
                                     </td>
                                     <td class="p-2">
-                                        <input type="number" step="0.01" x-model.number="item.rate" @input="recalcRow(item)" min="0" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-right font-mono">
+                                        <input type="number" step="0.01" x-model.number="item.rate" @input="recalcRow(item)" min="0" placeholder="0.00" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-right font-mono">
+                                    </td>
+                                    <td class="p-2">
+                                        <input type="number" step="any" min="0" max="100" x-model.number="item.discount_percent" @input="recalcRow(item)" placeholder="0" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-center font-mono">
                                     </td>
                                     <td class="p-2">
                                         <input type="number" step="0.01" x-model.number="item.amount" @input="recalcTotalsFromRows()" min="0" class="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950/50 border border-slate-200/60 dark:border-slate-800 rounded-lg text-xs text-right font-mono font-semibold">
+                                        <template x-if="item.discount_percent > 0">
+                                            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono text-right mt-0.5" x-text="'-₹' + (((parseFloat(item.quantity) || 0) * (parseFloat(item.rate) || 0) * (parseFloat(item.discount_percent) || 0)) / 100).toFixed(2) + ' (' + item.discount_percent + '%)'"></div>
+                                        </template>
                                     </td>
                                     <td class="p-2 text-center">
                                         <button type="button" @click="removeLineItem(index)" class="p-1 text-slate-400 hover:text-rose-500 rounded transition-colors">
@@ -416,6 +423,7 @@
                         hsn: '',
                         quantity: 1,
                         rate: 0,
+                        discount_percent: 0,
                         amount: 0
                     });
                 },
@@ -428,7 +436,10 @@
                 recalcRow(item) {
                     const q = parseFloat(item.quantity) || 0;
                     const r = parseFloat(item.rate) || 0;
-                    item.amount = parseFloat((q * r).toFixed(2));
+                    const disc = parseFloat(item.discount_percent) || 0;
+                    const gross = q * r;
+                    const discAmount = gross * (disc / 100);
+                    item.amount = parseFloat((gross - discAmount).toFixed(2));
                     this.recalcTotalsFromRows();
                 },
 

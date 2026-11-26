@@ -219,6 +219,7 @@ Extract all details into valid JSON with this exact schema:
       "hsn": "string or null",
       "quantity": 0.00,
       "rate": 0.00,
+      "discount_percent": 0.00,
       "tax_rate": 0,
       "amount": 0.00
     }

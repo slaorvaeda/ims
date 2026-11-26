@@ -542,5 +542,77 @@ class BillManagementTest extends TestCase
         $drilldownResponse->assertDontSee('TEST-SALE-02');
         $drilldownResponse->assertDontSee('TEST-SALE-03');
     }
+
+    public function test_bill_line_items_can_include_discount_percentage(): void
+    {
+        $bill = Bill::create([
+            'bill_type' => 'purchase',
+            'invoice_number' => 'SAE/26-27/1507',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'S.A.E. GLOBAL PRIVATE LIMITED',
+            'seller_name' => 'S.A.E. GLOBAL PRIVATE LIMITED',
+            'buyer_name' => 'SYNTRO GLOBAL MARKETING PRIVATE LIMITED',
+            'subtotal' => 360150.00,
+            'tax_amount' => 64828.00,
+            'total_amount' => 424978.00,
+            'status' => 'Paid',
+            'file_path' => 'bills/purchase/test_disc.pdf',
+            'file_name' => 'test_disc.pdf',
+            'line_items' => [
+                [
+                    'item_name' => 'PEDESTAL FAN 16" SYNTRO AEROMAX CHERRY',
+                    'hsn' => '841451',
+                    'quantity' => 250,
+                    'rate' => 1470,
+                    'discount_percent' => 2.0,
+                    'amount' => 360150.00,
+                    'tax_rate' => 18,
+                ]
+            ],
+        ]);
+
+        // Edit page should see Disc %
+        $editResponse = $this->actingAs($this->admin)->get(route('bills.edit', $bill));
+        $editResponse->assertStatus(200);
+        $editResponse->assertSee('Disc %');
+
+        // Show page should display 2% discount badge
+        $showResponse = $this->actingAs($this->admin)->get(route('bills.show', $bill));
+        $showResponse->assertStatus(200);
+        $showResponse->assertSee('Disc %');
+        $showResponse->assertSee('2%');
+        $showResponse->assertSee('360,150.00');
+
+        // Updating with new line items and discount
+        $updatePayload = [
+            'bill_type' => 'purchase',
+            'invoice_number' => 'SAE/26-27/1507',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'S.A.E. GLOBAL PRIVATE LIMITED',
+            'seller_name' => 'S.A.E. GLOBAL PRIVATE LIMITED',
+            'buyer_name' => 'SYNTRO GLOBAL MARKETING PRIVATE LIMITED',
+            'subtotal' => 360150.00,
+            'tax_amount' => 64828.00,
+            'total_amount' => 424978.00,
+            'status' => 'Paid',
+            'line_items' => json_encode([
+                [
+                    'item_name' => 'PEDESTAL FAN 16" SYNTRO AEROMAX CHERRY',
+                    'hsn' => '841451',
+                    'quantity' => 250,
+                    'rate' => 1470,
+                    'discount_percent' => 2.0,
+                    'amount' => 360150.00,
+                ]
+            ]),
+        ];
+
+        $updateResponse = $this->actingAs($this->admin)->put(route('bills.update', $bill), $updatePayload);
+        $updateResponse->assertSessionHasNoErrors();
+
+        $freshBill = $bill->fresh();
+        $this->assertEquals(2.0, $freshBill->line_items[0]['discount_percent']);
+        $this->assertEquals(360150.00, $freshBill->line_items[0]['amount']);
+    }
 }
 
