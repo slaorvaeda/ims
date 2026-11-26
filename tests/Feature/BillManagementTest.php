@@ -468,5 +468,79 @@ class BillManagementTest extends TestCase
         $drilldownResponse->assertDontSee('TEST-BUY-02');
         $drilldownResponse->assertDontSee('TEST-BUY-03');
     }
+
+    public function test_sales_bills_can_be_filtered_by_sales_from_and_sold_to_customer(): void
+    {
+        Bill::create([
+            'bill_type' => 'sale',
+            'invoice_number' => 'TEST-SALE-01',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'Flatron Plus Industries',
+            'seller_name' => 'Syntro Global Marketing',
+            'buyer_name' => 'Flatron Plus Industries',
+            'total_amount' => 50000.00,
+            'file_path' => 'bills/sale/test_sale1.pdf',
+            'file_name' => 'test_sale1.pdf',
+        ]);
+
+        Bill::create([
+            'bill_type' => 'sale',
+            'invoice_number' => 'TEST-SALE-02',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'Reliance Retail',
+            'seller_name' => 'Syntro Global Marketing',
+            'buyer_name' => 'Reliance Retail',
+            'total_amount' => 75000.00,
+            'file_path' => 'bills/sale/test_sale2.pdf',
+            'file_name' => 'test_sale2.pdf',
+        ]);
+
+        Bill::create([
+            'bill_type' => 'sale',
+            'invoice_number' => 'TEST-SALE-03',
+            'invoice_date' => now()->format('Y-m-d'),
+            'party_name' => 'Croma Digital',
+            'seller_name' => 'Indivolt Appliances',
+            'buyer_name' => 'Croma Digital',
+            'total_amount' => 90000.00,
+            'file_path' => 'bills/sale/test_sale3.pdf',
+            'file_name' => 'test_sale3.pdf',
+        ]);
+
+        // 1. Unfiltered sales: Selling Entity cards shown, all 3 invoices visible
+        $response = $this->actingAs($this->admin)->get(route('bills.index', ['type' => 'sale']));
+        $response->assertStatus(200);
+        $response->assertSee('Sales Company Explorer');
+        $response->assertSee('Step 1: Select Selling Entity (Sales FROM)');
+        $response->assertSee('Syntro Global Marketing');
+        $response->assertSee('Indivolt Appliances');
+        $response->assertSee('TEST-SALE-01');
+        $response->assertSee('TEST-SALE-02');
+        $response->assertSee('TEST-SALE-03');
+
+        // 2. Filter by Sales FROM (Syntro Global Marketing): Customer cards shown, only TEST-SALE-01 and 02 visible
+        $sellerResponse = $this->actingAs($this->admin)->get(route('bills.index', [
+            'type' => 'sale',
+            'seller' => 'Syntro Global Marketing',
+        ]));
+        $sellerResponse->assertStatus(200);
+        $sellerResponse->assertSee('Step 2: Customers / Buyers purchasing from');
+        $sellerResponse->assertSee('Flatron Plus Industries');
+        $sellerResponse->assertSee('Reliance Retail');
+        $sellerResponse->assertSee('TEST-SALE-01');
+        $sellerResponse->assertSee('TEST-SALE-02');
+        $sellerResponse->assertDontSee('TEST-SALE-03');
+
+        // 3. Drill down by both Sales FROM and Customer Sold TO (Flatron Plus Industries): only TEST-SALE-01 visible
+        $drilldownResponse = $this->actingAs($this->admin)->get(route('bills.index', [
+            'type' => 'sale',
+            'seller' => 'Syntro Global Marketing',
+            'buyer' => 'Flatron Plus Industries',
+        ]));
+        $drilldownResponse->assertStatus(200);
+        $drilldownResponse->assertSee('TEST-SALE-01');
+        $drilldownResponse->assertDontSee('TEST-SALE-02');
+        $drilldownResponse->assertDontSee('TEST-SALE-03');
+    }
 }
 

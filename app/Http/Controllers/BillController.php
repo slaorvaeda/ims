@@ -88,45 +88,80 @@ class BillController extends Controller implements HasMiddleware
             $query->whereDate('invoice_date', '<=', $endDate);
         }
 
-        // Buyer Companies (Purchased TO) aggregation for drill-down
-        $baseBuyerQuery = Bill::query();
-        if (!empty($type) && in_array($type, ['sale', 'purchase'])) {
-            $baseBuyerQuery->where('bill_type', $type);
-        } else {
-            // Default to purchase bills for company explorer unless sales is explicitly selected
-            $baseBuyerQuery->where('bill_type', 'purchase');
-        }
+        // Multi-Step Company Drill-down Explorer Aggregation
+        // For Sales: Step 1 = Sales FROM (seller_name), Step 2 = Sold TO / Customer (buyer_name)
+        // For Purchases / Default: Step 1 = Purchased TO (buyer_name), Step 2 = Supplier / Vendor (seller_name)
+        $isSaleExplorer = ($type === 'sale');
 
-        $buyerCompanies = (clone $baseBuyerQuery)
-            ->whereNotNull('buyer_name')
-            ->where('buyer_name', '!=', '')
-            ->select(
-                'buyer_name',
-                'buyer_gstin',
-                \Illuminate\Support\Facades\DB::raw('count(*) as count'),
-                \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
-            )
-            ->groupBy('buyer_name', 'buyer_gstin')
-            ->orderByDesc('total')
-            ->get();
-
-        // If a buyer is selected, get the suppliers that sold to this buyer
-        $sellerCompanies = collect();
-        if (!empty($buyer)) {
-            $sellerCompanies = (clone $baseBuyerQuery)
-                ->where('buyer_name', $buyer)
+        if ($isSaleExplorer) {
+            // Level 1: Selling Entities (Sales FROM)
+            $primaryCompanies = Bill::where('bill_type', 'sale')
                 ->whereNotNull('seller_name')
                 ->where('seller_name', '!=', '')
                 ->select(
-                    'seller_name',
-                    'seller_gstin',
+                    'seller_name as name',
+                    'seller_gstin as gstin',
                     \Illuminate\Support\Facades\DB::raw('count(*) as count'),
                     \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
                 )
                 ->groupBy('seller_name', 'seller_gstin')
                 ->orderByDesc('total')
                 ->get();
+
+            // Level 2: Customers (Sold TO) under selected seller
+            $secondaryCompanies = collect();
+            if (!empty($seller)) {
+                $secondaryCompanies = Bill::where('bill_type', 'sale')
+                    ->where('seller_name', $seller)
+                    ->whereNotNull('buyer_name')
+                    ->where('buyer_name', '!=', '')
+                    ->select(
+                        'buyer_name as name',
+                        'buyer_gstin as gstin',
+                        \Illuminate\Support\Facades\DB::raw('count(*) as count'),
+                        \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
+                    )
+                    ->groupBy('buyer_name', 'buyer_gstin')
+                    ->orderByDesc('total')
+                    ->get();
+            }
+        } else {
+            // Level 1: Buyer Companies (Purchased TO)
+            $primaryCompanies = Bill::where('bill_type', 'purchase')
+                ->whereNotNull('buyer_name')
+                ->where('buyer_name', '!=', '')
+                ->select(
+                    'buyer_name as name',
+                    'buyer_gstin as gstin',
+                    \Illuminate\Support\Facades\DB::raw('count(*) as count'),
+                    \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
+                )
+                ->groupBy('buyer_name', 'buyer_gstin')
+                ->orderByDesc('total')
+                ->get();
+
+            // Level 2: Suppliers / Vendors under selected buyer
+            $secondaryCompanies = collect();
+            if (!empty($buyer)) {
+                $secondaryCompanies = Bill::where('bill_type', 'purchase')
+                    ->where('buyer_name', $buyer)
+                    ->whereNotNull('seller_name')
+                    ->where('seller_name', '!=', '')
+                    ->select(
+                        'seller_name as name',
+                        'seller_gstin as gstin',
+                        \Illuminate\Support\Facades\DB::raw('count(*) as count'),
+                        \Illuminate\Support\Facades\DB::raw('sum(total_amount) as total')
+                    )
+                    ->groupBy('seller_name', 'seller_gstin')
+                    ->orderByDesc('total')
+                    ->get();
+            }
         }
+
+        // Maintain aliases for backward compatibility
+        $buyerCompanies = $isSaleExplorer ? $secondaryCompanies : $primaryCompanies;
+        $sellerCompanies = $isSaleExplorer ? $primaryCompanies : $secondaryCompanies;
 
         // Summary Statistics (calculated across all bills regardless of current pagination)
         $totalCount = Bill::count();
@@ -153,6 +188,9 @@ class BillController extends Controller implements HasMiddleware
             'endDate',
             'buyer',
             'seller',
+            'isSaleExplorer',
+            'primaryCompanies',
+            'secondaryCompanies',
             'buyerCompanies',
             'sellerCompanies',
             'filteredCount',
